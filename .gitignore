@@ -1,0 +1,5 @@
+*.pyc
+*.kate-swp
+.directory
+Videos
+Win_Installers
