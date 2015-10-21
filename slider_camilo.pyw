@@ -4,6 +4,15 @@
 import sys, random
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
+audio = None
+if QSound.isAvailable():
+    audio = 'qsound'
+else:
+    from PyQt4.phonon import Phonon
+    m_media = Phonon.MediaObject()
+    audioOutput = Phonon.AudioOutput(Phonon.GameCategory)
+    Phonon.createPath(m_media, audioOutput)
+    audio = 'phonon'
 
 class Training():
     MIN_RATE = 0.2
@@ -20,7 +29,7 @@ class Training():
         float_list = None
         if data:
             float_list = [ float(n) for n in data.split() ]
-            self._currentTrial = 0
+            self.currentTrial = 0
             print(float_list)
         return float_list
         
@@ -103,6 +112,19 @@ class CheckWidget(QWidget):
         if self.feedback:
             painter.setBrush(box_color[self.feedback])
             painter.drawRect(feedbackBox)
+            
+            
+    def playFeedbackSound(self):
+        if self.feedback:
+            wav = {'outside'  : 'bad2.wav',
+                   'in_yellow': 'good.wav',
+                   'in_green' : 'excelent.wav'}
+            if audio == 'qsound':
+                QSound.play(wav[self.feedback])
+            elif audio == 'phonon':
+                m_media.setCurrentSource(
+                    Phonon.MediaSource(wav[self.feedback]))
+                m_media.play()
 
 class Slider(QWidget):
     XMAR = 20
@@ -174,6 +196,7 @@ class Slider(QWidget):
         self.check.feedback = self.test.rateCheck(rate)
         center = self.xFromRate(self.correctRate)
         self.check.setSpanLeft(center)
+        self.check.playFeedbackSound()
         self.refresh()
         self.check.setVisible(True)
             
