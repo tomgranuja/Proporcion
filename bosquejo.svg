@@ -29,11 +29,11 @@
      borderopacity="1.0"
      inkscape:pageopacity="1"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="117.54446"
-     inkscape:cy="152.08724"
+     inkscape:zoom="2"
+     inkscape:cx="296.80673"
+     inkscape:cy="102.55329"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g4189"
      showgrid="true"
      units="px"
      inkscape:window-width="1280"
@@ -59,7 +59,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -120,16 +120,23 @@
              y="0"
              x="0" />
         </g>
+        <rect
+           y="962.36218"
+           x="20"
+           height="11.103624"
+           width="560"
+           id="rect3359"
+           style="opacity:1;fill:#b3b3b3;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none" />
       </g>
       <text
          sodipodi:linespacing="125%"
          id="text4141"
-         y="970.74695"
+         y="1041.2469"
          x="4.5441556"
          style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          xml:space="preserve"><tspan
            style="font-size:15px"
-           y="970.74695"
+           y="1041.2469"
            x="4.5441556"
            id="tspan4143"
            sodipodi:role="line">Cuadro</tspan></text>
@@ -148,24 +155,24 @@
       <text
          sodipodi:linespacing="125%"
          id="text4149"
-         y="985.39514"
-         x="65.538506"
+         y="1027.3951"
+         x="71.538506"
          style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          xml:space="preserve"><tspan
            style="font-size:15px"
-           y="985.39514"
-           x="65.538506"
+           y="1027.3951"
+           x="71.538506"
            id="tspan4151"
            sodipodi:role="line">Raya</tspan></text>
       <text
          sodipodi:linespacing="125%"
          id="text4153"
-         y="986.81305"
+         y="1023.813"
          x="204.25714"
          style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          xml:space="preserve"><tspan
            style="font-size:15px;text-align:center;text-anchor:middle;fill:#000000"
-           y="986.81305"
+           y="1023.813"
            x="204.25714"
            id="tspan4155"
            sodipodi:role="line">CheckWidget</tspan></text>
@@ -183,30 +190,6 @@
            sodipodi:role="line">green</tspan></text>
       <text
          sodipodi:linespacing="125%"
-         id="text4161"
-         y="1005.5741"
-         x="220.92789"
-         style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         xml:space="preserve"><tspan
-           style="font-size:10px"
-           y="1005.5741"
-           x="220.92789"
-           id="tspan4163"
-           sodipodi:role="line">rightYell</tspan></text>
-      <text
-         sodipodi:linespacing="125%"
-         id="text4165"
-         y="1004.1807"
-         x="152.75378"
-         style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-         xml:space="preserve"><tspan
-           style="font-size:10px"
-           y="1004.1807"
-           x="152.75378"
-           id="tspan4167"
-           sodipodi:role="line">leftYell</tspan></text>
-      <text
-         sodipodi:linespacing="125%"
          id="text4185"
          y="952.16119"
          x="212.22183"
@@ -217,6 +200,30 @@
            x="212.22183"
            id="tspan4187"
            sodipodi:role="line">Slider</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="101.61923"
+         y="973.12311"
+         id="text3361"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan3363"
+           x="101.61923"
+           y="973.12311"
+           style="font-size:15px">feedbackBox</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+         x="225.05025"
+         y="1006.182"
+         id="text3365"
+         sodipodi:linespacing="125%"><tspan
+           sodipodi:role="line"
+           id="tspan3367"
+           x="225.05025"
+           y="1006.182"
+           style="font-size:10px">yellowBox</tspan></text>
     </g>
   </g>
 </svg>

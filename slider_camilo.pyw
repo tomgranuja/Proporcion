@@ -5,79 +5,104 @@ import sys, random
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 
+class Training():
+    MIN_RATE = 0.2
+    MAX_RATE = 0.8
+    GREEN_ERROR  = 0.05
+    YELLOW_ERROR = 0.15
+    
+    def __init__(self, rates_data=None):
+        self.currentTrial = None
+        self.rates = self.getRates(rates_data)
+    
+    def getRates(self, data):
+        '''Rates from data string, reset trial counter.'''
+        float_list = None
+        if data:
+            float_list = [ float(n) for n in data.split() ]
+            self._currentTrial = 0
+            print(float_list)
+        return float_list
+        
+    def nextRate(self):
+        '''Next rate in list, update current trial counter.'''
+        nextRate = None
+        if self.currentTrial != None:
+            self.currentTrial += 1
+            if self.currentTrial >= len(self.rates):
+                print("Training finished, reseting trials.")
+                self.currentTrial = 0
+            nextRate = self.rates[self.currentTrial]
+        return nextRate
+        
+    def rateCheck(self, r=None):
+        result = None
+        if 0 <= r <= 1:
+            result = 'outside'
+            correctRate = self.rates[self.currentTrial]
+            error = abs(r - correctRate)
+            if error <= Training.YELLOW_ERROR:
+                result = 'in_yellow'
+                if error <= Training.GREEN_ERROR:
+                    result = 'in_green'
+        return result
+        
+    def writeAnswer(self, time, rate):
+        print(self.currentTrial, time, rate)
+
+
 class CheckWidget(QWidget):
-    def __init__(self, parent=None):
+    def __init__(self, riel=None, greenWidth=None, yellWidth=None,
+                 parent=None):
         super(CheckWidget, self).__init__(parent)
-        self.riel = self.parent().riel
+        self.riel = riel
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed,
                                        QSizePolicy.Fixed))
         self.setVisible(False)
-        self.greenWidth = 30
-        self.yellWidth  = 40
-        self.feedback   = 'outside'
-        self.span = self.greenWidth + 2 * self.yellWidth
-        min_val = int(self.riel.left() + self.span / 2) 
-        max_val = int(self.riel.right() - self.span / 2)
-        self._okvals = [ random.randint(min_val, max_val)
-                         for n in range(20) ]
-        print(self._okvals)
+        self.greenWidth = greenWidth
+        self.yellWidth  = yellWidth
+        self.spanLeft = None
+        self.feedback = None
         
-    @property
-    def okval(self):
-        return self._okvals[self.parent().trial]
+    def setSpanLeft(self, center):
+        span = self.yellWidth
+        min_val = self.riel.left() 
+        max_val = self.riel.right() - span
+        left = center - int(span / 2)
+        self.spanLeft = max(min_val, min(max_val, left))
         
     def sizeHint(self):
         return self.parent().sizeHint()
-    
-    def setFeedback(self, xval):
-        distance = self.riel.width()
-        if self.riel.contains(QPoint(xval,self.riel.top())):
-            distance = abs(xval - self.okval)
-        self.feedback = 'outside'
-        if distance <= self.span / 2:
-            self.feedback = 'in_yellow'
-            if distance <= self.greenWidth / 2:
-                self.feedback = 'in_green'
                 
     def paintEvent(self, event=None):
         painter = QPainter(self)
         greenColor = QColor(0,128,0)
         yellowColor = QColor(222,205,135)
-         
-        #Green
-        w = self.greenWidth
+        
         h = self.riel.height()
-        uppery = self.riel.top()
-        upperx = self.okval - w / 2
-        print(self.okval)
-        green = QRect(upperx, uppery, w, h)
-        painter.setBrush(greenColor)
-        painter.drawRect(green)
+        top = self.riel.top()
+        if self.spanLeft:
+            painter.setBrush(yellowColor)
+            #yellowBox
+            yellowBox = QRect(self.spanLeft, top, self.yellWidth, h)
+            painter.drawRect(yellowBox)
+            #greenBox
+            painter.setBrush(greenColor)
+            dx = (self.yellWidth - self.greenWidth)/ 2
+            green = yellowBox.translated(dx , 0)
+            green.setWidth(self.greenWidth)
+            painter.drawRect(green)
         
-        #leftYell
-        w = self.yellWidth
-        leftYell = green.translated(-w, 0)
-        leftYell.setWidth(w)
-        painter.setBrush(yellowColor)
-        painter.drawRect(leftYell)
-        
-        #rightYell
-        dx = leftYell.width() + green.width()
-        rightYell = leftYell.translated(dx , 0)
-        painter.drawRect(rightYell)
-        #print("check ha sido pintado")
-        
-        #feedbackBox
-        w = self.riel.width()
-        h = self.riel.height() / 2
-        uppery = self.parent().cuadro.top()
-        upperx = self.riel.left()
-        feedbackBox = QRect(upperx, uppery, w, h)
+        feedbackBox = QRect(self.riel.left(),
+                            self.parent().cuadro.top(),
+                            self.riel.width(), 
+                            self.riel.height() / 2)
         box_color = {'outside':self.palette().brush(QPalette.Midlight),
                      'in_yellow':yellowColor,
-                     'in_green':greenColor}
-        painter.setBrush(box_color[self.feedback])
-        painter.drawRect(feedbackBox)
+                      'in_green':greenColor}
+        if self.feedback:
+            painter.setBrush(box_color[self.feedback])
+            painter.drawRect(feedbackBox)
 
 class Slider(QWidget):
     XMAR = 20
@@ -87,20 +112,31 @@ class Slider(QWidget):
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed,
                                        QSizePolicy.Fixed))
         self.cuadro = QRect(Slider.XMAR, Slider.YMAR, 560, 80)
-        h = 20
-        self.riel = QRect(Slider.XMAR,
-                          (self.cuadro.height() - h) / 2 + Slider.YMAR,
-                          self.cuadro.width(),
-                          h)
-        self._userval = self.cuadro.left() + self.cuadro.width() / 2
+        rielH = 20
+        self.riel=QRect(Slider.XMAR,
+                   (self.cuadro.height() - rielH) / 2 + Slider.YMAR,
+                    self.cuadro.width(),
+                    rielH)
+        self._userClickX = None
         self._mouseListen = True
-        self.check = CheckWidget(self)
-        self.trial = 0
+        self.test = Training('0.2 0.3 0.4 0.5 0.6 0.7 0.8')
+        self.correctRate = self.test.rates[self.test.currentTrial]
+        gwidth = self.xFromRate(2 * self.test.GREEN_ERROR)
+        ywidth = self.xFromRate(2 * self.test.YELLOW_ERROR)
+        self.check = CheckWidget(self.riel, gwidth, ywidth, self)
 
     def sizeHint(self):
         w = self.cuadro.width() + Slider.XMAR * 2 
         h = self.cuadro.height() + Slider.YMAR * 2
         return QSize(w, h)
+    
+    def xFromRate(self, r):
+        x = self.riel.left() + r * self.riel.width() 
+        return int(x)
+    
+    def rateFromX(self, x):
+        r = (x - self.riel.left())/ self.riel.width()
+        return float(r)
     
     def paintEvent(self, event=None):
         painter = QPainter(self)
@@ -109,34 +145,44 @@ class Slider(QWidget):
         #Riel
         painter.setBrush(self.palette().brush(QPalette.Midlight))
         painter.drawRect(self.riel)
-        #Boton
+        #Raya
         w = 10
         over =  20 
         h = self.riel.height() + 2 * over
         uppery = self.riel.top() - over
-        upperx = self._userval - w / 2
-        but = QRect(upperx, uppery, w, h)
-        painter.setBrush(self.palette().brush(QPalette.Button))
-        painter.drawRect(but)
+        if self._userClickX:
+            upperx = self._userClickX - w / 2
+            raya = QRect(upperx, uppery, w, h)
+            painter.setBrush(self.palette().brush(QPalette.Button))
+            painter.drawRect(raya)
         #print("form ha sido pintado")
         
     def mouseReleaseEvent(self,event):
         if self._mouseListen:
             self._mouseListen = False
-            QTimer.singleShot(2000, self.pausa)
-            min_val = self.riel.left()
-            max_val = self.riel.right()
-            x = max(self.riel.left(), min(self.riel.right(), event.x()))
-            self._userval = x
-            self.check.setFeedback(self._userval)
-            print(self.trial, self._userval, self.check.feedback)
-            self.update()
-            self.check.setVisible(True)
+            self.checkUserEvent(None, event.x())
+            self.refresh()
+            QTimer.singleShot(2000, self.nextGame)
             
+    def checkUserEvent(self, time, x):
+        min_val = self.riel.left()
+        max_val = self.riel.right()
+        x_in_riel = max(self.riel.left(), min(self.riel.right(), x))
+        self._userClickX = x_in_riel
+        rate = self.rateFromX(x_in_riel)
+        self.test.writeAnswer(time, rate)
+        self.check.feedback = self.test.rateCheck(rate)
+        center = self.xFromRate(self.correctRate)
+        self.check.setSpanLeft(center)
+        self.refresh()
+        self.check.setVisible(True)
+            
+    def refresh(self):
+        self.update()
     
-    def pausa(self):
+    def nextGame(self):
         self.check.setVisible(False)
-        self.trial += 1
+        self.correctRate= self.test.nextRate()
         self._mouseListen = True
         
 if __name__ == "__main__":
