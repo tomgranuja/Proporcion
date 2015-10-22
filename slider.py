@@ -133,7 +133,7 @@ class Slider(QWidget):
         super(Slider, self).__init__(parent)
         self.setSizePolicy(QSizePolicy(QSizePolicy.Fixed,
                                        QSizePolicy.Fixed))
-        self.cuadro = QRect(Slider.XMAR, Slider.YMAR, 560, 80)
+        self.cuadro = QRect(Slider.XMAR, Slider.YMAR, 400, 80)
         rielH = 20
         self.riel=QRect(Slider.XMAR,
                    (self.cuadro.height() - rielH) / 2 + Slider.YMAR,
