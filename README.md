@@ -175,7 +175,7 @@ Once you get the python/pyqt installation, you can download the [project zip](ht
 In order to test fullscreen just run [fscreen_game.pyw](./fscreen_game.pyw).
 Remember Esc key press to quit.
 The game will progress with a rate sucession from 0.2 to 0.8. The rateBox bars
-are still fixed at a 0.5 rate, and maximum height (1.0).
+are still fixed at maximum height (1.0).
 (it requieres the three wavs from the project dir and the `slider` module).
 For windows user it can be run by double-clicking the file 
 if the windows PATH environ contains python dir and pyqt dir (see Installation 

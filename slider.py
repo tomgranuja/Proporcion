@@ -206,6 +206,8 @@ class Slider(QWidget):
     def nextGame(self):
         self.check.setVisible(False)
         self.correctRate= self.test.nextRate()
+        self.parent().rateBox.setBars(1.0, self.correctRate)
+        self.parent().rateBox.update()
         self._mouseListen = True
         
 if __name__ == "__main__":

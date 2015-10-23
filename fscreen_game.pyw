@@ -90,6 +90,7 @@ class WhiteBox(QWidget):
         layout.addWidget(self.slider)
         layout.addWidget(self.rPhotoBox)
         layout.addStretch()
+        self.rateBox.setBars(1.0, self.slider.correctRate)
         return layout
 
 
