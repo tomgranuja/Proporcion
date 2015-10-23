@@ -143,8 +143,8 @@ class Slider(QWidget):
         self._mouseListen = True
         self.test = Training('0.2 0.3 0.4 0.5 0.6 0.7 0.8')
         self.correctRate = self.test.rates[self.test.currentTrial]
-        gwidth = self.xFromRate(2 * self.test.GREEN_ERROR)
-        ywidth = self.xFromRate(2 * self.test.YELLOW_ERROR)
+        gwidth = self.xFromRate(2 * self.test.GREEN_ERROR) - Slider.XMAR
+        ywidth = self.xFromRate(2 * self.test.YELLOW_ERROR) - Slider.XMAR
         self.check = CheckWidget(self.riel, gwidth, ywidth, self)
 
     def sizeHint(self):
