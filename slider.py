@@ -15,14 +15,13 @@ else:
     audio = 'phonon'
 
 class Training():
-    MIN_RATE = 0.2
-    MAX_RATE = 0.8
     GREEN_ERROR  = 0.05
     YELLOW_ERROR = 0.15
     
     def __init__(self, rates_data=None):
         self.currentTrial = None
         self.rates = self.getRates(rates_data)
+        self.currentRate = self.rates[self.currentTrial]
     
     def getRates(self, data):
         '''Rates from data string, reset trial counter.'''
@@ -34,21 +33,21 @@ class Training():
         return float_list
         
     def nextRate(self):
-        '''Next rate in list, update current trial counter.'''
+        '''Next rate in list, update currentRate.'''
         nextRate = None
         if self.currentTrial != None:
             self.currentTrial += 1
             if self.currentTrial >= len(self.rates):
                 print("Training finished, reseting trials.")
                 self.currentTrial = 0
-            nextRate = self.rates[self.currentTrial]
-        return nextRate
+            self.currentRate = self.rates[self.currentTrial]
+        return self.currentRate
         
     def rateCheck(self, r=None):
         result = None
         if 0 <= r <= 1:
             result = 'outside'
-            correctRate = self.rates[self.currentTrial]
+            correctRate = self.currentRate
             error = abs(r - correctRate)
             if error <= Training.YELLOW_ERROR:
                 result = 'in_yellow'
