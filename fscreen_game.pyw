@@ -24,7 +24,7 @@ class Training():
             print(float_list)
         return float_list
         
-    def nextRate(self):
+    def toNextRate(self):
         '''Next rate in list, update currentRate.'''
         nextRate = None
         if self.currentTrial != None:
@@ -33,7 +33,6 @@ class Training():
                 print("Training finished, reseting trials.")
                 self.currentTrial = 0
             self.currentRate = self.rates[self.currentTrial]
-        return self.currentRate
         
     def rateCheck(self, r=None):
         result = None
@@ -111,6 +110,7 @@ class RateBox(CustomRateWidget):
 class Slider(CustomRateWidget):
     WIDTH  = 440
     HEIGHT = 60
+    sliderMouseRelease = pyqtSignal(float)
     def __init__(self, parent=None):
         super(Slider, self).__init__(parent)
         self.riel=QLine(self.xFromRate(0),
@@ -119,6 +119,7 @@ class Slider(CustomRateWidget):
                         self.yFromRate(0.5))
         self._userClickX = None
         self._mouseListen = True
+        #self.sliderMouseRelease = pyqtSignal(float)    
         
     def paintEvent(self, event=None):
         painter = QPainter(self)
@@ -128,9 +129,9 @@ class Slider(CustomRateWidget):
         w = 4
         if self._userClickX:
             raya = QRect(self._userClickX - w / 2, 
-                         self.yFromRate(0), 
+                         0, 
                          w,
-                         self.hFromRate(1))
+                         self.HEIGHT)
             painter.setBrush(self.palette().brush(QPalette.Button))
             painter.drawRect(raya)
     
@@ -139,28 +140,83 @@ class Slider(CustomRateWidget):
             self._mouseListen = False
             self.checkUserEvent(None, event.x())
             self.update()
-            QTimer.singleShot(200, self.nextGame)
     
     def checkUserEvent(self, time, x):
         self._userClickX = max(self.riel.x1(), min(self.riel.x2(), x))
         rate = self.rateFromX(self._userClickX)
-        self.parent().test.writeAnswer(time, rate)
-        #self.check.feedback = self.test.rateCheck(rate)
-        #center = self.xFromRate(self.correctRate)
-        #self.check.setSpanLeft(center)
-        #self.check.playFeedbackSound()
-        #self.refresh()
-        #self.check.setVisible(True)
-    
-    def nextGame(self):
-        #self.check.setVisible(False)
-        self.currentRate = self.parent().test.nextRate()
-        self.parent().rateBox.setBars(1.0, self.currentRate)
-        self.parent().rateBox.update()
-        self._mouseListen = True
-    
+        self.sliderMouseRelease.emit(rate)
 
-
+class CheckWidget(CustomRateWidget):
+    WIDTH  = Slider.WIDTH
+    HEIGHT = Slider.HEIGHT
+    def __init__(self, greenError=None, yellError=None, parent=None):
+        super(CheckWidget, self).__init__(parent)
+        self.setVisible(False)
+        self.gSemiWidth = self.wFromRate(greenError)
+        self.ySemiWidth = self.wFromRate(yellError)
+        self.yellLeftX  = None
+        self.greenLeftX = None
+        self.feedback   = None
+        self.intermitent = False
+        
+    def adjustRate(self, center):
+        spanCenterX = self.xFromRate(center)
+        self.yellLeftX  = spanCenterX - self.ySemiWidth
+        self.greenLeftX = spanCenterX - self.gSemiWidth
+    
+    def fbBlink(self, time, period):
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.fbBlinkStop)
+        self.blinktimer = QTimer()
+        self.blinktimer.timeout.connect(self.blink)
+        self.timer.start(time)
+        self.blinktimer.start(period)
+        
+    def fbBlinkStop(self):
+        self.timer.stop()
+        self.blinktimer.stop()
+        self.intermitent = False
+        self.update()
+        
+    def blink(self):
+        self.intermitent = not self.intermitent
+        self.update()
+        
+    
+    def paintEvent(self, event=None):
+        painter = QPainter(self)
+        painter.setPen(Qt.NoPen)
+        greenColor = QColor(0,128,0,150)
+        yellowColor = QColor(222,205,135,150)
+        outsideColor = QColor(0,0,0,0)
+        h = self.hFromRate(1)
+        top = self.xFromRate(0)
+        #yellowBox
+        if self.yellLeftX:
+            painter.setBrush(yellowColor)
+            yellowBox = QRect(self.yellLeftX, top, self.ySemiWidth * 2, h)
+            painter.drawRect(yellowBox)
+        #greenBox
+        if self.greenLeftX:
+            painter.setBrush(greenColor)
+            dx = self.ySemiWidth - self.gSemiWidth
+            green = yellowBox.translated(dx , 0)
+            green.setWidth(self.gSemiWidth * 2)
+            painter.drawRect(green)
+        
+        feedbackBox = QRect(self.xFromRate(0) - self.MARGIN,
+                            self.yFromRate(0) - self.MARGIN,
+                            self.WIDTH, 
+                            self.HEIGHT)
+        box_color = {'outside':outsideColor,
+                     'in_yellow':yellowColor,
+                      'in_green':greenColor}
+        if self.feedback:
+            painter.setBrush(box_color[self.feedback])
+            if self.intermitent:
+                painter.drawRect(feedbackBox)
+            
+            
 class WhiteBox(CustomRateWidget):
     WIDTH  = 640
     HEIGHT = 660
@@ -176,6 +232,7 @@ class WhiteBox(CustomRateWidget):
         layout.addStretch()
         layout.addLayout(self.sliderLayout())
         self.setLayout(layout)
+        self.slider.sliderMouseRelease.connect(self.onSliderMouseRelease)
         
     def rateBoxLayout(self):
         self.rateBox = RateBox()
@@ -188,8 +245,11 @@ class WhiteBox(CustomRateWidget):
     
     def sliderLayout(self):
         self.lPhotoBox = QLabel("Left Photo")
-        self.slider = Slider()
         self.rPhotoBox = QLabel("Right Photo")
+        self.slider = Slider()
+        self.check = CheckWidget(self.test.GREEN_ERROR,
+                                 self.test.YELLOW_ERROR,
+                                 parent = self.slider)
         layout = QHBoxLayout()
         layout.addStretch()
         layout.addWidget(self.lPhotoBox)
@@ -197,6 +257,23 @@ class WhiteBox(CustomRateWidget):
         layout.addWidget(self.rPhotoBox)
         layout.addStretch()
         return layout
+    
+    def onSliderMouseRelease(self, rate):
+        self.test.writeAnswer(None, rate)
+        self.check.feedback = self.test.rateCheck(rate)
+        self.check.adjustRate(self.test.currentRate)
+        #self.check.playFeedbackSound()
+        self.check.setVisible(True)
+        self.check.fbBlink(1600, 200)
+        QTimer.singleShot(3000, self.nextGame)
+        
+    def nextGame(self):
+        self.check.setVisible(False)
+        self.test.toNextRate()
+        self.rateBox.setBars(1.0, self.test.currentRate)
+        self.rateBox.update()
+        self.slider._mouseListen = True
+        
 
 class FullBox(QDialog):
     def __init__(self, parent=None):
