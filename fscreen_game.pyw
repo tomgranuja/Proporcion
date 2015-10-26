@@ -6,33 +6,52 @@ from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from functools import partial
 
+example_data = '''
+1.0 0.5
+1.0 0.25
+0.6 0.5
+0.6 0.75
+0.6 0.25
+0.3 0.8
+0.3 0.2
+0.3 0.5
+0.3 0.75
+1.0 0.2
+1.0 0.7
+1.0 0.3
+0.5 0.5
+'''[1:]
+
+
 class Training():
     GREEN_ERROR  = 0.05
     YELLOW_ERROR = 0.15
     
-    def __init__(self, rates_data=None):
+    def __init__(self, data=None):
         self.currentTrial = None
-        self.rates = self.getRates(rates_data)
-        self.currentRate = self.rates[self.currentTrial]
+        self.data = self.getRates(data)
+        self.currentHeight= self.data[self.currentTrial][0]
+        self.currentRate  = self.data[self.currentTrial][1]
     
     def getRates(self, data):
-        '''Rates from data string, reset trial counter.'''
-        float_list = None
+        '''Heights,rates from data string, reset trial counter.'''
+        tupls_list = None
         if data:
-            float_list = [ float(n) for n in data.split() ]
+            tupls_list = [ (float(h), float(r)) for h,r in[
+                           tuple(l.split()) for l in data.splitlines() ]]
             self.currentTrial = 0
-            print(float_list)
-        return float_list
+            print(tupls_list)
+        return tupls_list
         
     def toNextRate(self):
         '''Next rate in list, update currentRate.'''
-        nextRate = None
         if self.currentTrial != None:
             self.currentTrial += 1
-            if self.currentTrial >= len(self.rates):
+            if self.currentTrial >= len(self.data):
                 print("Training finished, reseting trials.")
                 self.currentTrial = 0
-            self.currentRate = self.rates[self.currentTrial]
+            self.currentHeight = self.data[self.currentTrial][0]
+            self.currentRate = self.data[self.currentTrial][1]
         
     def rateCheck(self, r=None):
         result = None
@@ -87,7 +106,7 @@ class RateBox(CustomRateWidget):
         if 0.0 < height  <= 1.0:
             self.blueRect = QRect(
                          self.xFromRate(0),
-                         self.yFromRate(0),
+                         self.yFromRate(1-height),
                          self.wFromRate(1),
                          self.hFromRate(height)
                          )
@@ -216,7 +235,6 @@ class CheckWidget(CustomRateWidget):
             if self.intermitent:
                 painter.drawRect(feedbackBox)
             
-            
 class WhiteBox(CustomRateWidget):
     WIDTH  = 640
     HEIGHT = 660
@@ -226,7 +244,7 @@ class WhiteBox(CustomRateWidget):
         p.setColor(self.backgroundRole(), Qt.white)
         self.setPalette(p)
         self.setAutoFillBackground(True)
-        self.test = Training('0.5 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.5')
+        self.test = Training(example_data)
         layout = QVBoxLayout()
         layout.addLayout(self.rateBoxLayout())
         layout.addStretch()
@@ -236,7 +254,8 @@ class WhiteBox(CustomRateWidget):
         
     def rateBoxLayout(self):
         self.rateBox = RateBox()
-        self.rateBox.setBars(1.0, self.test.currentRate)
+        self.rateBox.setBars(self.test.currentHeight, 
+                             self.test.currentRate)
         layout = QHBoxLayout()
         layout.addStretch()
         layout.addWidget(self.rateBox)
@@ -270,7 +289,8 @@ class WhiteBox(CustomRateWidget):
     def nextGame(self):
         self.check.setVisible(False)
         self.test.toNextRate()
-        self.rateBox.setBars(1.0, self.test.currentRate)
+        self.rateBox.setBars(self.test.currentHeight,
+                             self.test.currentRate)
         self.rateBox.update()
         self.slider._mouseListen = True
         
