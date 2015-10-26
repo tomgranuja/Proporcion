@@ -8,86 +8,184 @@ The script [fscreen_game.pyw](./fscreen_game.pyw) runs fullscreen, Esc key press
 It shows a slider that waits for mouse click in order to 
 record mouse x position and time. Inmediatly after slider interaction, the 
 widget shows a reference area of what would be the better proportion selection and
-plays a sound depending on how close the choice was from the current proportion.
+plays a sound (currently desactivated) depending on how close the choice was from the current proportion.
 
 ## Code Example
 
-### `slider` module
 
-The draw of the slider consist of two rectangles in the `Slider(QWidget)` class defined
-in slider.py:
+### Data set and Training class
+
+The game input data consist of two values lines that are readed into tuples (height, rate)
+in `Training()` class:
 ```python
-painter = QPainter(self)
-#Cuadro
-painter.drawRect(self.cuadro)
-#Riel
-painter.setBrush(self.palette().brush(QPalette.Midlight))
-painter.drawRect(self.riel)
-#Raya
-w = 10
-over =  20 
-h = self.riel.height() + 2 * over
-uppery = self.riel.top() - over
-if self._userClickX:
-    upperx = self._userClickX - w / 2
-    raya = QRect(upperx, uppery, w, h)
-    painter.setBrush(self.palette().brush(QPalette.Button))
-    painter.drawRect(raya)
+example_data = '''
+1.0 0.5
+1.0 0.25
+0.6 0.5
+0.6 0.75
+0.6 0.25
+0.3 0.8
+0.3 0.2
+0.3 0.5
+0.3 0.75
+1.0 0.2
+1.0 0.7
+1.0 0.3
+0.5 0.5
+'''[1:]
+
+class Training():
+    GREEN_ERROR  = 0.05
+    YELLOW_ERROR = 0.15
+    ...
+
+    def getRates(self, data):
+        '''Heights,rates from data string, reset trial counter.'''
+        tupls_list = None
+        if data:
+            tupls_list = [ (float(h), float(r)) for h,r in[
+                           tuple(l.split()) for l in data.splitlines() ]]
+            self.currentTrial = 0
+            print(tupls_list)
+        return tupls_list
 ```
+The class variables `GREEN_ERROR` and `YELLOW_ERROR` are used to eval the user's choice
+error in terms of rate. They are also used in `CheckWidget(CustomRateWidget)` class to calculate the green
+and yellow length of the feedback rectangles [see CheckBox below](./README.md#feedback-and-checkwidget-class).
+
+### Rate representation and RateBox class
+
+The `RateBox(CustomRateWidget)` widget has two rectangles (blue and red), whoes dimensions are 
+changed with `setBars(height, rate)`. It's arguments are two rates,
+one for the height of the blue bar, and the other for the proportion of the
+red bar that is drawed in front of the blue.
+
+```python
+class RateBox(CustomRateWidget):
+    ...
+    
+    def setBars(self, height, rate):
+        blueHeight = 1.0
+        if 0.0 < height  <= 1.0:
+            self.blueRect = QRect(
+                         self.xFromRate(0),
+                         self.yFromRate(1-height),
+                         self.wFromRate(1),
+                         self.hFromRate(height)
+                         )
+            if 0.0 < rate <= 1.0:
+                uppery = self.yFromRate(1 - rate * height)
+                self.redRect = QRect(self.blueRect)
+                self.redRect.setTop(uppery)
+        
+    def paintEvent(self, event=None):
+        painter = QPainter(self)
+        blueColor = QColor(85, 142, 213)
+        redColor  = QColor(254, 0, 0)
+        if self.blueRect:
+            painter.setBrush(blueColor)
+            painter.drawRect(self.blueRect)
+        if self.redRect:
+            painter.setBrush(redColor)
+            painter.drawRect(self.redRect)
+```
+
+
+### User interaction and Slider class
+
+The draw of the slider consist of a line (`riel`) and a button (`raya`) in the
+`Slider(CustomRateWidget)`
+class:
+```python
+class Slider(CustomRateWidget):
+    ...
+    def __init__(self, parent=None):
+        ...
+        self.riel=QLine(self.xFromRate(0),
+                        self.yFromRate(0.5),
+                        self.xFromRate(1),
+                        self.yFromRate(0.5))
+        ...
+    def paintEvent(self, event=None):
+        painter = QPainter(self)
+        #Riel
+        painter.drawLine(self.riel)
+        #Raya
+        w = 4
+        if self._userClickX:
+            raya = QRect(self._userClickX - w / 2, 
+                         0, 
+                         w,
+                         self.HEIGHT)
+            painter.setBrush(self.palette().brush(QPalette.Button))
+            painter.drawRect(raya)
+    ...
+```
+When user click release is generated, the custom signal `sliderMouseRelease(float)`
+is emitted with the user selected rate:
+```python
+    ...
+    def mouseReleaseEvent(self,event):
+        if self._mouseListen:
+            self._mouseListen = False
+            self.checkUserEvent(None, event.x())
+            self.update()
+    
+    def checkUserEvent(self, time, x):
+        self._userClickX = max(self.riel.x1(), min(self.riel.x2(), x))
+        rate = self.rateFromX(self._userClickX)
+        self.sliderMouseRelease.emit(rate)
+```
+
+
+### Feedback and CheckWidget class
 
 The reference area displayed after user interaction consist of two rectangles 
-defined in `CheckWidget(QWidget)` class:
+defined in `CheckWidget(CustomRateWidget)` class. First, the yellow and green
+left sides are calculated whit a rate center value using `adjustRate(center)`:
 ```python
-painter = QPainter(self)
-greenColor = QColor(0,128,0)
-yellowColor = QColor(222,205,135)
-
-h = self.riel.height()
-top = self.riel.top()
-if self.spanLeft:
-    painter.setBrush(yellowColor)
-    #yellowBox
-    yellowBox = QRect(self.spanLeft, top, self.yellWidth, h)
-    painter.drawRect(yellowBox)
-    #greenBox
-    painter.setBrush(greenColor)
-    dx = (self.yellWidth - self.greenWidth)/ 2
-    green = yellowBox.translated(dx , 0)
-    green.setWidth(self.greenWidth)
-    painter.drawRect(green)
+class CheckWidget(CustomRateWidget):
+    ...
+    def __init__(self, greenError=None, yellError=None, parent=None):
+        ...
+        self.gSemiWidth = self.wFromRate(greenError)
+        self.ySemiWidth = self.wFromRate(yellError)
+        ...
+    
+    def adjustRate(self, center):
+        spanCenterX = self.xFromRate(center)
+        self.yellLeftX  = spanCenterX - self.ySemiWidth
+        self.greenLeftX = spanCenterX - self.gSemiWidth
+```
+Then, the rectangles are drawn:
+```python
+    ...
+    
+    def paintEvent(self, event=None):
+        painter = QPainter(self)
+        painter.setPen(Qt.NoPen)
+        greenColor = QColor(0,128,0,150)
+        yellowColor = QColor(222,205,135,150)
+        outsideColor = QColor(0,0,0,0)
+        h = self.hFromRate(1)
+        top = self.xFromRate(0)
+        #yellowBox
+        if self.yellLeftX:
+            painter.setBrush(yellowColor)
+            yellowBox = QRect(self.yellLeftX, top, self.ySemiWidth * 2, h)
+            painter.drawRect(yellowBox)
+        #greenBox
+        if self.greenLeftX:
+            painter.setBrush(greenColor)
+            dx = self.ySemiWidth - self.gSemiWidth
+            green = yellowBox.translated(dx , 0)
+            green.setWidth(self.gSemiWidth * 2)
+            painter.drawRect(green)
+        ...
 ```
 
-The `Slider` class reimplement `QWidget.mouseReleaseEvent()` to send feedback to the user for certain amount of 
-time with the reference area and a sound. During this time, there is no processing of further mouse events:
-```python
-def mouseReleaseEvent(self,event):
-    if self._mouseListen:
-        self._mouseListen = False
-        self.checkUserEvent(None, event.x())
-        self.refresh()
-        QTimer.singleShot(2000, self.nextGame)
-```
 
-The `Training()` class manage the game information. On initialization, loads a float list with the proportions to be tested:
-
-```python
-def __init__(self, rates_data=None):
-    self.currentTrial = None
-    self.rates = self.getRates(rates_data)
-
-def getRates(self, data):
-    '''Rates from data string, reset trial counter.'''
-    float_list = None
-    if data:
-        float_list = [ float(n) for n in data.split() ]
-        self.currentTrial = 0
-        print(float_list)
-    return float_list
-```
-
-Also in `Training` class are defined two class vars, `Training.GREEN_ERROR` and `Trainig.YELLOW_ERROR` to control the reference feedback box width and sound played for the user uppon slider interaction.
-
-### Script fscreen_game.pyw
+### Top level and central widget
 
 The top level widget is `FullBox(QDialog)`:
 
@@ -106,8 +204,8 @@ class FullBox(QDialog):
         self.setLayout(layout)
 ```
 
-`WhiteBox()` instance is a fixed widget with fixed dimensions, parent of all the
-dinamic widgets (slider, rateBox and the photo boxes):
+`WhiteBox(CustomRateWidget)` instance is a fixed widget with fixed dimensions, parent of all the
+dinamic widgets (slider, rateBox, checkBox and the photo boxes):
 
 ```python
 class WhiteBox(QWidget):
@@ -120,32 +218,30 @@ class WhiteBox(QWidget):
         layout.addLayout(self.sliderLayout())
         self.setLayout(layout)
 ```
-
-The `rateBox` widget has two rectangles (blue and red), whoes dimensions are 
-changed with `rateBox.setBars(height, rate)`. It's arguments are two rates,
-one for the height of the blue bar, and the other for the proportion of the
-red bar that is drawed in front of the blue.
-
+Two methods in this class are used to update the widgets after user rate selection.
+First the `onSliderMouseRelease(rate)` is called. After processing the user rate selected
+and show feedback, a timer in this method launch the second method, `nextGame()` in order
+to progress to the next game:
 ```python
-def setBars(self, height, rate):
-    blueHeight = 1.0
-    if 0.0 < height  <= 1.0:
-        blueHeight = height * (self.height() - RateBox.MARGIN * 2)
-        self.blueRect = QRect(
-                        RateBox.MARGIN,
-                        self.height() - blueHeight - RateBox.MARGIN,
-                        self.width() - 2 * RateBox.MARGIN,
-                        blueHeight
-                        )
-        if 0.0 < rate <= 1.0:
-            redHeight = rate * blueHeight
-            self.redRect = QRect(
-                        RateBox.MARGIN,
-                        self.height() - redHeight - RateBox.MARGIN,
-                        self.width() - 2 * RateBox.MARGIN,
-                        redHeight
-                        )
+    ...
+    def onSliderMouseRelease(self, rate):
+        self.test.writeAnswer(None, rate)
+        self.check.feedback = self.test.rateCheck(rate)
+        self.check.adjustRate(self.test.currentRate)
+        #self.check.playFeedbackSound()
+        self.check.setVisible(True)
+        self.check.fbBlink(1600, 200)
+        QTimer.singleShot(3000, self.nextGame)
+        
+    def nextGame(self):
+        self.check.setVisible(False)
+        self.test.toNextRate()
+        self.rateBox.setBars(self.test.currentHeight,
+                             self.test.currentRate)
+        self.rateBox.update()
+        self.slider._mouseListen = True
 ```
+
 
 ## Motivation
 
@@ -174,15 +270,29 @@ Once you get the python/pyqt installation, you can download the [project zip](ht
 
 In order to test fullscreen just run [fscreen_game.pyw](./fscreen_game.pyw).
 Remember Esc key press to quit.
-The game will progress with a rate sucession from 0.2 to 0.8. The rateBox bars
-are still fixed at maximum height (1.0).
-(it requieres the three wavs from the project dir and the `slider` module).
+The game will progress with the following height and rate sucession:
+```python
+(1.0, 0.5)
+(1.0, 0.25)
+(0.6, 0.5)
+(0.6, 0.75)
+(0.6, 0.25)
+(0.3, 0.8)
+(0.3, 0.2)
+(0.3, 0.5)
+(0.3, 0.75)
+(1.0, 0.2)
+(1.0, 0.7)
+(1.0, 0.3)
+(0.5, 0.5)
+```
 For windows user it can be run by double-clicking the file 
 if the windows PATH environ contains python dir and pyqt dir (see Installation 
 section above).
 
 If fscreen_game.pyw is run from a command line interface, (CMD on windows) it 
-shows in the terminal the current trial number, the time (not yet, just 'None') and the x value of the user mouse click release.
+shows in the terminal the current trial number, the time (not yet, just 'None') and
+the x value of the user mouse click release.
 
 ## Contributors
 
