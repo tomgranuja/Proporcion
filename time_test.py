@@ -3,6 +3,7 @@
 
 import sys, time
 from threading import Timer
+from PyQt4.QtTest import QTest
 import fscreengame
 
 class Form(fscreengame.FullBox):
@@ -26,8 +27,10 @@ def run_at_some_times():
          Timer(secs, print_and_launch, ()).start()
 
 def f():
-    rate = 0.325
-    form.whiteBox.slider.sliderMouseRelease.emit(rate)
+    QTest.mouseRelease(
+        form.whiteBox.slider,
+        fscreengame.Qt.MouseButton(fscreengame.Qt.LeftButton))
+    #form.whiteBox.slider.mouseReleaseEvent.emit(event)
 
 app  = fscreengame.QApplication(sys.argv)
 form = Form()

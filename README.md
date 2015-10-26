@@ -291,8 +291,13 @@ if the windows PATH environ contains python dir and pyqt dir (see Installation
 section above).
 
 If fscreen_game.pyw is run from a command line interface, (CMD on windows) it 
-shows in the terminal the current trial number, the time (not yet, just 'None') and
-the x value of the user mouse click release.
+shows in the terminal the current trial number, the time in milliseconds and
+the rate value of the user mouse click release.
+
+Use the time_test.py script to simulate some predefined user mouse releases
+in the slider center spaced by 5 seconds, and compare time meassures.
+Sice feedback time are setted to 1 second, you should expect elapsed times
+round 4000 milliseconds after the first 5000 millisecond record.
 
 ## Contributors
 
