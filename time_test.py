@@ -14,15 +14,16 @@ class Form(fscreengame.FullBox):
     
     def showFullScreen(self):
         super(Form,self).showFullScreen()
+        self.whiteBox.test.testTime.start()
         run_at_some_times()
     
 def print_and_launch():
-    print("Launched at", time.time())
+    print("Click release at", time.time())
     f()
 def run_at_some_times():
      print('Test start time', time.time())
-     Timer(5, print_and_launch, ()).start()
-     Timer(10, print_and_launch, ()).start()
+     for secs in range(5,50,5):
+         Timer(secs, print_and_launch, ()).start()
 
 def f():
     rate = 0.325

@@ -32,6 +32,7 @@ class Training():
         self.data = self.getRates(data)
         self.currentHeight= self.data[self.currentTrial][0]
         self.currentRate  = self.data[self.currentTrial][1]
+        self.testTime = QTime()
     
     def getRates(self, data):
         '''Heights,rates from data string, reset trial counter.'''
@@ -252,6 +253,7 @@ class WhiteBox(CustomRateWidget):
         self.setLayout(layout)
         self.setTimers()
         self.slider.sliderMouseRelease.connect(self.onSliderMouseRelease)
+        self.test.testTime.start()
         
     def rateBoxLayout(self):
         self.rateBox = RateBox()
@@ -279,7 +281,8 @@ class WhiteBox(CustomRateWidget):
         return layout
     
     def onSliderMouseRelease(self, rate):
-        self.test.writeAnswer(None, rate)
+        mseconds =self.test.testTime.elapsed()
+        self.test.writeAnswer(mseconds, rate)
         self.check.feedback = self.test.rateCheck(rate)
         self.check.adjustRate(self.test.currentRate)
         #self.check.playFeedbackSound()
@@ -294,6 +297,7 @@ class WhiteBox(CustomRateWidget):
                              self.test.currentRate)
         self.rateBox.update()
         self.slider._mouseListen = True
+        self.test.testTime.start()
         
     def setTimers(self, fbtime      = 3000, 
                         blinktime   = 1600, 
