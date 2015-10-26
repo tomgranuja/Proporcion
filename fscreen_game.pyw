@@ -250,6 +250,7 @@ class WhiteBox(CustomRateWidget):
         layout.addStretch()
         layout.addLayout(self.sliderLayout())
         self.setLayout(layout)
+        self.setTimers()
         self.slider.sliderMouseRelease.connect(self.onSliderMouseRelease)
         
     def rateBoxLayout(self):
@@ -283,8 +284,8 @@ class WhiteBox(CustomRateWidget):
         self.check.adjustRate(self.test.currentRate)
         #self.check.playFeedbackSound()
         self.check.setVisible(True)
-        self.check.fbBlink(1600, 200)
-        QTimer.singleShot(3000, self.nextGame)
+        self.check.fbBlink(self.blinktime, self.blinkperiod)
+        QTimer.singleShot(self.fbtime, self.nextGame)
         
     def nextGame(self):
         self.check.setVisible(False)
@@ -293,6 +294,13 @@ class WhiteBox(CustomRateWidget):
                              self.test.currentRate)
         self.rateBox.update()
         self.slider._mouseListen = True
+        
+    def setTimers(self, fbtime      = 3000, 
+                        blinktime   = 1600, 
+                        blinkperiod =  200):
+        self.fbtime = fbtime
+        self.blinktime = blinktime
+        self.blinkperiod = blinkperiod
         
 
 class FullBox(QDialog):
