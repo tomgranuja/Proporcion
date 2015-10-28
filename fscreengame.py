@@ -163,6 +163,17 @@ class Slider(CustomRateWidget):
             painter.setBrush(self.palette().brush(QPalette.Button))
             painter.drawRect(raya)
     
+    def enterEvent(self, event=None):
+        self.setMouseTracking(True)
+    
+    def leaveEvent(self, event=None):
+        self.setMouseTracking(False)
+    
+    def mouseMoveEvent(self, event=None):
+        x = event.x()
+        self._userClickX = max(self.riel.x1(), min(self.riel.x2(), x))
+        self.update()
+    
     def mouseReleaseEvent(self,event):
         if self._mouseListen:
             self._mouseListen = False
@@ -317,6 +328,7 @@ class WhiteBox(CustomRateWidget):
         self.rateBox.setBars(self.test.currentHeight,
                              self.test.currentRate)
         self.rateBox.update()
+        self.slider._userClickX = None
         self.slider._mouseListen = True
         self.test.testTime.start()
         
