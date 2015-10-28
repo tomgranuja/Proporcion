@@ -236,6 +236,17 @@ class CheckWidget(CustomRateWidget):
             if self.intermitent:
                 painter.drawRect(feedbackBox)
             
+class RefreshWidget(CustomRateWidget):
+    WIDTH  = 640
+    HEIGHT = 660
+    def __init__(self, parent=None):
+        super(RefreshWidget, self).__init__(parent)
+        p = self.palette()
+        p.setColor(self.backgroundRole(), Qt.yellow)
+        self.setPalette(p)
+        self.setAutoFillBackground(True)
+        
+
 class WhiteBox(CustomRateWidget):
     WIDTH  = 640
     HEIGHT = 660
@@ -306,6 +317,7 @@ class WhiteBox(CustomRateWidget):
         self.blinktime = blinktime
         self.blinkperiod = blinkperiod
         
+        
 
 class FullBox(QDialog):
     def __init__(self, parent=None):
@@ -316,9 +328,30 @@ class FullBox(QDialog):
         self.setPalette(p)
         self.setAutoFillBackground(True)
         self.whiteBox = WhiteBox()
-        layout = QHBoxLayout()
-        layout.addWidget(self.whiteBox)
+        self.refresh = RefreshWidget()
+        layout = QVBoxLayout()
+        hlayout = QHBoxLayout()
+        self.slayout= QStackedLayout()
+        #slayout.setSizeConstraint(4)
+        self.slayout.addWidget(self.whiteBox)
+        self.slayout.addWidget(self.refresh)
+        hlayout.addStretch()
+        hlayout.addLayout(self.slayout)
+        hlayout.addStretch()
+        layout.addStretch()
+        layout.addLayout(hlayout)
+        layout.addStretch()
+        #layout.addWidget(self.refresh)
         self.setLayout(layout)
+        QTimer.singleShot(5000,self.showRefresh)
+        
+    def showRefresh(self):
+        self.slayout.setCurrentWidget(self.refresh)
+        QTimer.singleShot(1000,self.showWhite)
+        
+    def showWhite(self):
+        self.slayout.setCurrentWidget(self.whiteBox)
+        QTimer.singleShot(5000,self.showRefresh)
         
 if __name__ == "__main__":
     app  = QApplication(sys.argv)
