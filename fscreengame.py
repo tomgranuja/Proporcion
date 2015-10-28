@@ -168,6 +168,8 @@ class Slider(CustomRateWidget):
     
     def leaveEvent(self, event=None):
         self.setMouseTracking(False)
+        self._userClickX = None
+        self.update()
     
     def mouseMoveEvent(self, event=None):
         x = event.x()
