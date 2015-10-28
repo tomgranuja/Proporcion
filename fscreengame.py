@@ -76,9 +76,13 @@ def rateFromPixel(pixel, t, o = 0):
     return (pixel - o) / t
 
 class CustomRateWidget(QWidget):
-    WIDTH  = 50
-    HEIGHT = 100
-    MARGIN = 20
+    REF_WIDTH   = 0.5 * 1280 
+    #REF_WIDTH  = 640
+    #REF_HEIGHT = 660
+    REF_HEIGHT = REF_WIDTH
+    WIDTH  = 1.0 * REF_WIDTH
+    HEIGHT = 1.03125 * REF_HEIGHT
+    MARGIN = 0.03125 * REF_WIDTH
     def __init__(self, parent=None):
         super(CustomRateWidget, self).__init__(parent)
         fixedPol = QSizePolicy(QSizePolicy.Fixed,QSizePolicy.Fixed)
@@ -95,8 +99,10 @@ class CustomRateWidget(QWidget):
         return QSize(self.WIDTH, self.HEIGHT)
 
 class RateBox(CustomRateWidget):
-    WIDTH  = 120
-    HEIGHT = 460
+    WIDTH  = 0.1875 * CustomRateWidget.REF_WIDTH
+    HEIGHT = 0.7188 * CustomRateWidget.REF_HEIGHT
+    #WIDTH  = 120
+    #HEIGHT = 460
     def __init__(self, parent=None):
         super(RateBox, self).__init__(parent)
         self.blueRect = None
@@ -128,8 +134,10 @@ class RateBox(CustomRateWidget):
             painter.drawRect(self.redRect)
 
 class Slider(CustomRateWidget):
-    WIDTH  = 440
-    HEIGHT = 60
+    WIDTH  = 0.6875 * CustomRateWidget.REF_WIDTH
+    HEIGHT = 0.0938 * CustomRateWidget.REF_HEIGHT 
+    #WIDTH  = 440
+    #HEIGHT = 60
     sliderMouseRelease = pyqtSignal(float)
     def __init__(self, parent=None):
         super(Slider, self).__init__(parent)
@@ -237,8 +245,10 @@ class CheckWidget(CustomRateWidget):
                 painter.drawRect(feedbackBox)
             
 class RefreshWidget(CustomRateWidget):
-    WIDTH  = 640
-    HEIGHT = 660
+    WIDTH  = 1.0 * CustomRateWidget.REF_WIDTH
+    HEIGHT = 1.03125 * CustomRateWidget.REF_HEIGHT
+    #WIDTH  = 640
+    #HEIGHT = 660
     def __init__(self, parent=None):
         super(RefreshWidget, self).__init__(parent)
         p = self.palette()
@@ -248,8 +258,8 @@ class RefreshWidget(CustomRateWidget):
         
 
 class WhiteBox(CustomRateWidget):
-    WIDTH  = 640
-    HEIGHT = 660
+    #WIDTH  = 640
+    #HEIGHT = 660
     def __init__(self, parent=None):
         super(WhiteBox, self).__init__(parent)
         p = self.palette()
@@ -277,8 +287,8 @@ class WhiteBox(CustomRateWidget):
         return layout
     
     def sliderLayout(self):
-        self.lPhotoBox = QLabel("Left Photo")
-        self.rPhotoBox = QLabel("Right Photo")
+        self.lPhotoBox = QLabel("LP")
+        self.rPhotoBox = QLabel("RP")
         self.slider = Slider()
         self.check = CheckWidget(self.test.GREEN_ERROR,
                                  self.test.YELLOW_ERROR,
@@ -343,7 +353,7 @@ class FullBox(QDialog):
         layout.addStretch()
         #layout.addWidget(self.refresh)
         self.setLayout(layout)
-        QTimer.singleShot(5000,self.showRefresh)
+        #QTimer.singleShot(5000,self.showRefresh)
         
     def showRefresh(self):
         self.slayout.setCurrentWidget(self.refresh)
@@ -357,4 +367,12 @@ if __name__ == "__main__":
     app  = QApplication(sys.argv)
     form = FullBox()
     form.showFullScreen()
+    #form.show()
+    for w in [form, 
+              form.whiteBox,
+              form.whiteBox.rateBox,
+              form.whiteBox.slider,
+              form.whiteBox.check]:
+        print(type(w).__name__, w.width(),'x',w.height())
+        
     sys.exit(app.exec_())
