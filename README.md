@@ -33,11 +33,16 @@ example_data = '''
 1.0 0.3
 0.5 0.5
 '''[1:]
+```
 
+You can modify the class var `TEST_BREAKS` with a list of data index to trigger a user refresh pause in that data samples.
+
+```python
 class Training():
     GREEN_ERROR  = 0.05
     YELLOW_ERROR = 0.15
-    ...
+    #Pausas en [3, 6, 9, 12, ...,33]
+    TEST_BREAKS  = range(3,36,3)...
 
     def getRates(self, data):
         '''Heights,rates from data string, reset trial counter.'''
