@@ -26,7 +26,8 @@ example_data = '''
 class Training():
     GREEN_ERROR  = 0.05
     YELLOW_ERROR = 0.15
-    
+    #Pausas en [3, 6, 9, 12, ...,33]
+    TEST_BREAKS  = range(3,36,3)
     def __init__(self, data=None):
         self.currentTrial = None
         self.data = self.getRates(data)
@@ -51,6 +52,8 @@ class Training():
             if self.currentTrial >= len(self.data):
                 print("Training finished, reseting trials.")
                 self.currentTrial = 0
+            if self.currentTrial in self.TEST_BREAKS:
+                form.showRefresh()
             self.currentHeight = self.data[self.currentTrial][0]
             self.currentRate = self.data[self.currentTrial][1]
         
@@ -379,10 +382,11 @@ class FullBox(QDialog):
         
     def showRefresh(self):
         self.slayout.setCurrentWidget(self.refresh)
-        QTimer.singleShot(1000,self.showWhite)
+        QTimer.singleShot(3000,self.showWhite)
         
     def showWhite(self):
         self.slayout.setCurrentWidget(self.whiteBox)
+        self.whiteBox.test.testTime.start()
         #QTimer.singleShot(5000,self.showRefresh)
         pass
     
