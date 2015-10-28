@@ -25,7 +25,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -45,7 +45,7 @@
      id="namedview4"
      showgrid="false"
      inkscape:zoom="2"
-     inkscape:cx="11.865976"
+     inkscape:cx="7.365976"
      inkscape:cy="15.217661"
      inkscape:window-x="-4"
      inkscape:window-y="0"
@@ -61,13 +61,13 @@
      inkscape:export-xdpi="90"
      inkscape:export-ydpi="90">
     <path
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#cccccc;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0"
        d="M 1,1 59,1 59,59 1,59 Z"
        id="rect7371"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="ccccc" />
     <g
-       transform="matrix(0.06972747,0,0,0.06972747,8.305527,19.266631)"
+       transform="matrix(0.06972747,0,0,0.06972747,8.305527,13.266631)"
        id="g7341">
       <use
          height="100%"
@@ -112,60 +112,67 @@
      id="cherrimas"
      inkscape:label="#g7397"
      inkscape:export-xdpi="90"
-     inkscape:export-ydpi="90">
+     inkscape:export-ydpi="90"
+     style="stroke:#ffffff">
     <use
        height="100%"
        width="100%"
-       transform="translate(50.952426,-19.833631)"
+       transform="translate(50.952426,-13.833631)"
        id="use7363"
        xlink:href="#g7341"
        y="0"
-       x="0" />
+       x="0"
+       style="stroke:#ffffff" />
     <use
        height="100%"
        width="100%"
-       transform="translate(66.508775,-19.833631)"
+       transform="translate(66.508775,-13.833631)"
        id="use7365"
        xlink:href="#g7341"
        y="0"
-       x="0" />
+       x="0"
+       style="stroke:#ffffff" />
     <use
        height="100%"
        width="100%"
-       transform="translate(50.245319,-8.5199224)"
+       transform="translate(50.245319,-2.5199224)"
        id="use7359"
        xlink:href="#g7341"
        y="0"
-       x="0" />
+       x="0"
+       style="stroke:#ffffff" />
     <use
        height="100%"
        width="100%"
-       transform="translate(65.801668,-4.6308351)"
+       transform="translate(65.801668,1.3691649)"
        id="use7361"
        xlink:href="#g7341"
        y="0"
-       x="0" />
+       x="0"
+       style="stroke:#ffffff" />
     <path
        sodipodi:nodetypes="ccccc"
        inkscape:connector-curvature="0"
        id="rect7373"
        d="m 61,1 58,0 0,58 -58,0 z"
-       style="opacity:1;fill:none;fill-opacity:1;stroke:#cccccc;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0" />
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0" />
     <use
        height="100%"
        width="100%"
-       transform="translate(49,-1.5)"
+       transform="translate(49,4.5)"
        id="use7369"
        xlink:href="#g7341"
        y="0"
-       x="0" />
+       x="0"
+       style="stroke:#ffffff" />
     <use
        height="100%"
        width="100%"
-       transform="translate(71.75,-1)"
+       transform="translate(71.75,5)"
        id="use7367"
        xlink:href="#g7341"
        y="0"
-       x="0" />
+       x="0"
+       style="stroke:#ffffff" />
   </g>
 </svg>
