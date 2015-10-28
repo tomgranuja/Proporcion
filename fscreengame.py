@@ -300,8 +300,10 @@ class WhiteBox(CustomRateWidget):
         return layout
     
     def sliderLayout(self):
-        self.lPhotoBox = QLabel("LP")
-        self.rPhotoBox = QLabel("RP")
+        self.lPhotoBox = QLabel()
+        self.rPhotoBox = QLabel()
+        self.lPhotoBox.setPixmap(QPixmap('cherri.png'))
+        self.rPhotoBox.setPixmap(QPixmap('cherrimas.png'))
         self.slider = Slider()
         self.check = CheckWidget(self.test.GREEN_ERROR,
                                  self.test.YELLOW_ERROR,
