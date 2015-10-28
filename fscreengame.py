@@ -268,6 +268,12 @@ class RefreshWidget(CustomRateWidget):
         p.setColor(self.backgroundRole(), Qt.yellow)
         self.setPalette(p)
         self.setAutoFillBackground(True)
+        bearpix = QPixmap('ninjabear.png')
+        self.label = QLabel()
+        self.label.setPixmap(bearpix)
+        layout = QVBoxLayout()
+        layout.addWidget(self.label)
+        self.setLayout(layout)
         
 
 class WhiteBox(CustomRateWidget):
@@ -359,8 +365,8 @@ class FullBox(QDialog):
         hlayout = QHBoxLayout()
         self.slayout= QStackedLayout()
         #slayout.setSizeConstraint(4)
-        self.slayout.addWidget(self.whiteBox)
         self.slayout.addWidget(self.refresh)
+        self.slayout.addWidget(self.whiteBox)
         hlayout.addStretch()
         hlayout.addLayout(self.slayout)
         hlayout.addStretch()
@@ -369,7 +375,7 @@ class FullBox(QDialog):
         layout.addStretch()
         #layout.addWidget(self.refresh)
         self.setLayout(layout)
-        #QTimer.singleShot(5000,self.showRefresh)
+        QTimer.singleShot(5000,self.showWhite)
         
     def showRefresh(self):
         self.slayout.setCurrentWidget(self.refresh)
@@ -377,8 +383,9 @@ class FullBox(QDialog):
         
     def showWhite(self):
         self.slayout.setCurrentWidget(self.whiteBox)
-        QTimer.singleShot(5000,self.showRefresh)
-        
+        #QTimer.singleShot(5000,self.showRefresh)
+        pass
+    
 if __name__ == "__main__":
     app  = QApplication(sys.argv)
     form = FullBox()
