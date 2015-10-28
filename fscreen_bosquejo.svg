@@ -15,7 +15,7 @@
    width="1000"
    height="780"
    viewBox="0 0 1000 780"
-   sodipodi:docname="fullscreen_example.svg"
+   sodipodi:docname="fscreen_bosquejo.svg"
    inkscape:export-filename="/home/salva/Cmd/Pyqt4/Proporcion/fullscreen_example_1000X780.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
@@ -50,8 +50,8 @@
      showguides="true"
      inkscape:guide-bbox="true"
      inkscape:zoom="0.5"
-     inkscape:cx="850.33347"
-     inkscape:cy="399.44304"
+     inkscape:cx="855.37588"
+     inkscape:cy="466.8592"
      inkscape:window-x="-4"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -66,6 +66,12 @@
      id="rect3338"
      d="m 0.99999997,0.9999997 998.00000003,0 0,777.9998803 -998.00000003,0 z"
      style="opacity:1;fill:#b3b3b3;stroke:#000000;stroke-width:1.99999988;stroke-miterlimit:4;stroke-dasharray:none" />
+  <path
+     sodipodi:nodetypes="ccccc"
+     inkscape:connector-curvature="0"
+     id="path4183"
+     d="M 199.99999,80 840,80 l 0,660 -640.00001,0 z"
+     style="opacity:1;fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:1.99999988;stroke-miterlimit:4;stroke-dasharray:none" />
   <path
      style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.99999988;stroke-miterlimit:4;stroke-dasharray:none"
      d="M 179.99999,60 820,60 l 0,660 -640.00001,0 z"
@@ -292,7 +298,7 @@
        y="515.20001">whiteBox</tspan></text>
   <text
      xml:space="preserve"
-     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;"
+     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
      x="1032"
      y="456"
      id="text3419"
@@ -300,14 +306,15 @@
        sodipodi:role="line"
        id="tspan3421"
        x="1032"
-       y="456">fullBox</tspan></text>
+       y="456">refreshBox</tspan></text>
   <g
      id="g4251">
     <path
        inkscape:connector-curvature="0"
        id="path3425"
-       d="m 1000,440 30,0"
-       style="fill:none;fill-rule:evenodd;stroke:#000080;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+       d="M 840.19387,440 1030,440"
+       style="fill:none;fill-rule:evenodd;stroke:#000080;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       sodipodi:nodetypes="cc" />
     <path
        sodipodi:nodetypes="cc"
        inkscape:connector-curvature="0"
@@ -334,5 +341,21 @@
        id="path3435"
        d="m 1030,740 -780,0 0,-40"
        style="fill:none;fill-rule:evenodd;stroke:#000080;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000080;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 1000,380 30,0"
+       id="path4185"
+       inkscape:connector-curvature="0" />
   </g>
+  <text
+     sodipodi:linespacing="125%"
+     id="text4187"
+     y="392"
+     x="1032"
+     style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000080;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     xml:space="preserve"><tspan
+       y="392"
+       x="1032"
+       id="tspan4189"
+       sodipodi:role="line">fullBox</tspan></text>
 </svg>
