@@ -28,12 +28,13 @@ class Training():
     YELLOW_ERROR = 0.15
     #Pausas en [3, 6, 9, 12, ...,33]
     TEST_BREAKS  = range(3,36,3)
-    def __init__(self, data=None):
+    def __init__(self, data=None, break_function=None):
         self.currentTrial = None
         self.data = self.getRates(data)
         self.currentHeight= self.data[self.currentTrial][0]
         self.currentRate  = self.data[self.currentTrial][1]
         self.testTime = QTime()
+        self.break_function = break_function
     
     def getRates(self, data):
         '''Heights,rates from data string, reset trial counter.'''
@@ -53,7 +54,7 @@ class Training():
                 print("Training finished, reseting trials.")
                 self.currentTrial = 0
             if self.currentTrial in self.TEST_BREAKS:
-                form.showRefresh()
+                self.callBreakFunction()
             self.currentHeight = self.data[self.currentTrial][0]
             self.currentRate = self.data[self.currentTrial][1]
         
@@ -70,6 +71,10 @@ class Training():
         
     def writeAnswer(self, time, rate):
         print(self.currentTrial, time, rate)
+    
+    def callBreakFunction(self):
+        if self.break_function:
+            self.break_function()
 
 
 def pixelFromRate(rate, t, o = 0):
@@ -282,13 +287,13 @@ class RefreshWidget(CustomRateWidget):
 class WhiteBox(CustomRateWidget):
     #WIDTH  = 640
     #HEIGHT = 660
-    def __init__(self, parent=None):
+    def __init__(self, break_function=None, parent=None):
         super(WhiteBox, self).__init__(parent)
         p = self.palette()
         p.setColor(self.backgroundRole(), Qt.white)
         self.setPalette(p)
         self.setAutoFillBackground(True)
-        self.test = Training(example_data)
+        self.test = Training(example_data, break_function)
         layout = QVBoxLayout()
         layout.addLayout(self.rateBoxLayout())
         layout.addStretch()
@@ -362,7 +367,7 @@ class FullBox(QDialog):
         p.setColor(self.backgroundRole(), bgColor)
         self.setPalette(p)
         self.setAutoFillBackground(True)
-        self.whiteBox = WhiteBox()
+        self.whiteBox = WhiteBox(break_function=self.showRefresh)
         self.refresh = RefreshWidget()
         layout = QVBoxLayout()
         hlayout = QHBoxLayout()
