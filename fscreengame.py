@@ -383,11 +383,11 @@ class FullBox(QDialog):
         layout.addStretch()
         #layout.addWidget(self.refresh)
         self.setLayout(layout)
-        QTimer.singleShot(5000,self.showWhite)
+        QTimer.singleShot(1000,self.showWhite)
         
     def showRefresh(self):
         self.slayout.setCurrentWidget(self.refresh)
-        QTimer.singleShot(3000,self.showWhite)
+        QTimer.singleShot(1000,self.showWhite)
         
     def showWhite(self):
         self.slayout.setCurrentWidget(self.whiteBox)
