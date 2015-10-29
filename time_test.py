@@ -35,4 +35,5 @@ def f():
 app  = fscreengame.QApplication(sys.argv)
 form = Form()
 form.showFullScreen()
-sys.exit(app.exec_())
+_ = input()
+#sys.exit(app.exec_())
