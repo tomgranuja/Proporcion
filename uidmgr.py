@@ -15,42 +15,43 @@ def gen_uid(previas = None):
           print('Creado el identificador:', uid)
           return uid
 
-def init_data_file(uid):
-    fpath = '{}.dat'.format(uid.upper())
-    print('Agregando data a:', fpath)
-    return open(fpath, 'a')
-
-def last_session_index(uid):
-    with open('{}.dat'.format(uid.upper())) as f:
-        sessions = []
-        for l in f.readlines():
-            if l[:5].upper() == '#SESIÓN'[:5]:
-                n = [int(s) for s in l.split() if s.isdigit()][0]
-                sessions.append(n)
-        last_i = sessions[-1]
-        print('Encontrada ultima sesión:', last_i)
-        return last_i
+class User():
+    def __init__(self, uid=None):
+        if uid == None:
+            uid = gen_uid()
+        self.uid = uid
+        self.recFPath = '{}.dat'.format(self.uid)
     
-def get_records_list(uid):
-    with open('{}.dat'.format(uid.upper())) as f:
-        recs_list = []
-        rec_tups = []
-        for l in f.readlines():
-            if l[:5].upper() == '#SESIÓN'[:5]:
-                recs_list.append(rec_tups[:])
-                rec_tups = []
-            else:
-                rec_tups.append(tuple(l.split()))
-        recs_list.append(rec_tups[:])
-        return recs_list[1:]
+    def getRecordsList(self):
+        with open(self.recFPath) as f:
+            recs_list = []
+            rec_tups = []
+            for l in f.readlines():
+                if l[:5].upper() == '#SESIÓN'[:5]:
+                    recs_list.append(rec_tups[:])
+                    rec_tups = []
+                else:
+                    rec_tups.append(tuple(l.split()))
+            recs_list.append(rec_tups[:])
+            return recs_list[1:]
+    
+    def getLastSessionIndex(self):
+        with open(self.recFPath) as f:
+            sessions = []
+            for l in f.readlines():
+                if l[:5].upper() == '#SESIÓN'[:5]:
+                    n = [int(s) for s in l.split() if s.isdigit()][0]
+                    sessions.append(n)
+            last_i = sessions[-1]
+            print('Encontrada ultima sesión:', last_i)
+            return last_i
         
-    
+        
 if __name__ == "__main__":
-    subject = gen_uid()
-    #subject = 'IVQ'
-    user_f = init_data_file(subject)
-    user_f.write('#Sesión 0\n')
-    user_f.close()
-    #user_rec = get_records_list(subject)
-    #i = last_session_index(subject)
-    #for t in user_rec[i]: print(t)
+    subject = User()
+    with open(subject.recFPath, 'a') as f:
+        f.write('#Sesión 0\n')
+    #subject = User('WAM')
+    #recordsList = subject.getRecordsList()
+    #last_i      = subject.getLastSessionIndex()
+    #for tup in recordsList[last_i]: print(tup)
