@@ -358,6 +358,35 @@ class WhiteBox(CustomRateWidget):
         self.blinkperiod = blinkperiod
         
         
+class UserChooser(QDialog):
+    def __init__(self, parent=None):
+        super(UserChooser, self).__init__(parent)
+        self.label    = QLabel("Identificación")
+        self.lineEdit = QLineEdit('ABC')
+        buttonBox = QDialogButtonBox(QDialogButtonBox.Ok |
+                                          QDialogButtonBox.Cancel)
+        layout = QVBoxLayout()
+        layout.addWidget(self.label)
+        layout.addWidget(self.lineEdit)
+        layout.addWidget(buttonBox)
+        self.setLayout(layout)
+        buttonBox.accepted.connect(self.accept)
+        buttonBox.rejected.connect(self.reject)
+        self.lineEdit.selectAll()
+        self.lineEdit.setFocus()
+        self.choosenUid = None
+    
+    def accept(self):
+        validation = True #Pendiente la validacion
+        if validation:
+            self.choosenUid = self.lineEdit.text()
+            QDialog.accept(self)
+        else:
+            self.label.setText("¡¡Uid inválida!!")
+            self.lineEdit.selectAll()
+            self.lineEdit.setFocus()
+            return
+        
 
 class FullBox(QDialog):
     def __init__(self, parent=None):
@@ -367,6 +396,15 @@ class FullBox(QDialog):
         p.setColor(self.backgroundRole(), bgColor)
         self.setPalette(p)
         self.setAutoFillBackground(True)
+        self.userUid = None
+        self.setUserSession()
+        if self.userUid:
+            print("Construyendo juego para {}".format(self.userUid))
+            self.buildGame()
+        else:
+            print("No se identifica usuario, juego sin construir")
+        
+    def buildGame(self):
         self.whiteBox = WhiteBox(break_function=self.showRefresh)
         self.refresh = RefreshWidget()
         layout = QVBoxLayout()
@@ -395,16 +433,24 @@ class FullBox(QDialog):
         #QTimer.singleShot(5000,self.showRefresh)
         pass
     
+    def setUserSession(self):
+        dialog = UserChooser(self)
+        uid = None
+        if dialog.exec_():
+            uid = dialog.choosenUid
+        self.userUid = uid
+            
+    
 if __name__ == "__main__":
     app  = QApplication(sys.argv)
     form = FullBox()
     form.showFullScreen()
     #form.show()
-    for w in [form, 
-              form.whiteBox,
-              form.whiteBox.rateBox,
-              form.whiteBox.slider,
-              form.whiteBox.check]:
-        print(type(w).__name__, w.width(),'x',w.height())
+    #for w in [form, 
+              #form.whiteBox,
+              #form.whiteBox.rateBox,
+              #form.whiteBox.slider,
+              #form.whiteBox.check]:
+        #print(type(w).__name__, w.width(),'x',w.height())
         
     sys.exit(app.exec_())
