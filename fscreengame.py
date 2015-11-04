@@ -391,37 +391,45 @@ class UserChooser(QDialog):
 class FullBox(QDialog):
     def __init__(self, parent=None):
         super(FullBox, self).__init__(parent)
-        p = self.palette()
-        bgColor = QColor(179,179,179)
-        p.setColor(self.backgroundRole(), bgColor)
-        self.setPalette(p)
-        self.setAutoFillBackground(True)
-        self.userUid = None
+        self.setTheBackground(179,179,179)
         self.setUserSession()
         if self.userUid:
             print("Construyendo juego para {}".format(self.userUid))
             self.buildGame()
-        else:
-            print("No se identifica usuario, juego sin construir")
         
+    def setTheBackground(self,r,g,b):
+        p = self.palette()
+        p.setColor(self.backgroundRole(), QColor(r,g,b))
+        self.setPalette(p)
+        self.setAutoFillBackground(True)
+        
+    def setUserSession(self):
+        dialog = UserChooser(self)
+        self.userUid = None
+        if dialog.exec_():
+            self.userUid = dialog.choosenUid
+            print("Usuario {} identificado.".format(self.userUid))
+    
     def buildGame(self):
         self.whiteBox = WhiteBox(break_function=self.showRefresh)
         self.refresh = RefreshWidget()
-        layout = QVBoxLayout()
-        hlayout = QHBoxLayout()
         self.slayout= QStackedLayout()
-        #slayout.setSizeConstraint(4)
         self.slayout.addWidget(self.refresh)
         self.slayout.addWidget(self.whiteBox)
+        self.setLayout(self.slayout)
+        QTimer.singleShot(1000,self.showWhite)
+        
+    def setLayout(self,ly):
+        '''Reimplement to center 'ly' layout arg.'''
+        layout = QVBoxLayout()
+        hlayout = QHBoxLayout()
         hlayout.addStretch()
-        hlayout.addLayout(self.slayout)
+        hlayout.addLayout(ly)
         hlayout.addStretch()
         layout.addStretch()
         layout.addLayout(hlayout)
         layout.addStretch()
-        #layout.addWidget(self.refresh)
-        self.setLayout(layout)
-        QTimer.singleShot(1000,self.showWhite)
+        super(FullBox, self).setLayout(layout)
         
     def showRefresh(self):
         self.slayout.setCurrentWidget(self.refresh)
@@ -431,26 +439,12 @@ class FullBox(QDialog):
         self.slayout.setCurrentWidget(self.whiteBox)
         self.whiteBox.test.testTime.start()
         #QTimer.singleShot(5000,self.showRefresh)
-        pass
-    
-    def setUserSession(self):
-        dialog = UserChooser(self)
-        uid = None
-        if dialog.exec_():
-            uid = dialog.choosenUid
-        self.userUid = uid
-            
     
 if __name__ == "__main__":
     app  = QApplication(sys.argv)
     form = FullBox()
+    if form.userUid == None:
+        print("No se identificó usuario, saliendo.")
+        sys.exit(QDialog.Rejected)
     form.showFullScreen()
-    #form.show()
-    #for w in [form, 
-              #form.whiteBox,
-              #form.whiteBox.rateBox,
-              #form.whiteBox.slider,
-              #form.whiteBox.check]:
-        #print(type(w).__name__, w.width(),'x',w.height())
-        
     sys.exit(app.exec_())
