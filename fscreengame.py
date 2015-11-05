@@ -5,6 +5,7 @@ import sys, random
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from functools import partial
+import uidmgr
 
 example_data = '''
 1.0 0.5
@@ -28,7 +29,8 @@ class Training():
     YELLOW_ERROR = 0.15
     #Pausas en [3, 6, 9, 12, ...,33]
     TEST_BREAKS  = range(3,36,3)
-    def __init__(self, data=None, break_function=None):
+    def __init__(self, uid=None, data=None, break_function=None):
+        self.user = uidmgr.User(uid)
         self.currentTrial = None
         self.data = self.getRates(data)
         self.currentHeight= self.data[self.currentTrial][0]
@@ -287,13 +289,13 @@ class RefreshWidget(CustomRateWidget):
 class WhiteBox(CustomRateWidget):
     #WIDTH  = 640
     #HEIGHT = 660
-    def __init__(self, break_function=None, parent=None):
+    def __init__(self, uid = None, break_function=None, parent=None):
         super(WhiteBox, self).__init__(parent)
         p = self.palette()
         p.setColor(self.backgroundRole(), Qt.white)
         self.setPalette(p)
         self.setAutoFillBackground(True)
-        self.test = Training(example_data, break_function)
+        self.test = Training(uid, example_data, break_function)
         layout = QVBoxLayout()
         layout.addLayout(self.rateBoxLayout())
         layout.addStretch()
@@ -411,7 +413,8 @@ class FullBox(QDialog):
             print("Usuario {} identificado.".format(self.userUid))
     
     def buildGame(self):
-        self.whiteBox = WhiteBox(break_function=self.showRefresh)
+        self.whiteBox = WhiteBox(uid = self.userUid,
+                                 break_function = self.showRefresh)
         self.refresh = RefreshWidget()
         self.slayout= QStackedLayout()
         self.slayout.addWidget(self.refresh)
