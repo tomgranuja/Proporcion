@@ -3,17 +3,28 @@
 
 import random, string, os
 LENGTH = 3
+POOL   = string.digits + string.ascii_uppercase
 
 def gen_uid(previas = None):
     if previas == None:
         previas = [f[:LENGTH] for f in os.listdir('./')]
     while True:
-      chars = [random.choice(string.digits + string.ascii_uppercase)
-               for i in range(LENGTH) ]
+      chars = [random.choice(POOL) for i in range(LENGTH) ]
       uid = ''.join(chars)
       if uid not in previas:
           print('Creado el identificador:', uid)
           return uid
+
+def isValidUid(chars, length=LENGTH, pool=POOL):
+    test = False
+    if chars and len(chars) == length:
+        for c in chars:
+            if c not in pool:
+                break
+        else:
+            test = True
+    return test
+            
 
 def nextSessionId(current=None):
     if current == None:
