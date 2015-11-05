@@ -22,36 +22,39 @@ class User():
         self.uid = uid
         self.recFPath = '{}.dat'.format(self.uid)
     
-    def getRecordsList(self):
+    def getRecordsDic(self):
         with open(self.recFPath) as f:
-            recs_list = []
-            rec_tups = []
+            record = {}
             for l in f.readlines():
-                if l[:5].upper() == '#SESIÓN'[:5]:
-                    recs_list.append(rec_tups[:])
-                    rec_tups = []
-                else:
-                    rec_tups.append(tuple(l.split()))
-            recs_list.append(rec_tups[:])
-            return recs_list[1:]
+                if l[0] == '#':
+                    if l.upper().strip('#S\n').isdigit():
+                        key = l.upper().strip('#\n')
+                        record[key] = []
+                    continue
+                tup = tuple(l.split())
+                try:
+                    record[key].append(tup)
+                    #print(l[:-1])
+                except UnboundLocalError:
+                    print('Warn: Dato sin sesión:',
+                          l[:-1],
+                          'descartado')
+            return record
     
-    def getLastSessionIndex(self):
-        with open(self.recFPath) as f:
-            sessions = []
-            for l in f.readlines():
-                if l[:5].upper() == '#SESIÓN'[:5]:
-                    n = [int(s) for s in l.split() if s.isdigit()][0]
-                    sessions.append(n)
-            last_i = sessions[-1]
-            print('Encontrada ultima sesión:', last_i)
-            return last_i
+    def getLastSessionId(self):
+        recdic = self.getRecordsDic()
+        sessions = [ k for k in recdic ]
+        last = None
+        if sessions:
+            last = sorted(sessions).pop()
+        return last
         
         
 if __name__ == "__main__":
-    subject = User()
-    with open(subject.recFPath, 'a') as f:
-        f.write('#Sesión 0\n')
-    #subject = User('WAM')
-    #recordsList = subject.getRecordsList()
-    #last_i      = subject.getLastSessionIndex()
-    #for tup in recordsList[last_i]: print(tup)
+    #subject = User()
+    #with open(subject.recFPath, 'a') as f:
+        #f.write('#S01\n')
+    subject = User('H26')
+    recordsDic = subject.getRecordsDic()
+    last_i      = subject.getLastSessionId()
+    for tup in recordsDic.get(last_i,[]): print(tup)
