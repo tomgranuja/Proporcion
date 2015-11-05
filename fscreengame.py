@@ -81,6 +81,9 @@ class Training():
         
     def writeAnswer(self, time, rate):
         print(self.currentTrial, time, rate)
+        with open(self.user.recFPath, 'a') as f:
+            s = '{} {} {}\n'.format(self.currentTrial, time, rate)
+            f.write(s)
     
     def callBreakFunction(self):
         if self.break_function:
