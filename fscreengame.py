@@ -31,6 +31,7 @@ class Training():
     TEST_BREAKS  = range(3,36,3)
     def __init__(self, uid=None, data=None, break_function=None):
         self.user = uidmgr.User(uid)
+        self.initFileRecord()
         self.currentTrial = None
         self.data = self.getRates(data)
         self.currentHeight= self.data[self.currentTrial][0]
@@ -38,6 +39,13 @@ class Training():
         self.testTime = QTime()
         self.break_function = break_function
     
+    def initFileRecord(self):
+        lastSession = self.user.getLastSessionId()
+        currentSession = uidmgr.nextSessionId(lastSession)
+        with open(self.user.recFPath, 'a') as f:
+            s = '#{}\n'.format(currentSession)
+            f.write(s)
+        
     def getRates(self, data):
         '''Heights,rates from data string, reset trial counter.'''
         tupls_list = None
