@@ -390,9 +390,10 @@ class UserChooser(QDialog):
         self.choosenUid = None
     
     def accept(self):
-        validation = True #Pendiente la validacion
+        userText = self.lineEdit.text().upper()
+        validation = uidmgr.isValidUid(userText)
         if validation:
-            self.choosenUid = self.lineEdit.text()
+            self.choosenUid = userText
             QDialog.accept(self)
         else:
             self.label.setText("¡¡Uid inválida!!")
