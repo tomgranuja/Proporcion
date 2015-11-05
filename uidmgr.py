@@ -23,23 +23,25 @@ class User():
         self.recFPath = '{}.dat'.format(self.uid)
     
     def getRecordsDic(self):
-        with open(self.recFPath) as f:
-            record = {}
-            for l in f.readlines():
-                if l[0] == '#':
-                    if l.upper().strip('#S\n').isdigit():
-                        key = l.upper().strip('#\n')
-                        record[key] = []
-                    continue
-                tup = tuple(l.split())
-                try:
-                    record[key].append(tup)
-                    #print(l[:-1])
-                except UnboundLocalError:
-                    print('Warn: Dato sin sesión:',
-                          l[:-1],
-                          'descartado')
-            return record
+        record = {}
+        try:
+            with open(self.recFPath) as f:
+                for l in f.readlines():
+                    if l[0] == '#':
+                        if l.upper().strip('#S\n').isdigit():
+                            key = l.upper().strip('#\n')
+                            record[key] = []
+                        continue
+                    tup = tuple(l.split())
+                    try:
+                        record[key].append(tup)
+                        #print(l[:-1])
+                    except UnboundLocalError:
+                        print('Warn: Dato sin sesión:',
+                            l[:-1],
+                            'descartado')
+        except FileNotFoundError: pass
+        return record
     
     def getLastSessionId(self):
         recdic = self.getRecordsDic()
