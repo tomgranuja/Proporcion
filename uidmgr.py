@@ -15,6 +15,12 @@ def gen_uid(previas = None):
           print('Creado el identificador:', uid)
           return uid
 
+def nextSessionId(current=None):
+    if current == None:
+        current = 'S00'
+    i = int(current.strip('S')) + 1
+    return 'S{:02}'.format(i)
+
 class User():
     def __init__(self, uid=None):
         if uid == None:
