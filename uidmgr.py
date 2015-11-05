@@ -67,7 +67,16 @@ class User():
         if sessions:
             last = sorted(sessions).pop()
         return last
-        
+    
+    def delSession(self, sId):
+        record = self.getRecordsDic()
+        if sId in record:
+            del(record[sId])
+        with open(self.recFPath,'w') as f:
+            for session in sorted(record.keys()):
+                f.write('#{}\n'.format(session))
+                for i, t, r in record[session]:
+                    f.write('{} {} {}\n'.format(i,t,r))
         
 if __name__ == "__main__":
     #subject = User()
