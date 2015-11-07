@@ -159,14 +159,18 @@ class Slider(CustomRateWidget):
     #WIDTH  = 440
     #HEIGHT = 60
     sliderMouseRelease = pyqtSignal(bool)
-    def __init__(self, timeoutTimer = QTimer(), parent=None):
+    def __init__(self, timeoutTimer = QTimer(), 
+                 testTime     = QTime(),
+                 parent=None):
         super(Slider, self).__init__(parent)
         self.timeoutTimer = timeoutTimer
+        self.testTime = testTime
         self.riel=QLine(self.xFromRate(0),
                         self.yFromRate(0.5),
                         self.xFromRate(1),
                         self.yFromRate(0.5))
         self._userClickX = None
+        self._userTime   = None
         self._mouseListen = True
         #self.sliderMouseRelease = pyqtSignal(float)    
         
@@ -201,18 +205,20 @@ class Slider(CustomRateWidget):
         if self._mouseListen:
             self._mouseListen = False
             self.timeoutTimer.stop()
-            event.time = None
+            event.time = self.testTime.elapsed()
             self.checkUserEvent(event)
             self.update()
     
     def checkUserEvent(self, event):
-        t = event.time
+        t = None
         x = None
         user_release = False
         if event.type() == QEvent.MouseButtonRelease:
             user_release = True
             x = max(self.riel.x1(), min(self.riel.x2(), event.x()))
+            t = event.time
         self._userClickX = x
+        self._userTime = t
         self.sliderMouseRelease.emit(user_release)
 
 class CheckWidget(CustomRateWidget):
@@ -339,7 +345,8 @@ class WhiteBox(CustomRateWidget):
         self.rPhotoBox = QLabel()
         self.lPhotoBox.setPixmap(QPixmap('cherri.png'))
         self.rPhotoBox.setPixmap(QPixmap('cherrimas.png'))
-        self.slider = Slider()
+        self.slider = Slider(timeoutTimer = self.timeoutTimer,
+                             testTime     = self.testTime)
         self.check = CheckWidget(self.test.GREEN_ERROR,
                                  self.test.YELLOW_ERROR,
                                  parent = self.slider)
@@ -352,7 +359,7 @@ class WhiteBox(CustomRateWidget):
         return layout
     
     def onSliderMouseRelease(self, byUser=False):
-        mseconds =self.testTime.elapsed()
+        mseconds =self.slider._userTime
         rate = None
         if byUser:
             rate = self.slider.rateFromX(self.slider._userClickX)
@@ -390,7 +397,6 @@ class WhiteBox(CustomRateWidget):
         
     def onTimeOut(self):
         self.slider.mouseReleaseEvent()
-        print('Tiempo terminado!!')
         
         
 class UserChooser(QDialog):
@@ -475,6 +481,7 @@ class FullBox(QDialog):
     def showWhite(self):
         self.slayout.setCurrentWidget(self.whiteBox)
         self.whiteBox.testTime.start()
+        self.whiteBox.timeoutTimer.start()
         #QTimer.singleShot(5000,self.showRefresh)
     
 if __name__ == "__main__":
