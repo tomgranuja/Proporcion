@@ -327,8 +327,7 @@ class WhiteBox(CustomRateWidget):
         layout.addLayout(self.sliderLayout())
         self.setLayout(layout)
         self.slider.sliderMouseRelease.connect(self.onSliderMouseRelease)
-        self.testTime.start()
-        self.timeoutTimer.start()
+        self.updateTime()
         
     def rateBoxLayout(self):
         self.rateBox = RateBox()
@@ -379,8 +378,7 @@ class WhiteBox(CustomRateWidget):
         self.rateBox.update()
         self.slider._userClickX = None
         self.slider._mouseListen = True
-        self.testTime.start()
-        self.timeoutTimer.start()
+        self.updateTime()
         
     def setTimers(self, fbtime      = 3000, 
                         blinktime   = 1600, 
@@ -397,6 +395,10 @@ class WhiteBox(CustomRateWidget):
         
     def onTimeOut(self):
         self.slider.mouseReleaseEvent()
+    
+    def updateTime(self):
+        self.testTime.start()
+        self.timeoutTimer.start()
         
         
 class UserChooser(QDialog):
@@ -480,8 +482,7 @@ class FullBox(QDialog):
         
     def showWhite(self):
         self.slayout.setCurrentWidget(self.whiteBox)
-        self.whiteBox.testTime.start()
-        self.whiteBox.timeoutTimer.start()
+        self.whiteBox.updateTime()
         #QTimer.singleShot(5000,self.showRefresh)
     
 if __name__ == "__main__":
