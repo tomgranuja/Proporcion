@@ -252,9 +252,10 @@ class Slider(CustomRateWidget):
         self.setMouseTracking(False)
     
     def mouseMoveEvent(self, event=None):
-        x = event.x()
-        self._userClickX = max(self.riel.x1(), min(self.riel.x2(), x))
-        self.update()
+        if self._mouseListen:
+            x = event.x()
+            self._userClickX = max(self.riel.x1(), min(self.riel.x2(), x))
+            self.update()
     
     def mouseReleaseEvent(self,event=QEvent(QEvent.User)):
         if self._mouseListen:
