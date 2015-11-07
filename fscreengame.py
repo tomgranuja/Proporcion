@@ -62,6 +62,7 @@ class Training():
             if self.currentTrial >= len(self.data):
                 print("Training finished, reseting trials.")
                 self.currentTrial = 0
+                self.callBreakFunction('gracias')
             if self.currentTrial in self.TEST_BREAKS:
                 self.callBreakFunction()
             self.currentHeight = self.data[self.currentTrial][0]
@@ -84,9 +85,9 @@ class Training():
             s = '{} {} {}\n'.format(self.currentTrial, time, rate)
             f.write(s)
     
-    def callBreakFunction(self):
+    def callBreakFunction(self, btype=None):
         if self.break_function:
-            self.break_function()
+            self.break_function(btype)
 
 
 def pixelFromRate(rate, t, o = 0):
@@ -308,7 +309,7 @@ class RefreshWidget(CustomRateWidget):
           'listo?':      partial(self.setMsgWdg,'¿Estás listo?'),
           'pausa':       self.setIntroWdg,
           'parciales':   partial(self.setMsgWdg,'Tus resultados...'),
-          'gracias': self.setIntroWdg,
+          'gracias':     partial(self.setMsgWdg,'Gracias...')
         }
         self.setType.get(wdgType, self.setType['intro'])()
         layout = QVBoxLayout()
@@ -474,7 +475,7 @@ class FullBox(QDialog):
     
     def buildGame(self):
         self.whiteBox = WhiteBox(uid = self.userUid,
-                                 break_function = self.showRefresh)
+                                 break_function = self.takeABreak)
         self.slayout= QStackedLayout()
         self.slayout.dic = self.makeStckDic('intro',
                                             'a_practicar',
@@ -486,6 +487,19 @@ class FullBox(QDialog):
         self.slayout.setCurrentWidget(self.slayout.dic['a_practicar'])
         self.setLayout(self.slayout)
         QTimer.singleShot(1000,self.showWhite)
+    
+    def takeABreak(self, breakType=None):
+        #self.whiteBox.timeoutTimer.stop()
+        if breakType == None:
+            breakType = 'intro'
+        wdg = self.slayout.dic[breakType]
+        self.slayout.setCurrentWidget(wdg)
+        QTimer.singleShot(1000,self.showWhite)
+    
+    def showWhite(self):
+        self.slayout.setCurrentWidget(self.slayout.dic['whiteBox'])
+        self.whiteBox.updateTime()
+        #QTimer.singleShot(5000,self.showRefresh)
         
     def makeStckDic(self, *args, whiteBox):
         stckDic = {arg: RefreshWidget(arg) for arg in args}
@@ -506,14 +520,6 @@ class FullBox(QDialog):
         layout.addStretch()
         super(FullBox, self).setLayout(layout)
         
-    def showRefresh(self):
-        self.slayout.setCurrentWidget(self.slayout.dic['pausa'])
-        QTimer.singleShot(1000,self.showWhite)
-        
-    def showWhite(self):
-        self.slayout.setCurrentWidget(self.slayout.dic['whiteBox'])
-        self.whiteBox.updateTime()
-        #QTimer.singleShot(5000,self.showRefresh)
     
 if __name__ == "__main__":
     app  = QApplication(sys.argv)
