@@ -315,6 +315,7 @@ class WhiteBox(CustomRateWidget):
         self.setTimers()
         self.slider.sliderMouseRelease.connect(self.onSliderMouseRelease)
         self.test.testTime.start()
+        self.timeoutTimer.start()
         
     def rateBoxLayout(self):
         self.rateBox = RateBox()
@@ -344,6 +345,7 @@ class WhiteBox(CustomRateWidget):
         return layout
     
     def onSliderMouseRelease(self, rate):
+        self.timeoutTimer.stop()
         mseconds =self.test.testTime.elapsed()
         self.test.writeAnswer(mseconds, rate)
         self.check.feedback = self.test.rateCheck(rate)
@@ -362,13 +364,22 @@ class WhiteBox(CustomRateWidget):
         self.slider._userClickX = None
         self.slider._mouseListen = True
         self.test.testTime.start()
+        self.timeoutTimer.start()
         
     def setTimers(self, fbtime      = 3000, 
                         blinktime   = 1600, 
-                        blinkperiod =  200):
+                        blinkperiod =  200,
+                        timeout     = 7000):
         self.fbtime = fbtime
         self.blinktime = blinktime
         self.blinkperiod = blinkperiod
+        self.timeoutTimer    = QTimer()
+        self.timeoutTimer.setSingleShot(True)
+        self.timeoutTimer.setInterval(timeout)
+        self.timeoutTimer.timeout.connect(self.onTimeOut)
+        
+    def onTimeOut(self):
+        print('Tiempo terminado!!')
         
         
 class UserChooser(QDialog):
