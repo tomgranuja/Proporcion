@@ -296,19 +296,37 @@ class RefreshWidget(CustomRateWidget):
     HEIGHT = 1.03125 * CustomRateWidget.REF_HEIGHT
     #WIDTH  = 640
     #HEIGHT = 660
-    def __init__(self, parent=None):
+    def __init__(self, wdgType=None, parent=None):
         super(RefreshWidget, self).__init__(parent)
         p = self.palette()
         p.setColor(self.backgroundRole(), Qt.yellow)
         self.setPalette(p)
         self.setAutoFillBackground(True)
-        bearpix = QPixmap('ninjabear.png')
-        self.label = QLabel()
-        self.label.setPixmap(bearpix)
+        self.setType = {
+          'intro':       self.setIntroWdg,
+          'a_practicar': partial(self.setMsgWdg,'Vamos a practicar'),
+          'listo?':      partial(self.setMsgWdg,'¿Estás listo?'),
+          'pausa':       self.setIntroWdg,
+          'parciales':   partial(self.setMsgWdg,'Tus resultados...'),
+          'gracias': self.setIntroWdg,
+        }
+        self.setType.get(wdgType, self.setType['intro'])()
         layout = QVBoxLayout()
-        layout.addWidget(self.label)
+        layout.addWidget(self.wdg)
         self.setLayout(layout)
         
+    def setIntroWdg(self):
+        bearpix = QPixmap('ninjabear.png')
+        self.wdg = QLabel()
+        self.wdg.setPixmap(bearpix)
+        
+    def setMsgWdg(self, msg):
+        self.wdg = QLabel()
+        font = self.wdg.font()
+        font.setPointSize(32)
+        font.setBold(True)
+        self.wdg.setFont(font)
+        self.wdg.setText(msg)
 
 class WhiteBox(CustomRateWidget):
     #WIDTH  = 640
@@ -457,12 +475,24 @@ class FullBox(QDialog):
     def buildGame(self):
         self.whiteBox = WhiteBox(uid = self.userUid,
                                  break_function = self.showRefresh)
-        self.refresh = RefreshWidget()
         self.slayout= QStackedLayout()
-        self.slayout.addWidget(self.refresh)
-        self.slayout.addWidget(self.whiteBox)
+        self.slayout.dic = self.makeStckDic('intro',
+                                            'a_practicar',
+                                            'listo?',
+                                            'pausa',
+                                            'parciales',
+                                            'gracias',
+                                            whiteBox = self.whiteBox)
+        self.slayout.setCurrentWidget(self.slayout.dic['a_practicar'])
         self.setLayout(self.slayout)
         QTimer.singleShot(1000,self.showWhite)
+        
+    def makeStckDic(self, *args, whiteBox):
+        stckDic = {arg: RefreshWidget(arg) for arg in args}
+        stckDic['whiteBox'] = whiteBox
+        for k in stckDic:
+            self.slayout.addWidget(stckDic[k])
+        return stckDic
         
     def setLayout(self,ly):
         '''Reimplement to center 'ly' layout arg.'''
@@ -477,11 +507,11 @@ class FullBox(QDialog):
         super(FullBox, self).setLayout(layout)
         
     def showRefresh(self):
-        self.slayout.setCurrentWidget(self.refresh)
+        self.slayout.setCurrentWidget(self.slayout.dic['pausa'])
         QTimer.singleShot(1000,self.showWhite)
         
     def showWhite(self):
-        self.slayout.setCurrentWidget(self.whiteBox)
+        self.slayout.setCurrentWidget(self.slayout.dic['whiteBox'])
         self.whiteBox.updateTime()
         #QTimer.singleShot(5000,self.showRefresh)
     
