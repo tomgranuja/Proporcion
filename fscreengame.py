@@ -70,7 +70,7 @@ class Training():
         
     def rateCheck(self, r=None):
         result = None
-        if 0 <= r <= 1:
+        if r and 0 <= r <= 1:
             result = 'outside'
             error = abs(r - self.currentRate)
             if error <= Training.YELLOW_ERROR:
@@ -159,9 +159,10 @@ class Slider(CustomRateWidget):
     HEIGHT = 0.0938 * CustomRateWidget.REF_HEIGHT 
     #WIDTH  = 440
     #HEIGHT = 60
-    sliderMouseRelease = pyqtSignal(float)
-    def __init__(self, parent=None):
+    sliderMouseRelease = pyqtSignal(bool)
+    def __init__(self, timeoutTimer = QTimer(), parent=None):
         super(Slider, self).__init__(parent)
+        self.timeoutTimer = timeoutTimer
         self.riel=QLine(self.xFromRate(0),
                         self.yFromRate(0.5),
                         self.xFromRate(1),
@@ -197,16 +198,23 @@ class Slider(CustomRateWidget):
         self._userClickX = max(self.riel.x1(), min(self.riel.x2(), x))
         self.update()
     
-    def mouseReleaseEvent(self,event):
+    def mouseReleaseEvent(self,event=QEvent(QEvent.User)):
         if self._mouseListen:
             self._mouseListen = False
-            self.checkUserEvent(None, event.x())
+            self.timeoutTimer.stop()
+            event.time = None
+            self.checkUserEvent(event)
             self.update()
     
-    def checkUserEvent(self, time, x):
-        self._userClickX = max(self.riel.x1(), min(self.riel.x2(), x))
-        rate = self.rateFromX(self._userClickX)
-        self.sliderMouseRelease.emit(rate)
+    def checkUserEvent(self, event):
+        t = event.time
+        x = None
+        user_release = False
+        if event.type() == QEvent.MouseButtonRelease:
+            user_release = True
+            x = max(self.riel.x1(), min(self.riel.x2(), event.x()))
+        self._userClickX = x
+        self.sliderMouseRelease.emit(user_release)
 
 class CheckWidget(CustomRateWidget):
     WIDTH  = Slider.WIDTH
@@ -306,13 +314,13 @@ class WhiteBox(CustomRateWidget):
         p.setColor(self.backgroundRole(), Qt.white)
         self.setPalette(p)
         self.setAutoFillBackground(True)
+        self.setTimers()
         self.test = Training(uid, example_data, break_function)
         layout = QVBoxLayout()
         layout.addLayout(self.rateBoxLayout())
         layout.addStretch()
         layout.addLayout(self.sliderLayout())
         self.setLayout(layout)
-        self.setTimers()
         self.slider.sliderMouseRelease.connect(self.onSliderMouseRelease)
         self.test.testTime.start()
         self.timeoutTimer.start()
@@ -344,9 +352,11 @@ class WhiteBox(CustomRateWidget):
         layout.addStretch()
         return layout
     
-    def onSliderMouseRelease(self, rate):
-        self.timeoutTimer.stop()
+    def onSliderMouseRelease(self, byUser=False):
         mseconds =self.test.testTime.elapsed()
+        rate = None
+        if byUser:
+            rate = self.slider.rateFromX(self.slider._userClickX)
         self.test.writeAnswer(mseconds, rate)
         self.check.feedback = self.test.rateCheck(rate)
         self.check.adjustRate(self.test.currentRate)
@@ -373,12 +383,13 @@ class WhiteBox(CustomRateWidget):
         self.fbtime = fbtime
         self.blinktime = blinktime
         self.blinkperiod = blinkperiod
-        self.timeoutTimer    = QTimer()
+        self.timeoutTimer = QTimer()
         self.timeoutTimer.setSingleShot(True)
         self.timeoutTimer.setInterval(timeout)
         self.timeoutTimer.timeout.connect(self.onTimeOut)
         
     def onTimeOut(self):
+        self.slider.mouseReleaseEvent()
         print('Tiempo terminado!!')
         
         
