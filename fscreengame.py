@@ -36,7 +36,6 @@ class Training():
         self.data = self.getRates(data)
         self.currentHeight= self.data[self.currentTrial][0]
         self.currentRate  = self.data[self.currentTrial][1]
-        self.testTime = QTime()
         self.break_function = break_function
     
     def initFileRecord(self):
@@ -322,7 +321,7 @@ class WhiteBox(CustomRateWidget):
         layout.addLayout(self.sliderLayout())
         self.setLayout(layout)
         self.slider.sliderMouseRelease.connect(self.onSliderMouseRelease)
-        self.test.testTime.start()
+        self.testTime.start()
         self.timeoutTimer.start()
         
     def rateBoxLayout(self):
@@ -353,7 +352,7 @@ class WhiteBox(CustomRateWidget):
         return layout
     
     def onSliderMouseRelease(self, byUser=False):
-        mseconds =self.test.testTime.elapsed()
+        mseconds =self.testTime.elapsed()
         rate = None
         if byUser:
             rate = self.slider.rateFromX(self.slider._userClickX)
@@ -373,7 +372,7 @@ class WhiteBox(CustomRateWidget):
         self.rateBox.update()
         self.slider._userClickX = None
         self.slider._mouseListen = True
-        self.test.testTime.start()
+        self.testTime.start()
         self.timeoutTimer.start()
         
     def setTimers(self, fbtime      = 3000, 
@@ -387,6 +386,7 @@ class WhiteBox(CustomRateWidget):
         self.timeoutTimer.setSingleShot(True)
         self.timeoutTimer.setInterval(timeout)
         self.timeoutTimer.timeout.connect(self.onTimeOut)
+        self.testTime = QTime()
         
     def onTimeOut(self):
         self.slider.mouseReleaseEvent()
@@ -474,7 +474,7 @@ class FullBox(QDialog):
         
     def showWhite(self):
         self.slayout.setCurrentWidget(self.whiteBox)
-        self.whiteBox.test.testTime.start()
+        self.whiteBox.testTime.start()
         #QTimer.singleShot(5000,self.showRefresh)
     
 if __name__ == "__main__":
