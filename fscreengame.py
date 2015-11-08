@@ -7,33 +7,74 @@ from PyQt4.QtGui import *
 from functools import partial
 import uidmgr
 
-example_data = '''
+#example_data = '''
+#1.0 0.5
+#1.0 0.25
+#0.6 0.5
+#0.6 0.75
+#0.6 0.25
+#0.3 0.8
+#0.3 0.2
+#0.3 0.5
+#0.3 0.75
+#1.0 0.2
+#1.0 0.8
+#1.0 0.5
+#1.0 0.25
+#1.0 0.75
+#1.0 0.5
+#1.0 0.5
+#1.0 0.25
+#0.6 0.5
+#0.6 0.75
+#0.6 0.25
+#0.3 0.8
+#0.3 0.2
+#0.3 0.5
+#0.3 0.75
+#1.0 0.2
+#1.0 0.8
+example_data= '''
 1.0 0.5
 1.0 0.25
-0.6 0.5
+1.0 0.75
+1.0 0.5
 0.6 0.75
 0.6 0.25
 0.3 0.8
 0.3 0.2
 0.3 0.5
 0.3 0.75
-1.0 0.2
-1.0 0.7
-1.0 0.3
-0.5 0.5
+'''[1:]
+
+practice_data = '''
+0.75 0.25
+0.75 0.75
+0.75 0.5
 '''[1:]
 
 
 class Training():
     GREEN_ERROR  = 0.05
     YELLOW_ERROR = 0.15
-    #Pausas en [3, 6, 9, 12, ...,33]
-    TEST_BREAKS  = range(3,36,3)
-    def __init__(self, uid=None, data=None, break_function=None):
+    TEST_PARTIALS  = [2,4,6,8]
+    TEST_PAUSE     = [5]
+    #TEST_PARTIALS  = range(9,36,9)
+    #TEST_PAUSE     = [18]
+    
+    def __init__(self, uid=None, 
+                       dataStr=None, 
+                       practiceStr = None, 
+                       break_function=None):
         self.user = uidmgr.User(uid)
         self.initFileRecord()
         self.currentTrial = None
-        self.data = self.getRates(data)
+        self.dataStr = dataStr
+        self.data = self.getRates(self.dataStr)
+        self.practice = False
+        if practiceStr:
+            self.practice = True
+            self.data = self.getRates(practiceStr)
         self.currentHeight= self.data[self.currentTrial][0]
         self.currentRate  = self.data[self.currentTrial][1]
         self.break_function = break_function
@@ -50,7 +91,8 @@ class Training():
         tupls_list = None
         if data:
             tupls_list = [ (float(h), float(r)) for h,r in[
-                           tuple(l.split()) for l in data.splitlines() ]]
+                           tuple(l.split()) for l in data.splitlines()
+                           ]]
             self.currentTrial = 0
             print(tupls_list)
         return tupls_list
@@ -59,12 +101,20 @@ class Training():
         '''Next rate in list, update currentRate.'''
         if self.currentTrial != None:
             self.currentTrial += 1
-            if self.currentTrial >= len(self.data):
-                print("Training finished, reseting trials.")
-                self.currentTrial = 0
-                self.callBreakFunction('gracias')
-            if self.currentTrial in self.TEST_BREAKS:
-                self.callBreakFunction()
+            if self.practice:
+                if self.currentTrial >= len(self.data):
+                    self.practice = False
+                    self.data = self.getRates(self.dataStr)
+                    self.callBreakFunction('listo?')
+            else:
+                if self.currentTrial >= len(self.data):
+                    print("Training finished, reseting trials.")
+                    self.currentTrial = 0
+                    self.callBreakFunction('gracias')
+                if self.currentTrial in self.TEST_PARTIALS:
+                    self.callBreakFunction('parciales')
+                elif self.currentTrial in self.TEST_PAUSE:
+                    self.callBreakFunction('pausa')
             self.currentHeight = self.data[self.currentTrial][0]
             self.currentRate = self.data[self.currentTrial][1]
         
@@ -339,7 +389,10 @@ class WhiteBox(CustomRateWidget):
         self.setPalette(p)
         self.setAutoFillBackground(True)
         self.setTimers()
-        self.test = Training(uid, example_data, break_function)
+        self.test = Training(uid, 
+                             example_data,
+                             practice_data,
+                             break_function)
         layout = QVBoxLayout()
         layout.addLayout(self.rateBoxLayout())
         layout.addStretch()
@@ -484,8 +537,15 @@ class FullBox(QDialog):
                                             'parciales',
                                             'gracias',
                                             whiteBox = self.whiteBox)
-        self.slayout.setCurrentWidget(self.slayout.dic['a_practicar'])
+        wdg = self.slayout.dic['intro']
+        if self.whiteBox.test.practice:
+            wdg = self.slayout.dic['a_practicar']
+        self.slayout.setCurrentWidget(wdg)
         self.setLayout(self.slayout)
+        self.whiteBox.setTimers(fbtime      =  500, 
+                                blinktime   =  200, 
+                                blinkperiod =   50,
+                                timeout     = 2000)
         QTimer.singleShot(1000,self.showWhite)
     
     def takeABreak(self, breakType=None):
