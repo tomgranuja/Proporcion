@@ -32,9 +32,9 @@ import uidmgr
 #0.3 0.2
 #0.3 0.5
 #0.3 0.75
-#1.0 0.2
-#1.0 0.8
 example_data= '''
+1.0 0.2
+1.0 0.8
 1.0 0.5
 1.0 0.25
 1.0 0.75
@@ -53,31 +53,31 @@ practice_data = '''
 0.75 0.5
 '''[1:]
 
+#practice_data = None
 
 class Training():
     GREEN_ERROR  = 0.05
     YELLOW_ERROR = 0.15
-    TEST_PARTIALS  = [2,4,6,8]
-    TEST_PAUSE     = [5]
+    TEST_PARTIALS  = [2,4,6,8,10]
+    TEST_PAUSE     = [6]
     #TEST_PARTIALS  = range(9,36,9)
     #TEST_PAUSE     = [18]
     
     def __init__(self, uid=None, 
                        dataStr=None, 
-                       practiceStr = None, 
-                       break_function=None):
+                       practiceStr = None):
         self.user = uidmgr.User(uid)
         self.initFileRecord()
         self.currentTrial = None
         self.dataStr = dataStr
-        self.data = self.getRates(self.dataStr)
         self.practice = False
         if practiceStr:
             self.practice = True
             self.data = self.getRates(practiceStr)
-        self.currentHeight= self.data[self.currentTrial][0]
-        self.currentRate  = self.data[self.currentTrial][1]
-        self.break_function = break_function
+        else: 
+            self.data = self.getRates(self.dataStr)
+        self.currentHeight = self.data[self.currentTrial][0]
+        self.currentRate   = self.data[self.currentTrial][1]
     
     def initFileRecord(self):
         lastSession = self.user.getLastSessionId()
@@ -99,24 +99,26 @@ class Training():
         
     def toNextRate(self):
         '''Next rate in list, update currentRate.'''
+        aBreak = None
         if self.currentTrial != None:
             self.currentTrial += 1
             if self.practice:
                 if self.currentTrial >= len(self.data):
                     self.practice = False
                     self.data = self.getRates(self.dataStr)
-                    self.callBreakFunction('listo?')
+                    aBreak = 'fin_practica'
             else:
                 if self.currentTrial >= len(self.data):
                     print("Training finished, reseting trials.")
                     self.currentTrial = 0
-                    self.callBreakFunction('gracias')
-                if self.currentTrial in self.TEST_PARTIALS:
-                    self.callBreakFunction('parciales')
-                elif self.currentTrial in self.TEST_PAUSE:
-                    self.callBreakFunction('pausa')
+                    aBreak = 'gracias'
+                if self.currentTrial in self.TEST_PAUSE:
+                    aBreak = 'pausa'
+                elif self.currentTrial in self.TEST_PARTIALS:
+                    aBreak = 'parciales'
             self.currentHeight = self.data[self.currentTrial][0]
             self.currentRate = self.data[self.currentTrial][1]
+        return aBreak
         
     def rateCheck(self, r=None):
         result = None
@@ -134,10 +136,6 @@ class Training():
         with open(self.user.recFPath, 'a') as f:
             s = '{} {} {}\n'.format(self.currentTrial, time, rate)
             f.write(s)
-    
-    def callBreakFunction(self, btype=None):
-        if self.break_function:
-            self.break_function(btype)
 
 
 def pixelFromRate(rate, t, o = 0):
@@ -211,11 +209,10 @@ class Slider(CustomRateWidget):
     #HEIGHT = 60
     sliderMouseRelease = pyqtSignal(bool)
     def __init__(self, timeoutTimer = QTimer(), 
-                 testTime     = QTime(),
                  parent=None):
         super(Slider, self).__init__(parent)
         self.timeoutTimer = timeoutTimer
-        self.testTime = testTime
+        self.testTime = QTime()
         self.riel=QLine(self.xFromRate(0),
                         self.yFromRate(0.5),
                         self.xFromRate(1),
@@ -391,8 +388,8 @@ class WhiteBox(CustomRateWidget):
         self.setTimers()
         self.test = Training(uid, 
                              example_data,
-                             practice_data,
-                             break_function)
+                             practice_data)
+        self.breakFuncion = break_function
         layout = QVBoxLayout()
         layout.addLayout(self.rateBoxLayout())
         layout.addStretch()
@@ -416,8 +413,7 @@ class WhiteBox(CustomRateWidget):
         self.rPhotoBox = QLabel()
         self.lPhotoBox.setPixmap(QPixmap('cherri.png'))
         self.rPhotoBox.setPixmap(QPixmap('cherrimas.png'))
-        self.slider = Slider(timeoutTimer = self.timeoutTimer,
-                             testTime     = self.testTime)
+        self.slider = Slider(timeoutTimer = self.timeoutTimer)
         self.check = CheckWidget(self.test.GREEN_ERROR,
                                  self.test.YELLOW_ERROR,
                                  parent = self.slider)
@@ -442,15 +438,24 @@ class WhiteBox(CustomRateWidget):
         self.check.fbBlink(self.blinktime, self.blinkperiod)
         QTimer.singleShot(self.fbtime, self.nextGame)
         
+    def startGame(self):
+        if self.test.practice:
+            self.breakFuncion('a_practicar')
+        else:
+            self.breakFuncion('listo?')
+        
     def nextGame(self):
         self.check.setVisible(False)
-        self.test.toNextRate()
+        takeBreak = self.test.toNextRate()
         self.rateBox.setBars(self.test.currentHeight,
                              self.test.currentRate)
         self.rateBox.update()
         self.slider._userClickX = None
         self.slider._mouseListen = True
         self.updateTime()
+        if takeBreak:
+            self.timeoutTimer.stop()
+            self.breakFuncion(takeBreak)
         
     def setTimers(self, fbtime      = 3000, 
                         blinktime   = 1600, 
@@ -463,13 +468,12 @@ class WhiteBox(CustomRateWidget):
         self.timeoutTimer.setSingleShot(True)
         self.timeoutTimer.setInterval(timeout)
         self.timeoutTimer.timeout.connect(self.onTimeOut)
-        self.testTime = QTime()
         
     def onTimeOut(self):
         self.slider.mouseReleaseEvent()
     
     def updateTime(self):
-        self.testTime.start()
+        self.slider.testTime.start()
         self.timeoutTimer.start()
         
         
@@ -538,29 +542,41 @@ class FullBox(QDialog):
                                             'gracias',
                                             whiteBox = self.whiteBox)
         wdg = self.slayout.dic['intro']
-        if self.whiteBox.test.practice:
-            wdg = self.slayout.dic['a_practicar']
         self.slayout.setCurrentWidget(wdg)
         self.setLayout(self.slayout)
-        self.whiteBox.setTimers(fbtime      =  500, 
-                                blinktime   =  200, 
-                                blinkperiod =   50,
-                                timeout     = 2000)
-        QTimer.singleShot(1000,self.showWhite)
+        self.whiteBox.setTimers(fbtime      =  600, 
+                                blinktime   =  400, 
+                                blinkperiod =  100,
+                                timeout     = 5000)
+        QTimer.singleShot(2000,self.whiteBox.startGame)
     
     def takeABreak(self, breakType=None):
         #self.whiteBox.timeoutTimer.stop()
+        showPausa= partial(self.showWdg, self.slayout.dic['pausa'])
+        showGrax = partial(self.showWdg, self.slayout.dic['gracias'])
+        startGm = self.whiteBox.startGame
+        f_dic = {'pausa': showPausa, 
+                 'gracias': showGrax,
+                 'fin_practica': startGm}
         if breakType == None:
             breakType = 'intro'
-        wdg = self.slayout.dic[breakType]
+        if breakType in f_dic:
+            wdg = self.slayout.dic['parciales']
+            self.slayout.setCurrentWidget(wdg)
+            QTimer.singleShot(2000, f_dic[breakType])
+        else:
+            self.showWdg(self.slayout.dic[breakType])
+
+    def showWdg(self, wdg):
         self.slayout.setCurrentWidget(wdg)
-        QTimer.singleShot(1000,self.showWhite)
-    
-    def showWhite(self):
-        self.slayout.setCurrentWidget(self.slayout.dic['whiteBox'])
-        self.whiteBox.updateTime()
+        QTimer.singleShot(2000,self.showWhite)
         #QTimer.singleShot(5000,self.showRefresh)
         
+    def showWhite(self):
+        wdg = self.whiteBox
+        self.slayout.setCurrentWidget(wdg)
+        self.whiteBox.updateTime()
+    
     def makeStckDic(self, *args, whiteBox):
         stckDic = {arg: RefreshWidget(arg) for arg in args}
         stckDic['whiteBox'] = whiteBox
