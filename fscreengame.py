@@ -105,6 +105,7 @@ class Training():
                 if self.currentTrial >= len(self.data):
                     self.practice = False
                     self.data = self.getRates(self.dataStr)
+                    self.currentTrial = 0
                     aBreak = 'fin_practica'
             else:
                 if self.currentTrial >= len(self.data):
