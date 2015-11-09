@@ -201,6 +201,16 @@ class RateBox(CustomRateWidget):
         if self.redRect:
             painter.setBrush(redColor)
             painter.drawRect(self.redRect)
+            
+class RestBox(CustomRateWidget):
+    WIDTH  = RateBox.WIDTH
+    HEIGHT = RateBox.HEIGHT
+    def __init__(self, parent=None):
+        super(RestBox, self).__init__(parent)
+        p = self.palette()
+        p.setColor(self.backgroundRole(), Qt.white)
+        self.setPalette(p)
+        self.setAutoFillBackground(True)
 
 class Slider(CustomRateWidget):
     WIDTH  = 0.6875 * CustomRateWidget.REF_WIDTH
@@ -402,6 +412,8 @@ class WhiteBox(CustomRateWidget):
         self.rateBox = RateBox()
         self.rateBox.setBars(self.test.currentHeight, 
                              self.test.currentRate)
+        self.restBox = RestBox(self.rateBox)
+        self.restBox.setVisible(False)
         layout = QHBoxLayout()
         layout.addStretch()
         layout.addWidget(self.rateBox)
@@ -435,9 +447,10 @@ class WhiteBox(CustomRateWidget):
         self.check.adjustRate(self.test.currentRate)
         #self.check.playFeedbackSound()
         self.check.setVisible(True)
+        self.restBox.setVisible(True)
         self.check.fbBlink(self.blinktime, self.blinkperiod)
         QTimer.singleShot(self.fbtime, self.nextGame)
-        
+    
     def startGame(self):
         if self.test.practice:
             self.breakFuncion('a_practicar')
@@ -450,6 +463,7 @@ class WhiteBox(CustomRateWidget):
         self.rateBox.setBars(self.test.currentHeight,
                              self.test.currentRate)
         self.rateBox.update()
+        self.restBox.setVisible(False)
         self.slider._userClickX = None
         self.slider._mouseListen = True
         self.updateTime()
