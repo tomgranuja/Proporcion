@@ -596,6 +596,13 @@ class FullBox(QDialog):
         layout.addStretch()
         super(FullBox, self).setLayout(layout)
         
+    def keyPressEvent(self, e):
+        if e.key() == Qt.Key_Space:
+            print("space hited")
+        else:
+            super(FullBox, self).keyPressEvent(e)
+
+        
     
 if __name__ == "__main__":
     app  = QApplication(sys.argv)
