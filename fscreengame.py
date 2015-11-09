@@ -405,11 +405,13 @@ class WhiteBox(CustomRateWidget):
         layout.addLayout(self.sliderLayout())
         self.setLayout(layout)
         self.slider.sliderMouseRelease.connect(self.onSliderMouseRelease)
-        self.putOnRest()
-        #self.updateTime()
         
     def rateBoxLayout(self):
         self.rateBox = RateBox()
+        self.test.toNextRate()
+        self.rateBox.setBars(self.test.currentHeight,
+                             self.test.currentRate)
+        self.rateBox.update()
         self.restBox = RestBox(self.rateBox)
         self.restBox.setVisible(False)
         layout = QHBoxLayout()
@@ -445,7 +447,6 @@ class WhiteBox(CustomRateWidget):
         self.check.adjustRate(self.test.currentRate)
         #self.check.playFeedbackSound()
         self.check.setVisible(True)
-        #self.restBox.setVisible(True)
         self.check.fbBlink(self.blinktime, self.blinkperiod)
         QTimer.singleShot(self.fbtime, self.putOnRest)
     
@@ -462,8 +463,7 @@ class WhiteBox(CustomRateWidget):
         self.rateBox.setBars(self.test.currentHeight,
                              self.test.currentRate)
         self.rateBox.update()
-        if takeBreak:
-            self.breakFuncion(takeBreak)
+        self.breakFuncion(takeBreak)
     
     def nextGame(self):
         self.slider._userClickX = None
@@ -545,6 +545,7 @@ class FullBox(QDialog):
             print("Usuario {} identificado.".format(self.userUid))
     
     def buildGame(self):
+        self.keyListen = False
         self.whiteBox = WhiteBox(uid = self.userUid,
                                  break_function = self.takeABreak)
         self.slayout= QStackedLayout()
@@ -575,7 +576,8 @@ class FullBox(QDialog):
                  'gracias': showGrax,
                  'fin_practica': startGm}
         if breakType == None:
-            breakType = 'intro'
+            showWhite()
+            return
         if breakType in f_dic:
             wdg = self.slayout.dic['parciales']
             self.slayout.setCurrentWidget(wdg)
@@ -585,6 +587,7 @@ class FullBox(QDialog):
 
     def showWdg(self, wdg):
         self.slayout.setCurrentWidget(wdg)
+        self.keyListen = True
         
     def makeStckDic(self, *args, whiteBox):
         stckDic = {arg: RefreshWidget(arg) for arg in args}
@@ -606,7 +609,8 @@ class FullBox(QDialog):
         super(FullBox, self).setLayout(layout)
         
     def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Space:
+        if self.keyListen and e.key() == Qt.Key_Space:
+            self.keyListen = False
             print("space hited, calling next game")
             self.slayout.setCurrentWidget(self.whiteBox)
             self.whiteBox.nextGame()
