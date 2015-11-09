@@ -76,8 +76,6 @@ class Training():
             self.data = self.getRates(practiceStr)
         else: 
             self.data = self.getRates(self.dataStr)
-        self.currentHeight = self.data[self.currentTrial][0]
-        self.currentRate   = self.data[self.currentTrial][1]
     
     def initFileRecord(self):
         lastSession = self.user.getLastSessionId()
@@ -93,14 +91,15 @@ class Training():
             tupls_list = [ (float(h), float(r)) for h,r in[
                            tuple(l.split()) for l in data.splitlines()
                            ]]
-            self.currentTrial = 0
             print(tupls_list)
         return tupls_list
         
     def toNextRate(self):
         '''Next rate in list, update currentRate.'''
         aBreak = None
-        if self.currentTrial != None:
+        if self.currentTrial == None:
+            self.currentTrial = 0
+        else:
             self.currentTrial += 1
             if self.practice:
                 if self.currentTrial >= len(self.data):
@@ -116,8 +115,8 @@ class Training():
                     aBreak = 'pausa'
                 elif self.currentTrial in self.TEST_PARTIALS:
                     aBreak = 'parciales'
-            self.currentHeight = self.data[self.currentTrial][0]
-            self.currentRate = self.data[self.currentTrial][1]
+        self.currentHeight = self.data[self.currentTrial][0]
+        self.currentRate = self.data[self.currentTrial][1]
         return aBreak
         
     def rateCheck(self, r=None):
@@ -406,12 +405,11 @@ class WhiteBox(CustomRateWidget):
         layout.addLayout(self.sliderLayout())
         self.setLayout(layout)
         self.slider.sliderMouseRelease.connect(self.onSliderMouseRelease)
-        self.updateTime()
+        self.putOnRest()
+        #self.updateTime()
         
     def rateBoxLayout(self):
         self.rateBox = RateBox()
-        self.rateBox.setBars(self.test.currentHeight, 
-                             self.test.currentRate)
         self.restBox = RestBox(self.rateBox)
         self.restBox.setVisible(False)
         layout = QHBoxLayout()
@@ -447,9 +445,9 @@ class WhiteBox(CustomRateWidget):
         self.check.adjustRate(self.test.currentRate)
         #self.check.playFeedbackSound()
         self.check.setVisible(True)
-        self.restBox.setVisible(True)
+        #self.restBox.setVisible(True)
         self.check.fbBlink(self.blinktime, self.blinkperiod)
-        QTimer.singleShot(self.fbtime, self.nextGame)
+        QTimer.singleShot(self.fbtime, self.putOnRest)
     
     def startGame(self):
         if self.test.practice:
@@ -457,19 +455,21 @@ class WhiteBox(CustomRateWidget):
         else:
             self.breakFuncion('listo?')
         
-    def nextGame(self):
+    def putOnRest(self):
         self.check.setVisible(False)
+        self.restBox.setVisible(True)
         takeBreak = self.test.toNextRate()
         self.rateBox.setBars(self.test.currentHeight,
                              self.test.currentRate)
         self.rateBox.update()
-        self.restBox.setVisible(False)
+        if takeBreak:
+            self.breakFuncion(takeBreak)
+    
+    def nextGame(self):
         self.slider._userClickX = None
         self.slider._mouseListen = True
         self.updateTime()
-        if takeBreak:
-            self.timeoutTimer.stop()
-            self.breakFuncion(takeBreak)
+        self.restBox.setVisible(False)
         
     def setTimers(self, fbtime      = 3000, 
                         blinktime   = 1600, 
@@ -566,10 +566,12 @@ class FullBox(QDialog):
     
     def takeABreak(self, breakType=None):
         #self.whiteBox.timeoutTimer.stop()
+        showWhite= partial(self.showWdg, self.whiteBox)
         showPausa= partial(self.showWdg, self.slayout.dic['pausa'])
         showGrax = partial(self.showWdg, self.slayout.dic['gracias'])
         startGm = self.whiteBox.startGame
-        f_dic = {'pausa': showPausa, 
+        f_dic = {'parciales': showWhite,
+                 'pausa': showPausa, 
                  'gracias': showGrax,
                  'fin_practica': startGm}
         if breakType == None:
@@ -583,14 +585,7 @@ class FullBox(QDialog):
 
     def showWdg(self, wdg):
         self.slayout.setCurrentWidget(wdg)
-        QTimer.singleShot(2000,self.showWhite)
-        #QTimer.singleShot(5000,self.showRefresh)
         
-    def showWhite(self):
-        wdg = self.whiteBox
-        self.slayout.setCurrentWidget(wdg)
-        self.whiteBox.updateTime()
-    
     def makeStckDic(self, *args, whiteBox):
         stckDic = {arg: RefreshWidget(arg) for arg in args}
         stckDic['whiteBox'] = whiteBox
@@ -612,7 +607,9 @@ class FullBox(QDialog):
         
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Space:
-            print("space hited")
+            print("space hited, calling next game")
+            self.slayout.setCurrentWidget(self.whiteBox)
+            self.whiteBox.nextGame()
         else:
             super(FullBox, self).keyPressEvent(e)
 
