@@ -546,7 +546,7 @@ class FullBox(QDialog):
             print("Usuario {} identificado.".format(self.userUid))
     
     def buildGame(self):
-        self.keyListen = False
+        self.keyListen = True
         self.whiteBox = WhiteBox(uid = self.userUid,
                                  break_function = self.takeABreak)
         self.slayout= QStackedLayout()
@@ -564,7 +564,8 @@ class FullBox(QDialog):
                                 blinktime   =  400, 
                                 blinkperiod =  100,
                                 timeout     = 5000)
-        QTimer.singleShot(2000,self.whiteBox.startGame)
+        self.introListen = True
+        #QTimer.singleShot(2000,self.whiteBox.startGame)
     
     def takeABreak(self, breakType=None):
         #self.whiteBox.timeoutTimer.stop()
@@ -611,10 +612,14 @@ class FullBox(QDialog):
         
     def keyPressEvent(self, e):
         if self.keyListen and e.key() == Qt.Key_Space:
-            self.keyListen = False
-            print("space hited, calling next game")
-            self.slayout.setCurrentWidget(self.whiteBox)
-            self.whiteBox.nextGame()
+            if self.introListen:
+                self.introListen = False
+                self.whiteBox.startGame()
+            else:
+                self.keyListen = False
+                print("space hited, calling next game")
+                self.slayout.setCurrentWidget(self.whiteBox)
+                self.whiteBox.nextGame()
         else:
             super(FullBox, self).keyPressEvent(e)
 
