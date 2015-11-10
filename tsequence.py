@@ -81,8 +81,6 @@ class Training():
                     print(msg.format(n, repr(line)))
                     raise
                 float_tupls.append( (hf, rf) )
-            if float_tupls:
-                print(float_tupls)
         return float_tupls
         
     def toNextRate(self):
@@ -110,6 +108,14 @@ class Training():
         else: print('None currentRate to check')
         return result
         
+    def __str__(self):
+        if len(self.data) > 3:
+            data = self.data[:3] + ['...']
+        else:
+            data = self.data
+        dataStr = str(data)
+        return 'Training({})'.format(dataStr)
     
 if __name__ == "__main__":
-    pass
+    practice = Training(practice_data)
+    test     = Training(test_data)
