@@ -115,25 +115,52 @@ class Training():
             data = self.data
         dataStr = str(data)
         return 'Training({})'.format(dataStr)
-
+        
 class Sequence():
     def __init__(self,p = None, t = None):
-        self.frames = ['intro']
+        self.overview = ['intro']
         if p:
-            self.addPracticeToSequence()
+            self.addPracticeToSequence(p)
         if t:
-            self.addTestToSequence()
-        self.frames.append('thanks')
+            self.addTestToSequence(t)
+        self.overview.append('thanks')
             
-    def addPracticeToSequence(self):
-        self.frames.append('practice')
+    def addPracticeToSequence(self, tr_object):
+        self.overview.append('practice')
+        self.pFrames = []
+        for n, rate in enumerate(tr_object.data):
+            self.pFrames.append('rate {}'.format(n+1))
         
-    def addTestToSequence(self):
-        self.frames.append('test')
+    def addTestToSequence(self, tr_object):
+        self.overview.append('test')
+        self.tFrames = []
+        for n, rate in enumerate(tr_object.data):
+            self.tFrames.append('rate {}'.format(n+1))
         
     def __str__(self):
-        return 'Sequence: {}'.format(str(self.frames))
+        return 'Sequence: {}'.format(str(self.overview))
     
+def sequenceMap(seq):
+    mapList = []
+    for section in seq.overview:
+        if section == 'intro':
+            mapList.append('-Introduction')
+        elif section == 'practice':
+            mapList.append('-Practice:')
+            for rate in seq.pFrames:
+                mapList.append('    -{}'.format(rate))
+        elif section == 'test':
+            mapList.append('-Test:')
+            for rate in seq.tFrames:
+                mapList.append('    -{}'.format(rate))
+        elif section == 'thanks':
+            mapList.append('-Thanks')
+    return '\n'.join(mapList)
+
 if __name__ == "__main__":
     practice = Training(practice_data)
     test     = Training(test_data)
+    practiceSeq = Sequence(practice)
+    testSeq = Sequence(t=test)
+    bothSeq = Sequence(practice, test)
+    [ print(sequenceMap(s)) for s in [practiceSeq, testSeq, bothSeq]]
