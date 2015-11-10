@@ -115,6 +115,24 @@ class Training():
             data = self.data
         dataStr = str(data)
         return 'Training({})'.format(dataStr)
+
+class Sequence():
+    def __init__(self,p = None, t = None):
+        self.frames = ['intro']
+        if p:
+            self.addPracticeToSequence()
+        if t:
+            self.addTestToSequence()
+        self.frames.append('thanks')
+            
+    def addPracticeToSequence(self):
+        self.frames.append('practice')
+        
+    def addTestToSequence(self):
+        self.frames.append('test')
+        
+    def __str__(self):
+        return 'Sequence: {}'.format(str(self.frames))
     
 if __name__ == "__main__":
     practice = Training(practice_data)
