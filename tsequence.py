@@ -119,7 +119,8 @@ class Training():
 class Frame():
     def __init__(self, spListen = False, clkListen = False,
                  timeout = 0, fbActive = False,
-                 restIsVisible = False, refreshWdg = None ):
+                 restIsVisible = False, refreshWdg = None,
+                 setRate = False, dataWrite = False):
         self.spListen      = spListen
         self.clkListen     = clkListen
         self.timeout       = timeout
@@ -129,6 +130,8 @@ class Frame():
         if self.refreshWdg:
             self.restIsVisible = True
             self.fbActive      = False
+        self.mustSetRate       = setRate
+        self.mustDataWrite     = dataWrite
     
     def frameAttrs(self):
         ss =  ['Special wdg : {}'.format(self.refreshWdg)]
@@ -137,6 +140,8 @@ class Frame():
         ss += ['Timeout ms  : {}'.format(self.timeout)]
         ss += ['Feedbk Activ: {}'.format(self.fbActive)]
         ss += ['Estim. rest : {}'.format(self.restIsVisible)]
+        ss += ['File write  : {}'.format(self.mustDataWrite)]
+        ss += ['Set rates   : {}'.format(self.mustSetRate)]
         return '\n'.join(ss)
     
 class Sequence():
@@ -155,10 +160,13 @@ class Sequence():
     
     def addPracticeToSequence(self, tr_object):
         self.overview.append('practice')
-        firstFrame = Frame(spListen = True, refreshWdg = 'pract')
+        firstFrame = Frame(spListen = True, refreshWdg = 'pract',
+                           setRate = True)
         rateFrame  = Frame(clkListen = True)
-        fbFrame    = Frame(timeout = 6000, fbActive = True)
-        restFrame  = Frame(spListen = True, restIsVisible = True)
+        fbFrame    = Frame(timeout = 6000, fbActive = True,
+                           dataWrite = True)
+        restFrame  = Frame(spListen = True, restIsVisible = True,
+                           setRate = True)
         partFrame  = Frame(refreshWdg = 'parcials', timeout = 5000)
         self.allFrames.append(firstFrame)
         self.pFrames = []
@@ -169,12 +177,16 @@ class Sequence():
         
     def addTestToSequence(self, tr_object):
         self.overview.append('test')
-        firstFrame = Frame(spListen = True, refreshWdg = 'ready')
+        firstFrame = Frame(spListen = True, refreshWdg = 'ready',
+                           setRate = True)
         rateFrame  = Frame(clkListen = True, timeout = 5000)
-        fbFrame    = Frame(timeout = 3000, fbActive = True)
-        restFrame  = Frame(spListen = True, restIsVisible = True)
+        fbFrame    = Frame(timeout = 3000, fbActive = True,
+                           dataWrite = True)
+        restFrame  = Frame(spListen = True, restIsVisible = True,
+                           setRate = True)
         partFrame  = Frame(refreshWdg = 'parcials', timeout = 5000)
-        pauseFrame = Frame(refreshWdg = 'pause', spListen = True)
+        pauseFrame = Frame(refreshWdg = 'pause', spListen = True,
+                           setRate = True)
         self.allFrames.append(firstFrame)
         self.tFrames = []
         for n, rate in enumerate(tr_object.data):
@@ -223,7 +235,9 @@ if __name__ == "__main__":
     practiceSeq = Sequence(practice)
     testSeq = Sequence(t=test)
     bothSeq = Sequence(practice, test)
-    for n in range(15):
+    n = 0
+    while n < len(bothSeq.allFrames):
         print('Frame {}:'.format(n))
         print(bothSeq.allFrames[n].frameAttrs())
         print('')
+        n += 1
