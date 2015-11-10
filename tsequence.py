@@ -116,30 +116,83 @@ class Training():
         dataStr = str(data)
         return 'Training({})'.format(dataStr)
         
+class Frame():
+    def __init__(self, spListen = False, clkListen = False, 
+                 timeout = 0, restIsVisible = False, 
+                 refreshWdg = None                         ):
+        self.spListen = spListen
+        self.clkListen = clkListen
+        self.timeout = timeout
+        self.restIsVisible = restIsVisible
+        self.refreshWdg = refreshWdg
+        if self.refreshWdg:
+            self.restIsVisible = True
+    
+    def frameAttrs(self):
+        ss =  ['Special wdg : {}'.format(self.refreshWdg)]
+        ss += ['Space Listen: {}'.format(self.spListen)]
+        ss += ['Clic Listen : {}'.format(self.clkListen)]
+        ss += ['Timeout ms  : {}'.format(self.timeout)]
+        ss += ['Estim. rest : {}'.format(self.restIsVisible)]
+        return '\n'.join(ss)
+    
 class Sequence():
     def __init__(self,p = None, t = None):
-        self.overview = ['intro']
+        self.addIntroToSequence()
         if p:
             self.addPracticeToSequence(p)
         if t:
             self.addTestToSequence(t)
-        self.overview.append('thanks')
+        self.addThanksToSequence()
             
+    def addIntroToSequence(self):
+        self.overview = ['intro']
+        frame = Frame(spListen = True, refreshWdg = 'intro')
+        self.allFrames = [frame]
+    
     def addPracticeToSequence(self, tr_object):
         self.overview.append('practice')
+        firstFrame = Frame(spListen = True, refreshWdg = 'pract')
+        rateFrame  = Frame(clkListen = True)
+        restFrame  = Frame(spListen = True, restIsVisible = True)
+        partFrame  = Frame(refreshWdg = 'parcials', timeout = 5000)
+        self.allFrames.append(firstFrame)
         self.pFrames = []
         for n, rate in enumerate(tr_object.data):
             self.pFrames.append('rate {}'.format(n+1))
+            self.allFrames += [ rateFrame, restFrame ]
+        self.allFrames[-1] = partFrame
         
     def addTestToSequence(self, tr_object):
         self.overview.append('test')
+        firstFrame = Frame(spListen = True, refreshWdg = 'ready')
+        rateFrame  = Frame(clkListen = True, timeout = 5000)
+        restFrame  = Frame(spListen = True, restIsVisible = True)
+        partFrame  = Frame(refreshWdg = 'parcials', timeout = 5000)
+        pauseFrame = Frame(refreshWdg = 'pause', spListen = True)
+        self.allFrames.append(firstFrame)
         self.tFrames = []
         for n, rate in enumerate(tr_object.data):
             self.tFrames.append('rate {}'.format(n+1))
+            if n in TEST_PAUSES:
+                self.allFrames[-1] = partFrame
+                self.allFrames += [ pauseFrame, rateFrame, restFrame]
+            elif n in TEST_PARTIALS:
+                self.allFrames[-1] = partFrame
+                self.allFrames += [ restFrame, rateFrame, restFrame]
+            else:
+                self.allFrames += [ rateFrame, restFrame ]
+        self.allFrames[-1] = partFrame
+        
+    
+    def addThanksToSequence(self):
+        self.overview.append('thanks')
+        thanksFrame= Frame(refreshWdg = 'thanks')
+        self.allFrames.append(thanksFrame)
         
     def __str__(self):
         return 'Sequence: {}'.format(str(self.overview))
-    
+
 def sequenceMap(seq):
     mapList = []
     for section in seq.overview:
@@ -163,4 +216,7 @@ if __name__ == "__main__":
     practiceSeq = Sequence(practice)
     testSeq = Sequence(t=test)
     bothSeq = Sequence(practice, test)
-    [ print(sequenceMap(s)) for s in [practiceSeq, testSeq, bothSeq]]
+    for n in range(15):
+        print('Frame {}:'.format(n))
+        print(bothSeq.allFrames[n].frameAttrs())
+        print('')
