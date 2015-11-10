@@ -117,22 +117,25 @@ class Training():
         return 'Training({})'.format(dataStr)
         
 class Frame():
-    def __init__(self, spListen = False, clkListen = False, 
-                 timeout = 0, restIsVisible = False, 
-                 refreshWdg = None                         ):
-        self.spListen = spListen
-        self.clkListen = clkListen
-        self.timeout = timeout
+    def __init__(self, spListen = False, clkListen = False,
+                 timeout = 0, fbActive = False,
+                 restIsVisible = False, refreshWdg = None ):
+        self.spListen      = spListen
+        self.clkListen     = clkListen
+        self.timeout       = timeout
+        self.fbActive      = fbActive
         self.restIsVisible = restIsVisible
-        self.refreshWdg = refreshWdg
+        self.refreshWdg    = refreshWdg
         if self.refreshWdg:
             self.restIsVisible = True
+            self.fbActive      = False
     
     def frameAttrs(self):
         ss =  ['Special wdg : {}'.format(self.refreshWdg)]
         ss += ['Space Listen: {}'.format(self.spListen)]
         ss += ['Clic Listen : {}'.format(self.clkListen)]
         ss += ['Timeout ms  : {}'.format(self.timeout)]
+        ss += ['Feedbk Activ: {}'.format(self.fbActive)]
         ss += ['Estim. rest : {}'.format(self.restIsVisible)]
         return '\n'.join(ss)
     
@@ -154,19 +157,21 @@ class Sequence():
         self.overview.append('practice')
         firstFrame = Frame(spListen = True, refreshWdg = 'pract')
         rateFrame  = Frame(clkListen = True)
+        fbFrame    = Frame(timeout = 6000, fbActive = True)
         restFrame  = Frame(spListen = True, restIsVisible = True)
         partFrame  = Frame(refreshWdg = 'parcials', timeout = 5000)
         self.allFrames.append(firstFrame)
         self.pFrames = []
         for n, rate in enumerate(tr_object.data):
             self.pFrames.append('rate {}'.format(n+1))
-            self.allFrames += [ rateFrame, restFrame ]
+            self.allFrames += [ rateFrame, fbFrame, restFrame ]
         self.allFrames[-1] = partFrame
         
     def addTestToSequence(self, tr_object):
         self.overview.append('test')
         firstFrame = Frame(spListen = True, refreshWdg = 'ready')
         rateFrame  = Frame(clkListen = True, timeout = 5000)
+        fbFrame    = Frame(timeout = 3000, fbActive = True)
         restFrame  = Frame(spListen = True, restIsVisible = True)
         partFrame  = Frame(refreshWdg = 'parcials', timeout = 5000)
         pauseFrame = Frame(refreshWdg = 'pause', spListen = True)
@@ -176,12 +181,14 @@ class Sequence():
             self.tFrames.append('rate {}'.format(n+1))
             if n in TEST_PAUSES:
                 self.allFrames[-1] = partFrame
-                self.allFrames += [ pauseFrame, rateFrame, restFrame]
+                self.allFrames += [ pauseFrame, rateFrame,
+                                    fbFrame, restFrame]
             elif n in TEST_PARTIALS:
                 self.allFrames[-1] = partFrame
-                self.allFrames += [ restFrame, rateFrame, restFrame]
+                self.allFrames += [ restFrame, rateFrame,
+                                    fbFrame, restFrame]
             else:
-                self.allFrames += [ rateFrame, restFrame ]
+                self.allFrames += [ rateFrame, fbFrame, restFrame ]
         self.allFrames[-1] = partFrame
         
     
