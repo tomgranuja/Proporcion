@@ -457,6 +457,7 @@ class WhiteBox(CustomRateWidget):
         
     def putOnRest(self):
         self.check.setVisible(False)
+        self.slider._userClickX = None
         self.restBox.setVisible(True)
         takeBreak = self.test.toNextRate()
         self.rateBox.setBars(self.test.currentHeight,
