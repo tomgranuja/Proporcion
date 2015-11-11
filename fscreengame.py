@@ -98,8 +98,9 @@ class Training():
         '''Heights,rates from data string, reset trial counter.'''
         tupls_list = None
         if data:
-            tupls_list = [ (1/float(h), float(r)) for r,h,w in [
-                           tuple(l.split()) for l in data.splitlines()
+            tupls_list = [ (1/float(h), float(r), float(w))
+                           for r,h,w in [tuple(l.split())
+                                         for l in data.splitlines()
                            ]]
             print(tupls_list)
         return tupls_list
@@ -128,6 +129,7 @@ class Training():
                     aBreak = 'parciales'
         self.currentHeight = self.data[self.currentTrial][0]
         self.currentRate = self.data[self.currentTrial][1]
+        self.currentWidth= self.data[self.currentTrial][2]
         return aBreak
         
     def rateCheck(self, r=None):
@@ -178,7 +180,7 @@ class CustomRateWidget(QWidget):
         return QSize(self.WIDTH, self.HEIGHT)
 
 class RateBox(CustomRateWidget):
-    WIDTH  = 0.1875 * CustomRateWidget.REF_WIDTH
+    WIDTH  = 2 * 0.1875 * CustomRateWidget.REF_WIDTH
     HEIGHT = 0.7188 * CustomRateWidget.REF_HEIGHT
     #WIDTH  = 120
     #HEIGHT = 460
@@ -186,21 +188,22 @@ class RateBox(CustomRateWidget):
         super(RateBox, self).__init__(parent)
         self.blueRect = None
         self.redRect  = None
-        
-    def setBars(self, height, rate):
+
+
+    def setBars(self, height, rate, width):
         blueHeight = 1.0
-        if 0.0 < height  <= 1.0:
+        if 0.0 < height  <= 1.0 and 0.0 < width <= 1.0:
             self.blueRect = QRect(
-                         self.xFromRate(0),
+                         self.xFromRate((1-width)/2.0),
                          self.yFromRate(1-height),
-                         self.wFromRate(1),
+                         self.wFromRate(width),
                          self.hFromRate(height)
                          )
             if 0.0 < rate <= 1.0:
                 uppery = self.yFromRate(1 - rate * height)
                 self.redRect = QRect(self.blueRect)
                 self.redRect.setTop(uppery)
-        
+
     def paintEvent(self, event=None):
         painter = QPainter(self)
         blueColor = QColor(85, 142, 213)
@@ -432,7 +435,8 @@ class WhiteBox(CustomRateWidget):
         self.rateBox = RateBox()
         self.test.toNextRate()
         self.rateBox.setBars(self.test.currentHeight,
-                             self.test.currentRate)
+                             self.test.currentRate,
+                             self.test.currentWidth)
         self.rateBox.update()
         self.restBox = RestBox(self.rateBox)
         self.restBox.setVisible(False)
@@ -484,7 +488,8 @@ class WhiteBox(CustomRateWidget):
         self.restBox.setVisible(True)
         takeBreak = self.test.toNextRate()
         self.rateBox.setBars(self.test.currentHeight,
-                             self.test.currentRate)
+                             self.test.currentRate,
+                             self.test.currentWidth)
         self.rateBox.update()
         self.breakFuncion(takeBreak)
     
