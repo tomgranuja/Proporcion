@@ -146,20 +146,24 @@ class Frame():
     
 class Sequence():
     def __init__(self,p = None, t = None):
+        self.framesDic = {}
         self.addIntroToSequence()
         if p:
             self.addPracticeToSequence(p)
         if t:
             self.addTestToSequence(t)
         self.addThanksToSequence()
-            
+        self.frIndex = (None, None)
+    
     def addIntroToSequence(self):
-        self.overview = ['intro']
+        k = 'intro'
+        self.overview = [k]
         frame = Frame(spListen = True, refreshWdg = 'intro')
-        self.allFrames = [frame]
+        self.framesDic[k] = [frame]
     
     def addPracticeToSequence(self, tr_object):
-        self.overview.append('practice')
+        k = 'practice'
+        self.overview.append(k)
         firstFrame = Frame(spListen = True, refreshWdg = 'pract',
                            setRate = True)
         rateFrame  = Frame(clkListen = True)
@@ -168,15 +172,16 @@ class Sequence():
         restFrame  = Frame(spListen = True, restIsVisible = True,
                            setRate = True)
         partFrame  = Frame(refreshWdg = 'parcials', timeout = 5000)
-        self.allFrames.append(firstFrame)
+        self.framesDic[k] = [firstFrame]
         self.pFrames = []
         for n, rate in enumerate(tr_object.data):
-            self.allFrames += [ rateFrame, fbFrame, restFrame ]
-        self.allFrames[-1] = partFrame
             self.pFrames.append('trial {:02}: {}'.format(n+1,rate))
+            self.framesDic[k] += [ rateFrame, fbFrame, restFrame ]
+        self.framesDic[k][-1] = partFrame
         
     def addTestToSequence(self, tr_object):
-        self.overview.append('test')
+        k = 'test'
+        self.overview.append(k)
         firstFrame = Frame(spListen = True, refreshWdg = 'ready',
                            setRate = True)
         rateFrame  = Frame(clkListen = True, timeout = 5000)
@@ -187,28 +192,27 @@ class Sequence():
         partFrame  = Frame(refreshWdg = 'parcials', timeout = 5000)
         pauseFrame = Frame(refreshWdg = 'pause', spListen = True,
                            setRate = True)
-        self.allFrames.append(firstFrame)
+        self.framesDic[k] = [firstFrame]
         self.tFrames = []
         for n, rate in enumerate(tr_object.data):
             self.tFrames.append('trial {:02}: {}'.format(n+1,rate))
             if n in TEST_PAUSES:
-                self.allFrames[-1] = partFrame
-                self.allFrames += [ pauseFrame, rateFrame,
-                                    fbFrame, restFrame]
+                self.framesDic[k][-1] = partFrame
+                self.framesDic[k] += [pauseFrame, rateFrame,
+                                     fbFrame, restFrame]
             elif n in TEST_PARTIALS:
-                self.allFrames[-1] = partFrame
-                self.allFrames += [ restFrame, rateFrame,
-                                    fbFrame, restFrame]
+                self.framesDic[k][-1] = partFrame
+                self.framesDic[k] += [ restFrame, rateFrame,
+                                     fbFrame, restFrame]
             else:
-                self.allFrames += [ rateFrame, fbFrame, restFrame ]
-        self.allFrames[-1] = partFrame
+                self.framesDic[k] += [ rateFrame, fbFrame, restFrame ]
+        self.framesDic[k][-1] = partFrame
         
-    
     def addThanksToSequence(self):
-        self.overview.append('thanks')
-        thanksFrame= Frame(refreshWdg = 'thanks')
-        self.allFrames.append(thanksFrame)
-        
+        k = 'thanks'
+        self.overview.append(k)
+        self.framesDic[k]= [Frame(refreshWdg = k)]
+
     def __str__(self):
         return 'Sequence: {}'.format(str(self.overview))
 
