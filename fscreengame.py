@@ -1,140 +1,11 @@
 #!/usr/bin/python3 -tt
 #-*- coding:utf-8 -*-
 
-import sys, random
+import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from functools import partial
-import uidmgr
-
-example_data = '''
-1.0 0.5
-1.0 0.25
-0.6 0.5
-0.6 0.75
-0.6 0.25
-0.3 0.8
-0.3 0.2
-0.3 0.5
-0.3 0.75
-1.0 0.2
-1.0 0.8
-1.0 0.5
-1.0 0.25
-1.0 0.75
-1.0 0.5
-1.0 0.5
-1.0 0.25
-0.6 0.5
-0.6 0.75
-0.6 0.25
-0.3 0.8
-0.3 0.2
-0.3 0.5
-0.3 0.75
-1.0 0.2
-1.0 0.8
-1.0 0.5
-1.0 0.25
-1.0 0.75
-1.0 0.5
-0.6 0.75
-0.6 0.25
-0.3 0.8
-0.3 0.2
-0.3 0.5
-0.3 0.75
-'''[211:]
-
-practice_data = '''
-0.75 0.25
-0.75 0.75
-0.75 0.5
-'''[1:]
-
-#practice_data = None
-
-class Training():
-    GREEN_ERROR  = 0.05
-    YELLOW_ERROR = 0.15
-    TEST_PARTIALS  = [2,4,6,8,10]
-    TEST_PAUSE     = [6]
-    #TEST_PARTIALS  = range(9,36,9)
-    #TEST_PAUSE     = [18]
-    
-    def __init__(self, uid=None, 
-                       dataStr=None, 
-                       practiceStr = None):
-        self.user = uidmgr.User(uid)
-        self.initFileRecord()
-        self.currentTrial = None
-        self.dataStr = dataStr
-        self.practice = False
-        if practiceStr:
-            self.practice = True
-            self.data = self.getRates(practiceStr)
-        else: 
-            self.data = self.getRates(self.dataStr)
-    
-    def initFileRecord(self):
-        lastSession = self.user.getLastSessionId()
-        currentSession = uidmgr.nextSessionId(lastSession)
-        with open(self.user.recFPath, 'a') as f:
-            s = '#{}\n'.format(currentSession)
-            f.write(s)
-        
-    def getRates(self, data):
-        '''Heights,rates from data string, reset trial counter.'''
-        tupls_list = None
-        if data:
-            tupls_list = [ (float(h), float(r)) for h,r in[
-                           tuple(l.split()) for l in data.splitlines()
-                           ]]
-            print(tupls_list)
-        return tupls_list
-        
-    def toNextRate(self):
-        '''Next rate in list, update currentRate.'''
-        aBreak = None
-        if self.currentTrial == None:
-            self.currentTrial = 0
-        else:
-            self.currentTrial += 1
-            if self.practice:
-                if self.currentTrial >= len(self.data):
-                    self.practice = False
-                    self.data = self.getRates(self.dataStr)
-                    self.currentTrial = 0
-                    aBreak = 'fin_practica'
-            else:
-                if self.currentTrial >= len(self.data):
-                    print("Training finished, reseting trials.")
-                    self.currentTrial = 0
-                    aBreak = 'gracias'
-                if self.currentTrial in self.TEST_PAUSE:
-                    aBreak = 'pausa'
-                elif self.currentTrial in self.TEST_PARTIALS:
-                    aBreak = 'parciales'
-        self.currentHeight = self.data[self.currentTrial][0]
-        self.currentRate = self.data[self.currentTrial][1]
-        return aBreak
-        
-    def rateCheck(self, r=None):
-        result = None
-        if r and 0 <= r <= 1:
-            result = 'outside'
-            error = abs(r - self.currentRate)
-            if error <= Training.YELLOW_ERROR:
-                result = 'in_yellow'
-                if error <= Training.GREEN_ERROR:
-                    result = 'in_green'
-        return result
-        
-    def writeAnswer(self, time, rate):
-        print(self.currentTrial, time, rate)
-        with open(self.user.recFPath, 'a') as f:
-            s = '{} {} {}\n'.format(self.currentTrial, time, rate)
-            f.write(s)
+import uidmgr, tsequence, filelogger
 
 
 def pixelFromRate(rate, t, o = 0):
@@ -227,6 +98,7 @@ class Slider(CustomRateWidget):
                         self.xFromRate(1),
                         self.yFromRate(0.5))
         self._userClickX = None
+        self._userClickRate = None
         self._userTime   = None
         self._mouseListen = True
         #self.sliderMouseRelease = pyqtSignal(float)    
@@ -268,11 +140,13 @@ class Slider(CustomRateWidget):
     def checkUserEvent(self, event):
         t = None
         x = None
+        self._userClickRate = None
         user_release = False
         if event.type() == QEvent.MouseButtonRelease:
             user_release = True
             x = max(self.riel.x1(), min(self.riel.x2(), event.x()))
             t = event.time
+            self._userClickRate = self.rateFromX(self._userClickX)
         self._userClickX = x
         self._userTime = t
         self.sliderMouseRelease.emit(user_release)
@@ -313,7 +187,6 @@ class CheckWidget(CustomRateWidget):
         self.intermitent = not self.intermitent
         self.update()
         
-    
     def paintEvent(self, event=None):
         painter = QPainter(self)
         painter.setPen(Qt.NoPen)
@@ -521,7 +394,6 @@ class UserChooser(QDialog):
             self.lineEdit.setFocus()
             return
         
-
 class FullBox(QDialog):
     def __init__(self, parent=None):
         super(FullBox, self).__init__(parent)
@@ -545,58 +417,29 @@ class FullBox(QDialog):
             print("Usuario {} identificado.".format(self.userUid))
     
     def buildGame(self):
-        self.keyListen = True
-        self.whiteBox = WhiteBox(uid = self.userUid,
-                                 break_function = self.takeABreak)
-        self.slayout= QStackedLayout()
-        self.slayout.dic = self.makeStckDic('intro',
-                                            'a_practicar',
-                                            'listo?',
-                                            'pausa',
-                                            'parciales',
-                                            'gracias',
-                                            whiteBox = self.whiteBox)
-        wdg = self.slayout.dic['intro']
-        self.slayout.setCurrentWidget(wdg)
-        self.setLayout(self.slayout)
-        self.whiteBox.setTimers(fbtime      =  600, 
-                                blinktime   =  400, 
+        self.whiteBox = WhiteBox()
+        self.whiteBox.setTimers(blinktime   =  400, 
                                 blinkperiod =  100,
                                 timeout     = 5000)
-        self.introListen = True
-        #QTimer.singleShot(2000,self.whiteBox.startGame)
+        self.slayout= QStackedLayout()
+        self.slayout.dic = self.makeStckDic('intro',
+                                            'practice',
+                                            'ready',
+                                            'pause',
+                                            'parcials',
+                                            'thanks',
+                                            whiteBox = self.whiteBox)
+        self.setLayout(self.slayout)
+        self.gameSequenceConfig()
+        self.gameStart()
     
-    def takeABreak(self, breakType=None):
-        #self.whiteBox.timeoutTimer.stop()
-        showWhite= partial(self.showWdg, self.whiteBox)
-        showPausa= partial(self.showWdg, self.slayout.dic['pausa'])
-        showGrax = partial(self.showWdg, self.slayout.dic['gracias'])
-        startGm = self.whiteBox.startGame
-        f_dic = {'parciales': showWhite,
-                 'pausa': showPausa, 
-                 'gracias': showGrax,
-                 'fin_practica': startGm}
-        if breakType == None:
-            showWhite()
-            return
-        if breakType in f_dic:
-            wdg = self.slayout.dic['parciales']
-            self.slayout.setCurrentWidget(wdg)
-            QTimer.singleShot(2000, f_dic[breakType])
-        else:
-            self.showWdg(self.slayout.dic[breakType])
-
-    def showWdg(self, wdg):
-        self.slayout.setCurrentWidget(wdg)
-        self.keyListen = True
-        
     def makeStckDic(self, *args, whiteBox):
         stckDic = {arg: RefreshWidget(arg) for arg in args}
         stckDic['whiteBox'] = whiteBox
         for k in stckDic:
             self.slayout.addWidget(stckDic[k])
         return stckDic
-        
+    
     def setLayout(self,ly):
         '''Reimplement to center 'ly' layout arg.'''
         layout = QVBoxLayout()
@@ -608,21 +451,78 @@ class FullBox(QDialog):
         layout.addLayout(hlayout)
         layout.addStretch()
         super(FullBox, self).setLayout(layout)
+    
+    def gameSequenceConfig(self):
+        self.practice = tsequence.Training(tsequence.practice_data)
+        self.test     = tsequence.Training(tsequence.test_data)
+        self.sequence = tsequence.Sequence(practice,test)
+        self.timeoutTimer = QTimer()
+        self.timeoutTimer.setSingleShot(True)
+        
+    def gameStart(self):
+        self.iframe = 0
+        self.gameSection = self.sequence.overview[0]
+        frame = self.sequence.allFrames[iframe]
+        self.setListenFlags(frame.spListen, frame.clkListen,
+                            frame.timeout)
+        self.setRefreshWdg(frame.refreshWdg)
+        self.setTimeout(frame.timeout)
+        sliderRelease = self.whiteBox.sliderMouseRelease
+        sliderRelease.connect(self.onSliderMouseRelease)
+        self.timeoutTimer.timeout.connect(self.onTimeOut)
+    
+    def setListenFlags(self, sp, clk, t):
+        self.spListen = sp
+        self.clkListen= clk
+        
+    def setRefreshWdg(wdg_id):
+        if wdg_id:
+            wdg = self.slayout.dic[wdg_id]
+            self.slayout.setCurrentWidget(wdg)
+        else:
+            self.slayout.setCurrentWidget(self.whiteBox)
+    
+    def setTimeout(self, t):
+        if t:
+            self.timeoutTimer.setInterval(t)
+            self.timeoutTimer.start()
+            self.toListen = True
         
     def keyPressEvent(self, e):
-        if self.keyListen and e.key() == Qt.Key_Space:
-            if self.introListen:
-                self.introListen = False
-                self.whiteBox.startGame()
-            else:
-                self.keyListen = False
-                print("space hited, calling next game")
-                self.slayout.setCurrentWidget(self.whiteBox)
-                self.whiteBox.nextGame()
+        if self.spListen and e.key() == Qt.Key_Space:
+            self.userTime = self.whiteBox.slider._userTime
+            self.userRate = self.whiteBox.slider._userRate
+            self.currentTrial = self.test.currentTrial
+            self.toListen = False
+            self.spListen = False
+            self.setNextFrame()
         else:
             super(FullBox, self).keyPressEvent(e)
+    
+    def onSliderMouseRelease(self):
+        if self.clkListen:
+            self.toListen = False
+            self.clkListen = False
+            self.setNextFrame()
+    
+    def onTimeOut(self):
+        if self.toListen:
+            self.setNextFrame()
+    
+    def setNextFrame(self):
+        self.iframe += 1
+        frame = self.sequence.allFrames[self.iframe]
+        if self.sequence.allFrames[self.iframe].mustDataWrite:
+            pass
+        if self.sequence.allFrames
+            
+            n, r, h = None, None, None
+            self.logger.write(n, r, h)
+        self.sequence.toNextFrame()
+        frame = self.sequence.allFrames[self.iframe]
+        self.setRefreshWdg(frame.refreshWdg)
+        self.setListenFlags(frame.spListen, frame.clkListen)
 
-        
     
 if __name__ == "__main__":
     app  = QApplication(sys.argv)
