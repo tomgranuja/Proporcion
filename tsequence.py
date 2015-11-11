@@ -213,6 +213,24 @@ class Sequence():
         self.overview.append(k)
         self.framesDic[k]= [Frame(refreshWdg = k)]
 
+    def nextFrameSection(self):
+        frSec, frN = self.frIndex
+        if frN == None:
+            frSec, frN = (0, 0)
+        else:
+            frN += 1
+        sectionName = self.overview[frSec]
+        if frN >= len(self.framesDic[sectionName]):
+            frN = 0
+            frSec += 1
+            if frSec >= len(self.overview):
+                sectionName = None
+            else:
+                sectionName = self.overview[frSec]
+        self.frIndex = (frSec, frN)
+        return sectionName
+
+
     def __str__(self):
         return 'Sequence: {}'.format(str(self.overview))
 
