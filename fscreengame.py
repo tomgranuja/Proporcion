@@ -438,7 +438,7 @@ class RefreshWidget(CustomRateWidget):
     def __init__(self, wdgType=None, parent=None):
         super(RefreshWidget, self).__init__(parent)
         p = self.palette()
-        p.setColor(self.backgroundRole(), Qt.yellow)
+        p.setColor(self.backgroundRole(), QColor(179,179,179))
         self.setPalette(p)
         self.setAutoFillBackground(True)
         self.setType = {
@@ -561,10 +561,10 @@ class WhiteBox(CustomRateWidget):
         self.updateTime()
         self.restBox.setVisible(False)
         
-    def setTimers(self, fbtime      = 3000, 
-                        blinktime   = 1600, 
-                        blinkperiod =  200,
-                        timeout     = 7000):
+    def setTimers(self, fbtime      = 2000, 
+                        blinktime   = 1000, 
+                        blinkperiod =  150,
+                        timeout     = 5000):
         self.fbtime = fbtime
         self.blinktime = blinktime
         self.blinkperiod = blinkperiod
@@ -649,9 +649,9 @@ class FullBox(QDialog):
         wdg = self.slayout.dic['intro']
         self.slayout.setCurrentWidget(wdg)
         self.setLayout(self.slayout)
-        self.whiteBox.setTimers(fbtime      =  600, 
-                                blinktime   =  400, 
-                                blinkperiod =  100,
+        self.whiteBox.setTimers(fbtime      = 2000,
+                                blinktime   = 1000, 
+                                blinkperiod =  150,
                                 timeout     = 5000)
         parFnc = self.slayout.dic['parciales'].wdg.setBars
         self.whiteBox.setParcials = parFnc
@@ -674,7 +674,7 @@ class FullBox(QDialog):
         if breakType in f_dic:
             wdg = self.slayout.dic['parciales']
             self.slayout.setCurrentWidget(wdg)
-            QTimer.singleShot(5000, f_dic[breakType])
+            QTimer.singleShot(4000, f_dic[breakType])
         else:
             self.showWdg(self.slayout.dic[breakType])
 
