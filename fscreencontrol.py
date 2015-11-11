@@ -65,6 +65,9 @@ practice_data = '''
 
 #practice_data = None
 
+FORCED_MIN = 0.25
+FORCED_MAX = 0.75
+
 class Training():
     GREEN_ERROR  = 0.05
     YELLOW_ERROR = 0.15
@@ -72,6 +75,7 @@ class Training():
     #TEST_PAUSE     = [6]
     TEST_PARTIALS  = range(9,36,9)
     TEST_PAUSE     = [18]
+
     
     def __init__(self, uid=None, 
                        dataStr=None, 
@@ -145,9 +149,9 @@ class Training():
         result = None
         if r:
             if r > 0.5:
-                result = 0.75
+                result = FORCED_MAX
             else:
-                result = 0.25
+                result = FORCED_MIN
         return result
     
     def writeAnswer(self, time, rate):
@@ -276,9 +280,9 @@ class Slider(CustomRateWidget):
         if self._mouseListen:
             x = event.x()
             if self.rateFromX(x) > 0.5:
-                self._userClickX = self.xFromRate(0.75)
+                self._userClickX = self.xFromRate(FORCED_MAX)
             else:
-                self._userClickX = self.xFromRate(0.25)
+                self._userClickX = self.xFromRate(FORCED_MIN)
             self.update()
     
     def mouseReleaseEvent(self,event=QEvent(QEvent.User)):
@@ -296,9 +300,9 @@ class Slider(CustomRateWidget):
         if event.type() == QEvent.MouseButtonRelease:
             user_release = True
             if self.rateFromX(event.x()) > 0.5:
-                x = self.xFromRate(0.75)
+                x = self.xFromRate(FORCED_MAX)
             else:
-                x = self.xFromRate(0.25)
+                x = self.xFromRate(FORCED_MIN)
             t = event.time
         self._userClickX = x
         self._userTime = t
