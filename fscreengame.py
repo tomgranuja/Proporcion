@@ -372,7 +372,7 @@ class RefreshWidget(CustomRateWidget):
         self.setLayout(layout)
         
     def setIntroWdg(self):
-        bearpix = QPixmap('ninjabear.png')
+        bearpix = QPixmap('intro_sesion1.png')
         self.wdg = QLabel()
         self.wdg.setPixmap(bearpix)
         
@@ -422,8 +422,8 @@ class WhiteBox(CustomRateWidget):
     def sliderLayout(self):
         self.lPhotoBox = QLabel()
         self.rPhotoBox = QLabel()
-        self.lPhotoBox.setPixmap(QPixmap('cherri.png'))
-        self.rPhotoBox.setPixmap(QPixmap('cherrimas.png'))
+        self.lPhotoBox.setPixmap(QPixmap('i_sesion1.png'))
+        self.rPhotoBox.setPixmap(QPixmap('d_sesion1.png'))
         self.slider = Slider(timeoutTimer = self.timeoutTimer)
         self.check = CheckWidget(self.test.GREEN_ERROR,
                                  self.test.YELLOW_ERROR,
