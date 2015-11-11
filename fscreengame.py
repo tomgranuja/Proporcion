@@ -8,43 +8,43 @@ from functools import partial
 import uidmgr
 
 example_data = '''
-1.0 0.5
-1.0 0.25
-0.6 0.5
-0.6 0.75
-0.6 0.25
-0.3 0.8
-0.3 0.2
-0.3 0.5
-0.3 0.75
-1.0 0.2
-1.0 0.8
-1.0 0.5
-1.0 0.25
-1.0 0.75
-1.0 0.5
-1.0 0.5
-1.0 0.25
-0.6 0.5
-0.6 0.75
-0.6 0.25
-0.3 0.8
-0.3 0.2
-0.3 0.5
-0.3 0.75
-1.0 0.2
-1.0 0.8
-1.0 0.5
-1.0 0.25
-1.0 0.75
-1.0 0.5
-0.6 0.75
-0.6 0.25
-0.3 0.8
-0.3 0.2
-0.3 0.5
-0.3 0.75
-'''[211:]
+0.21 1 1
+0.76 1.5 0.5
+0.01 1 0.5
+0.5 1.5 1
+0.95 1 0.5
+0.03 1 0.5
+0.5 1 0.5
+0.16 1 1
+0.76 4 1
+0.26 4 0.5
+0.21 4 1
+0.61 1.5 1
+0.8 1.5 0.5
+0.03 1.5 0.5
+0.03 4 0.5
+0.43 1.5 0.5
+0.95 4 1
+0.7 4 1
+0.76 1 0.5
+0.7 1 0.5
+0.26 1.5 1
+0.8 1 0.5
+0.16 1.5 1
+0.5 4 1
+0.26 1 1
+0.21 1.5 0.5
+0.61 1 1
+0.43 1 1
+0.7 1.5 1
+0.16 4 0.5
+0.01 1.5 0.5
+0.95 1.5 1
+0.43 4 0.5
+0.01 4 1
+0.61 4 0.5
+0.8 4 1
+'''[1:]
 
 practice_data = '''
 0.75 0.25
@@ -52,15 +52,15 @@ practice_data = '''
 0.75 0.5
 '''[1:]
 
-#practice_data = None
+practice_data = None
 
 class Training():
     GREEN_ERROR  = 0.05
     YELLOW_ERROR = 0.15
-    TEST_PARTIALS  = [2,4,6,8,10]
-    TEST_PAUSE     = [6]
-    #TEST_PARTIALS  = range(9,36,9)
-    #TEST_PAUSE     = [18]
+    #TEST_PARTIALS  = [2,4,6,8,10]
+    #TEST_PAUSE     = [6]
+    TEST_PARTIALS  = range(9,36,9)
+    TEST_PAUSE     = [18]
     
     def __init__(self, uid=None, 
                        dataStr=None, 
@@ -87,7 +87,7 @@ class Training():
         '''Heights,rates from data string, reset trial counter.'''
         tupls_list = None
         if data:
-            tupls_list = [ (float(h), float(r)) for h,r in[
+            tupls_list = [ (1/float(h), float(r)) for r,h,w in [
                            tuple(l.split()) for l in data.splitlines()
                            ]]
             print(tupls_list)
@@ -121,7 +121,7 @@ class Training():
         
     def rateCheck(self, r=None):
         result = None
-        if r and 0 <= r <= 1:
+        if r or r == 0.0 and 0 <= r <= 1:
             result = 'outside'
             error = abs(r - self.currentRate)
             if error <= Training.YELLOW_ERROR:
