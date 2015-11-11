@@ -58,12 +58,12 @@ example_data = '''
 '''[1:]
 
 practice_data = '''
-0.75 0.25
-0.75 0.75
-0.75 0.5
+0.6 1 0.5
+0.4 1 1
+0.55 1 0.5
 '''[1:]
 
-practice_data = None
+#practice_data = None
 
 class Training():
     GREEN_ERROR  = 0.05
