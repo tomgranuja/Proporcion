@@ -171,9 +171,9 @@ class Sequence():
         self.allFrames.append(firstFrame)
         self.pFrames = []
         for n, rate in enumerate(tr_object.data):
-            self.pFrames.append('rate {}'.format(n+1))
             self.allFrames += [ rateFrame, fbFrame, restFrame ]
         self.allFrames[-1] = partFrame
+            self.pFrames.append('trial {:02}: {}'.format(n+1,rate))
         
     def addTestToSequence(self, tr_object):
         self.overview.append('test')
@@ -190,7 +190,7 @@ class Sequence():
         self.allFrames.append(firstFrame)
         self.tFrames = []
         for n, rate in enumerate(tr_object.data):
-            self.tFrames.append('rate {}'.format(n+1))
+            self.tFrames.append('trial {:02}: {}'.format(n+1,rate))
             if n in TEST_PAUSES:
                 self.allFrames[-1] = partFrame
                 self.allFrames += [ pauseFrame, rateFrame,
