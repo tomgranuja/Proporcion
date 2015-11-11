@@ -7,6 +7,17 @@ from PyQt4.QtGui import *
 from functools import partial
 import uidmgr
 
+audio = None
+if QSound.isAvailable():
+    audio = 'qsound'
+else:
+    from PyQt4.phonon import Phonon
+    m_media = Phonon.MediaObject()
+    audioOutput = Phonon.AudioOutput(Phonon.GameCategory)
+    Phonon.createPath(m_media, audioOutput)
+    audio = 'phonon'
+
+
 example_data = '''
 0.21 1 1
 0.76 1.5 0.5
@@ -346,6 +357,18 @@ class CheckWidget(CustomRateWidget):
             painter.setBrush(box_color[self.feedback])
             if self.intermitent:
                 painter.drawRect(feedbackBox)
+        
+    def playFeedbackSound(self):
+        if self.feedback:
+            wav = {'outside'  : 'bad_short.wav',
+                   'in_yellow': 'good.wav',
+                   'in_green' : 'excelent.wav'}
+            if audio == 'qsound':
+                QSound.play(wav[self.feedback])
+            elif audio == 'phonon':
+                m_media.setCurrentSource(
+                    Phonon.MediaSource(wav[self.feedback]))
+                m_media.play()
             
 class RefreshWidget(CustomRateWidget):
     WIDTH  = 1.0 * CustomRateWidget.REF_WIDTH
@@ -444,7 +467,7 @@ class WhiteBox(CustomRateWidget):
         self.test.writeAnswer(mseconds, rate)
         self.check.feedback = self.test.rateCheck(rate)
         self.check.adjustRate(self.test.currentRate)
-        #self.check.playFeedbackSound()
+        self.check.playFeedbackSound()
         self.check.setVisible(True)
         self.check.fbBlink(self.blinktime, self.blinkperiod)
         QTimer.singleShot(self.fbtime, self.putOnRest)
