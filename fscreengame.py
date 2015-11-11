@@ -362,16 +362,16 @@ class CheckWidget(CustomRateWidget):
                 painter.drawRect(feedbackBox)
         
     def playFeedbackSound(self):
-        if self.feedback:
-            wav = {'outside'  : 'bad_short.wav',
-                   'in_yellow': 'good.wav',
-                   'in_green' : 'excelent.wav'}
-            if audio == 'qsound':
-                QSound.play(wav[self.feedback])
-            elif audio == 'phonon':
-                m_media.setCurrentSource(
-                    Phonon.MediaSource(wav[self.feedback]))
-                m_media.play()
+        print('playing audio')
+        wavs = {'outside'  : 'bad_short.wav',
+                'in_yellow': 'good.wav',
+                'in_green' : 'excelent.wav'}
+        wav = wavs.get(self.feedback, wavs['outside'])
+        if audio == 'qsound':
+            QSound.play(wav)
+        elif audio == 'phonon':
+            m_media.setCurrentSource(Phonon.MediaSource(wav))
+            m_media.play()
             
 class RefreshWidget(CustomRateWidget):
     WIDTH  = 1.0 * CustomRateWidget.REF_WIDTH
