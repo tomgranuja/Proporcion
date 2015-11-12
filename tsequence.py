@@ -56,7 +56,7 @@ class Training():
     def __init__(self, dataStr=None):
         self.currentTrial = None
         self.data = self.getRates(dataStr)
-        self.toNextRate()
+        #self.toNextRate()
         
     @property
     def current(self):
