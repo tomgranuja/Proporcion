@@ -118,11 +118,12 @@ class Training():
         
 class Frame():
     def __init__(self, spListen = False, clkListen = False,
-                 timeout = 0, fbActive = False,
+                 isStim = False, timeout = 0, fbActive = False,
                  restIsVisible = False, refreshWdg = None,
                  setRate = False, dataWrite = False):
         self.spListen      = spListen
         self.clkListen     = clkListen
+        self.isStim        = isStim
         self.timeout       = timeout
         self.fbActive      = fbActive
         self.restIsVisible = restIsVisible
@@ -137,6 +138,7 @@ class Frame():
         ss =  ['Special wdg : {}'.format(self.refreshWdg)]
         ss += ['Space Listen: {}'.format(self.spListen)]
         ss += ['Clic Listen : {}'.format(self.clkListen)]
+        ss += ['Show stimul : {}'.format(self.isStim)]
         ss += ['Timeout ms  : {}'.format(self.timeout)]
         ss += ['Feedbk Activ: {}'.format(self.fbActive)]
         ss += ['Estim. rest : {}'.format(self.restIsVisible)]
@@ -166,7 +168,7 @@ class Sequence():
         self.overview.append(k)
         firstFrame = Frame(spListen = True, refreshWdg = 'pract',
                            setRate = True)
-        rateFrame  = Frame(clkListen = True)
+        rateFrame  = Frame(clkListen = True, isStim = True)
         fbFrame    = Frame(timeout = 6000, fbActive = True,
                            dataWrite = True)
         restFrame  = Frame(spListen = True, restIsVisible = True,
@@ -184,7 +186,8 @@ class Sequence():
         self.overview.append(k)
         firstFrame = Frame(spListen = True, refreshWdg = 'ready',
                            setRate = True)
-        rateFrame  = Frame(clkListen = True, timeout = 5000)
+        rateFrame  = Frame(clkListen = True, isStim = True,
+                           timeout = 5000)
         fbFrame    = Frame(timeout = 3000, fbActive = True,
                            dataWrite = True)
         restFrame  = Frame(spListen = True, restIsVisible = True,
