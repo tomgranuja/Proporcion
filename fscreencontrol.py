@@ -55,7 +55,7 @@ example_data = '''
 0.4 1.5 1
 0.555 4 0.5
 0.535 1.5 1
-'''[1:]
+'''[337:]
 
 practice_data = '''
 0.6 1 0.5
@@ -63,7 +63,7 @@ practice_data = '''
 0.55 1 0.5
 '''[1:]
 
-#practice_data = None
+practice_data = None
 
 FORCED_MIN = 0.01
 FORCED_MAX = 0.99
@@ -681,7 +681,7 @@ class FullBox(QDialog):
         #self.whiteBox.timeoutTimer.stop()
         showWhite= partial(self.showWdg, self.whiteBox)
         showPausa= partial(self.showWdg, self.slayout.dic['pausa'])
-        showGrax = partial(self.showWdg, self.slayout.dic['gracias'])
+        showGrax = self.gameEnd
         startGm = self.whiteBox.startGame
         f_dic = {'parciales': showWhite,
                  'pausa': showPausa, 
@@ -700,6 +700,12 @@ class FullBox(QDialog):
     def showWdg(self, wdg):
         self.slayout.setCurrentWidget(wdg)
         self.keyListen = True
+
+    def gameEnd(self):
+        self.keyListen = False
+        wdg = self.slayout.dic['gracias']
+        self.slayout.setCurrentWidget(wdg)
+        QTimer.singleShot(4000, self.close)
         
     def makeStckDic(self, *args, whiteBox):
         stckDic = {arg: RefreshWidget(arg) for arg in args}
