@@ -65,12 +65,12 @@ practice_data = '''
 
 #practice_data = None
 
-FORCED_MIN = 0.25
-FORCED_MAX = 0.75
+FORCED_MIN = 0.01
+FORCED_MAX = 0.99
 
 class Training():
     GREEN_ERROR  = 0.05
-    YELLOW_ERROR = 0.15
+    YELLOW_ERROR = 0.0
     #TEST_PARTIALS  = [2,4,6,8,10]
     #TEST_PAUSE     = [6]
     TEST_PARTIALS  = range(9,36,9)
@@ -266,7 +266,7 @@ class Slider(CustomRateWidget):
             raya = QRect(self._userClickX - w / 2, 
                          0, 
                          w,
-                         self.HEIGHT)
+                         self.HEIGHT-1)
             painter.setBrush(self.palette().brush(QPalette.Button))
             painter.drawRect(raya)
     
@@ -527,7 +527,7 @@ class WhiteBox(CustomRateWidget):
     def sliderLayout(self):
         self.lPhotoBox = QLabel()
         self.rPhotoBox = QLabel()
-        self.lPhotoBox.setPixmap(QPixmap('i_sesion1.png'))
+        self.lPhotoBox.setPixmap(QPixmap('agua.png'))
         self.rPhotoBox.setPixmap(QPixmap('d_sesion1.png'))
         self.slider = Slider(timeoutTimer = self.timeoutTimer)
         self.check = CheckWidget(self.test.GREEN_ERROR,
