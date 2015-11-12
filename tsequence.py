@@ -231,6 +231,8 @@ class Sequence():
             else:
                 sectionName = self.overview[frSec]
         self.frIndex = (frSec, frN)
+        print('{} {:02}'.format(sectionName,frN))
+        print(self.framesDic[sectionName][frN].frameAttrs(), '\n')
         return sectionName
 
 
