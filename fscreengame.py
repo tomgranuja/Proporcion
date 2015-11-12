@@ -88,8 +88,7 @@ class Slider(CustomRateWidget):
     #WIDTH  = 440
     #HEIGHT = 60
     sliderMouseRelease = pyqtSignal()
-    def __init__(self, timeoutTimer = QTimer(), 
-                 parent=None):
+    def __init__(self, parent=None):
         super(Slider, self).__init__(parent)
         self.testTime = QTime()
         self.riel=QLine(self.xFromRate(0),
@@ -97,7 +96,7 @@ class Slider(CustomRateWidget):
                         self.xFromRate(1),
                         self.yFromRate(0.5))
         self._userClickX = None
-        self._userClickRate = None
+        self._userRate = None
         self._userTime   = None
         self._mouseListen = True
         
@@ -137,7 +136,7 @@ class Slider(CustomRateWidget):
     def checkUserEvent(self, event):
         x = max(self.riel.x1(), min(self.riel.x2(), event.x()))
         self._userClickX = x
-        self._userClickRate = self.rateFromX(self._userClickX)
+        self._userRate = self.rateFromX(self._userClickX)
         self.sliderMouseRelease.emit()
 
 class CheckWidget(CustomRateWidget):
@@ -145,14 +144,20 @@ class CheckWidget(CustomRateWidget):
     HEIGHT = Slider.HEIGHT
     def __init__(self, greenError=None, yellError=None, parent=None):
         super(CheckWidget, self).__init__(parent)
-        self.setVisible(False)
-        self.gSemiWidth = self.wFromRate(greenError)
-        self.ySemiWidth = self.wFromRate(yellError)
+        self.gSemiWidth = 0
+        self.ySemiWidth = 0
+        self.setErrors(greenError, yellError)
         self.yellLeftX  = None
         self.greenLeftX = None
         self.feedback   = None
         self.intermitent = False
         
+    def setErrors(self, green, yell):
+        if green:
+            self.gSemiWidth = self.wFromRate(green)
+        if yell:
+            self.ySemiWidth = self.wFromRate(yell)
+    
     def adjustRate(self, center):
         spanCenterX = self.xFromRate(center)
         self.yellLeftX  = spanCenterX - self.ySemiWidth
@@ -222,11 +227,11 @@ class RefreshWidget(CustomRateWidget):
         self.setAutoFillBackground(True)
         self.setType = {
           'intro':       self.setIntroWdg,
-          'a_practicar': partial(self.setMsgWdg,'Vamos a practicar'),
-          'listo?':      partial(self.setMsgWdg,'¿Estás listo?'),
-          'pausa':       self.setIntroWdg,
-          'parciales':   partial(self.setMsgWdg,'Tus resultados...'),
-          'gracias':     partial(self.setMsgWdg,'Gracias...')
+          'pract': partial(self.setMsgWdg,'Vamos a practicar'),
+          'ready':      partial(self.setMsgWdg,'¿Estás listo?'),
+          'pause':       self.setIntroWdg,
+          'parcials':   partial(self.setMsgWdg,'Tus resultados...'),
+          'thanks':     partial(self.setMsgWdg,'Gracias...')
         }
         self.setType.get(wdgType, self.setType['intro'])()
         layout = QVBoxLayout()
@@ -249,30 +254,20 @@ class RefreshWidget(CustomRateWidget):
 class WhiteBox(CustomRateWidget):
     #WIDTH  = 640
     #HEIGHT = 660
-    def __init__(self, uid = None, break_function=None, parent=None):
+    def __init__(self, parent=None):
         super(WhiteBox, self).__init__(parent)
         p = self.palette()
         p.setColor(self.backgroundRole(), Qt.white)
         self.setPalette(p)
         self.setAutoFillBackground(True)
-        self.setTimers()
-        self.test = Training(uid, 
-                             example_data,
-                             practice_data)
-        self.breakFuncion = break_function
         layout = QVBoxLayout()
         layout.addLayout(self.rateBoxLayout())
         layout.addStretch()
         layout.addLayout(self.sliderLayout())
         self.setLayout(layout)
-        self.slider.sliderMouseRelease.connect(self.onSliderMouseRelease)
-        
+
     def rateBoxLayout(self):
         self.rateBox = RateBox()
-        self.test.toNextRate()
-        self.rateBox.setBars(self.test.currentHeight,
-                             self.test.currentRate)
-        self.rateBox.update()
         self.restBox = RestBox(self.rateBox)
         self.restBox.setVisible(False)
         layout = QHBoxLayout()
@@ -280,16 +275,14 @@ class WhiteBox(CustomRateWidget):
         layout.addWidget(self.rateBox)
         layout.addStretch()
         return layout
-    
+
     def sliderLayout(self):
         self.lPhotoBox = QLabel()
         self.rPhotoBox = QLabel()
         self.lPhotoBox.setPixmap(QPixmap('cherri.png'))
         self.rPhotoBox.setPixmap(QPixmap('cherrimas.png'))
-        self.slider = Slider(timeoutTimer = self.timeoutTimer)
-        self.check = CheckWidget(self.test.GREEN_ERROR,
-                                 self.test.YELLOW_ERROR,
-                                 parent = self.slider)
+        self.slider = Slider()
+        self.check = CheckWidget(parent = self.slider)
         layout = QHBoxLayout()
         layout.addStretch()
         layout.addWidget(self.lPhotoBox)
@@ -297,61 +290,6 @@ class WhiteBox(CustomRateWidget):
         layout.addWidget(self.rPhotoBox)
         layout.addStretch()
         return layout
-    
-    def onSliderMouseRelease(self, byUser=False):
-        mseconds =self.slider._userTime
-        rate = None
-        if byUser:
-            rate = self.slider.rateFromX(self.slider._userClickX)
-        self.test.writeAnswer(mseconds, rate)
-        self.check.feedback = self.test.rateCheck(rate)
-        self.check.adjustRate(self.test.currentRate)
-        #self.check.playFeedbackSound()
-        self.check.setVisible(True)
-        self.check.fbBlink(self.blinktime, self.blinkperiod)
-        QTimer.singleShot(self.fbtime, self.putOnRest)
-    
-    def startGame(self):
-        if self.test.practice:
-            self.breakFuncion('a_practicar')
-        else:
-            self.breakFuncion('listo?')
-        
-    def putOnRest(self):
-        self.check.setVisible(False)
-        self.slider._userClickX = None
-        self.restBox.setVisible(True)
-        takeBreak = self.test.toNextRate()
-        self.rateBox.setBars(self.test.currentHeight,
-                             self.test.currentRate)
-        self.rateBox.update()
-        self.breakFuncion(takeBreak)
-    
-    def nextGame(self):
-        self.slider._userClickX = None
-        self.slider._mouseListen = True
-        self.updateTime()
-        self.restBox.setVisible(False)
-        
-    def setTimers(self, fbtime      = 3000, 
-                        blinktime   = 1600, 
-                        blinkperiod =  200,
-                        timeout     = 7000):
-        self.fbtime = fbtime
-        self.blinktime = blinktime
-        self.blinkperiod = blinkperiod
-        self.timeoutTimer = QTimer()
-        self.timeoutTimer.setSingleShot(True)
-        self.timeoutTimer.setInterval(timeout)
-        self.timeoutTimer.timeout.connect(self.onTimeOut)
-        
-    def onTimeOut(self):
-        self.slider.mouseReleaseEvent()
-    
-    def updateTime(self):
-        self.slider.testTime.start()
-        self.timeoutTimer.start()
-        
         
 class UserChooser(QDialog):
     def __init__(self, parent=None):
@@ -407,12 +345,9 @@ class FullBox(QDialog):
     
     def buildGame(self):
         self.whiteBox = WhiteBox()
-        self.whiteBox.setTimers(blinktime   =  400, 
-                                blinkperiod =  100,
-                                timeout     = 5000)
         self.slayout= QStackedLayout()
         self.slayout.dic = self.makeStckDic('intro',
-                                            'practice',
+                                            'pract',
                                             'ready',
                                             'pause',
                                             'parcials',
@@ -459,13 +394,14 @@ class FullBox(QDialog):
             self.tlogger = filelogger.Logger(tFilePath)
 
     def gameStart(self):
-        sliderRelease = self.whiteBox.sliderMouseRelease
+        sliderRelease = self.whiteBox.slider.sliderMouseRelease
         sliderRelease.connect(self.onSliderMouseRelease)
         self.timeoutTimer.timeout.connect(self.onTimeOut)
         self.setNextFrame()
 
     def keyPressEvent(self, e):
         if self.spListen and e.key() == Qt.Key_Space:
+            print('key press event')
             self.toListen = False
             self.spListen = False
             self.userTime = self.whiteBox.slider._userTime
@@ -483,6 +419,7 @@ class FullBox(QDialog):
     
     def onTimeOut(self):
         if self.toListen:
+            self.whiteBox.slider._mouseListen = False
             self.setNextFrame()
     
     def setNextFrame(self):
@@ -491,18 +428,24 @@ class FullBox(QDialog):
             finishGame()
             return
         _, frN = self.sequence.frIndex
-        frame = self.sequence.frameDic[section][frN]
+        frame = self.sequence.framesDic[section][frN]
+        training, logger = None, None
+        if section == 'practice':
+            training = self.practice
+            logger = self.plogger
+        elif section == 'test':
+            training = self.test
+            logger = self.tlogger
+        sldr = self.whiteBox.slider
         if frame.mustDataWrite:
-            n, r, h = None, None, None
-            if section == 'practice':
-                self.plogger.write(n, r, h)
-            elif section == 'test':
-                self.tlogger.write(n, r, h)
+            n = training.currentTrial
+            t, r = sldr._userTime, sldr._userRate
+            logger.write(n, t, r)
         if frame.fbActive:
-            testR, _, _ = self.test.current 
-            userR = None
+            h, testR = training.current 
+            userR = sldr._userRate
             check = self.whiteBox.check
-            check.feedback = self.test.rateCheck(userR)
+            check.feedback = training.rateCheck(userR)
             check.adjustRate(testR)
             #self.check.playFeedbackSound()
             check.setVisible(True)
@@ -510,9 +453,17 @@ class FullBox(QDialog):
         else:
             self.whiteBox.check.setVisible(False)
         if frame.mustSetRate:
-            self.test.toNextRate()
-            h, r = self.test.current
+            sldr._userClickX = None
+            training.toNextRate()
+            gerror = training.GREEN_ERROR
+            yerror = training.YELLOW_ERROR
+            self.whiteBox.check.setErrors(gerror, yerror)
+            h, r = training.current
             self.whiteBox.rateBox.setBars(h, r)
+        if frame.isStim:
+            sldr._userClickX = None
+            sldr._mouseListen = True
+            sldr.testTime.start()
         self.setRefreshWdg(frame.refreshWdg)
         self.setListenFlags(frame.spListen, frame.clkListen)
         self.whiteBox.restBox.setVisible(frame.restIsVisible)
@@ -521,8 +472,8 @@ class FullBox(QDialog):
     def setListenFlags(self, sp, clk):
         self.spListen = sp
         self.clkListen= clk
-        
-    def setRefreshWdg(wdg_id):
+
+    def setRefreshWdg(self, wdg_id):
         if wdg_id:
             wdg = self.slayout.dic[wdg_id]
             self.slayout.setCurrentWidget(wdg)
