@@ -76,7 +76,7 @@ class Training():
     def __init__(self, uid=None, 
                        dataStr=None, 
                        practiceStr = None):
-        self.user = uidmgr.User(uid)
+        self.uid = uid
         self.initFileRecord()
         self.currentTrial = None
         self.dataStr = dataStr
@@ -88,11 +88,12 @@ class Training():
             self.data = self.getRates(self.dataStr)
     
     def initFileRecord(self):
-        lastSession = self.user.getLastSessionId()
-        currentSession = uidmgr.nextSessionId(lastSession)
-        with open(self.user.recFPath, 'a') as f:
-            s = '#{}\n'.format(currentSession)
-            f.write(s)
+        #lastSession = self.user.getLastSessionId()
+        #currentSession = uidmgr.nextSessionId(lastSession)
+        self.recPath = '{}_{:02}_{}.dat'.format(self.uid, 0, 'T') 
+        with open(self.recPath, 'w') as f:
+            #s = '#{}\n'.format(currentSession)
+            f.write(self.recPath + '\n')
         
     def getRates(self, data):
         '''Heights,rates from data string, reset trial counter.'''
@@ -145,7 +146,7 @@ class Training():
         
     def writeAnswer(self, time, rate):
         print(self.currentTrial, time, rate)
-        with open(self.user.recFPath, 'a') as f:
+        with open(self.recPath, 'a') as f:
             s = '{} {} {}\n'.format(self.currentTrial, time, rate)
             f.write(s)
 
