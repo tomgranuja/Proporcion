@@ -8,6 +8,10 @@ from PyQt4.QtGui import *
 sys.path.append(APP_DIR)
 import fscreengame
 
+#Probamos redefinir constante
+
+fscreengame.tsequence.TEST_PARTIALS = [2,3]
+
 if __name__ == "__main__":
     app  = QApplication(sys.argv)
     form = fscreengame.FullBox()
