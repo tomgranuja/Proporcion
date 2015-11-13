@@ -1,53 +1,55 @@
 #!/usr/bin/python3 -tt
 #-*- coding:utf-8 -*-
 
-TEST_PARTIALS   = [2,4,6,8,10]
-TEST_PAUSES     = [6]
+TEST_PARTIALS = [4,10]
+TEST_PAUSES = [6]
+#TEST_PARTIALS   = range(9,36,9)
+#TEST_PAUSES     = [18]
 
 test_data = '''
-1.0 0.5
-1.0 0.25
-0.6 0.5
-0.6 0.75
-0.6 0.25
-0.3 0.8
-0.3 0.2
-0.3 0.5
-0.3 0.75
-1.0 0.2
-1.0 0.8
-1.0 0.5
-1.0 0.25
-1.0 0.75
-1.0 0.5
-1.0 0.5
-1.0 0.25
-0.6 0.5
-0.6 0.75
-0.6 0.25
-0.3 0.8
-0.3 0.2
-0.3 0.5
-0.3 0.75
-1.0 0.2
-1.0 0.8
-1.0 0.5
-1.0 0.25
-1.0 0.75
-1.0 0.5
-0.6 0.75
-0.6 0.25
-0.3 0.8
-0.3 0.2
-0.3 0.5
-0.3 0.75
-'''[203:]
+0.21 1 1
+0.76 1.5 0.5
+0.01 1 0.5
+0.5 1.5 1
+0.95 1 0.5
+0.03 1 0.5
+0.5 1 0.5
+0.16 1 1
+0.76 4 1
+0.26 4 0.5
+0.21 4 1
+0.61 1.5 1
+0.8 1.5 0.5
+0.03 1.5 0.5
+0.03 4 0.5
+0.43 1.5 0.5
+0.95 4 1
+0.7 4 1
+0.76 1 0.5
+0.7 1 0.5
+0.26 1.5 1
+0.8 1 0.5
+0.16 1.5 1
+0.5 4 1
+0.26 1 1
+0.21 1.5 0.5
+0.61 1 1
+0.43 1 1
+0.7 1.5 1
+0.16 4 0.5
+0.01 1.5 0.5
+0.95 1.5 1
+0.43 4 0.5
+0.01 4 1
+0.61 4 0.5
+0.8 4 1
+'''[252:]
 
 practice_data = '''
-0.75 0.25
-0.75 0.75
-0.75 0.5
-'''[1:]
+0.6 1 0.5
+0.4 1 1
+0.55 1 0.5
+'''[20:]
 #practice_data = None
 
 class Training():
@@ -62,11 +64,11 @@ class Training():
     def current(self):
         '''(height, rate) or (None, None) if outside data.'''
         try:
-            height, rate = self.data[self.currentTrial]
+            height, rate, width = self.data[self.currentTrial]
         except IndexError:
             print('Current trial outside data range')
-            height, rate = None, None
-        return height, rate
+            height, rate, width = None, None, None
+        return height, rate, width
         
     def getRates(self, data):
         '''Heights,rates from data string.'''
@@ -74,13 +76,13 @@ class Training():
         if data:
             for n, line in enumerate(data.splitlines()):
                 try:
-                    h,r =  line.split()
-                    hf,rf = float(h), float(r)
+                    r,s,w =  line.split()
+                    hf,rf, wf = 1/float(s), float(r), float(w)
                 except:
                     msg = 'Error in data line {}: {}'
                     print(msg.format(n, repr(line)))
                     raise
-                float_tupls.append( (hf, rf) )
+                float_tupls.append( (hf, rf, wf) )
         return float_tupls
         
     def toNextRate(self):
@@ -95,7 +97,7 @@ class Training():
     def rateCheck(self, r=None):
         '''Check r error against current rate.'''
         result = None
-        HEIGHT, RATE = range(2)
+        HEIGHT, RATE, WIDTH = range(3)
         if self.current[RATE]:
             if r and 0 <= r <= 1:
                 result = 'outside'
@@ -169,11 +171,11 @@ class Sequence():
         firstFrame = Frame(spListen = True, refreshWdg = 'pract',
                            setRate = True)
         rateFrame  = Frame(clkListen = True, isStim = True)
-        fbFrame    = Frame(timeout = 6000, fbActive = True,
+        fbFrame    = Frame(timeout = 1200, fbActive = True,
                            dataWrite = True)
         restFrame  = Frame(spListen = True, restIsVisible = True,
                            setRate = True)
-        partFrame  = Frame(refreshWdg = 'parcials', timeout = 5000)
+        partFrame  = Frame(refreshWdg = 'parcials', timeout = 1000)
         self.framesDic[k] = [firstFrame]
         self.pFrames = []
         for n, rate in enumerate(tr_object.data):
@@ -188,11 +190,11 @@ class Sequence():
                            setRate = True)
         rateFrame  = Frame(clkListen = True, isStim = True,
                            timeout = 5000)
-        fbFrame    = Frame(timeout = 3000, fbActive = True,
+        fbFrame    = Frame(timeout = 1200, fbActive = True,
                            dataWrite = True)
         restFrame  = Frame(spListen = True, restIsVisible = True,
                            setRate = True)
-        partFrame  = Frame(refreshWdg = 'parcials', timeout = 5000)
+        partFrame  = Frame(refreshWdg = 'parcials', timeout = 1000)
         pauseFrame = Frame(refreshWdg = 'pause', spListen = True,
                            setRate = True)
         self.framesDic[k] = [firstFrame]

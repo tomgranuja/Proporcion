@@ -38,7 +38,7 @@ class CustomRateWidget(QWidget):
         return QSize(self.WIDTH, self.HEIGHT)
 
 class RateBox(CustomRateWidget):
-    WIDTH  = 0.1875 * CustomRateWidget.REF_WIDTH
+    WIDTH  = 2 * 0.1875 * CustomRateWidget.REF_WIDTH
     HEIGHT = 0.7188 * CustomRateWidget.REF_HEIGHT
     #WIDTH  = 120
     #HEIGHT = 460
@@ -47,13 +47,13 @@ class RateBox(CustomRateWidget):
         self.blueRect = None
         self.redRect  = None
         
-    def setBars(self, height, rate):
+    def setBars(self, height, rate, width):
         blueHeight = 1.0
-        if 0.0 < height  <= 1.0:
+        if 0.0 < height  <= 1.0 and 0.0 < width <= 1.0:
             self.blueRect = QRect(
-                         self.xFromRate(0),
+                         self.xFromRate((1-width)/2),
                          self.yFromRate(1-height),
-                         self.wFromRate(1),
+                         self.wFromRate(width),
                          self.hFromRate(height)
                          )
             if 0.0 < rate <= 1.0:
@@ -401,7 +401,6 @@ class FullBox(QDialog):
 
     def keyPressEvent(self, e):
         if self.spListen and e.key() == Qt.Key_Space:
-            print('key press event')
             self.toListen = False
             self.spListen = False
             self.userTime = self.whiteBox.slider._userTime
@@ -442,7 +441,7 @@ class FullBox(QDialog):
             t, r = sldr._userTime, sldr._userRate
             logger.write(n, t, r)
         if frame.fbActive:
-            h, testR = training.current 
+            h, testR, w = training.current 
             userR = sldr._userRate
             check = self.whiteBox.check
             check.feedback = training.rateCheck(userR)
@@ -458,8 +457,8 @@ class FullBox(QDialog):
             gerror = training.GREEN_ERROR
             yerror = training.YELLOW_ERROR
             self.whiteBox.check.setErrors(gerror, yerror)
-            h, r = training.current
-            self.whiteBox.rateBox.setBars(h, r)
+            h, r, w = training.current
+            self.whiteBox.rateBox.setBars(h, r, w)
         if frame.isStim:
             sldr._userClickX = None
             sldr._mouseListen = True
