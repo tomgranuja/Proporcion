@@ -64,6 +64,9 @@ class Training():
         else: print('None currentRate to check')
         return result
         
+    def __len__(self):
+        return len(self.data)
+    
     def __str__(self):
         if len(self.data) > 3:
             data = self.data[:3] + ['...']
