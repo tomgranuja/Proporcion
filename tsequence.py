@@ -6,52 +6,6 @@ TEST_PAUSES = [6]
 #TEST_PARTIALS   = range(9,36,9)
 #TEST_PAUSES     = [18]
 
-test_data = '''
-0.21 1 1
-0.76 1.5 0.5
-0.01 1 0.5
-0.5 1.5 1
-0.95 1 0.5
-0.03 1 0.5
-0.5 1 0.5
-0.16 1 1
-0.76 4 1
-0.26 4 0.5
-0.21 4 1
-0.61 1.5 1
-0.8 1.5 0.5
-0.03 1.5 0.5
-0.03 4 0.5
-0.43 1.5 0.5
-0.95 4 1
-0.7 4 1
-0.76 1 0.5
-0.7 1 0.5
-0.26 1.5 1
-0.8 1 0.5
-0.16 1.5 1
-0.5 4 1
-0.26 1 1
-0.21 1.5 0.5
-0.61 1 1
-0.43 1 1
-0.7 1.5 1
-0.16 4 0.5
-0.01 1.5 0.5
-0.95 1.5 1
-0.43 4 0.5
-0.01 4 1
-0.61 4 0.5
-0.8 4 1
-'''[252:]
-
-practice_data = '''
-0.6 1 0.5
-0.4 1 1
-0.55 1 0.5
-'''[20:]
-#practice_data = None
-
 class Training():
     GREEN_ERROR  = 0.05
     YELLOW_ERROR = 0.15
@@ -277,14 +231,13 @@ def sequenceMap(seq):
     return '\n'.join(mapList)
 
 if __name__ == "__main__":
-    practice = Training(practice_data)
-    test     = Training(test_data)
-    practiceSeq = Sequence(practice)
-    testSeq = Sequence(t=test)
+    import inputdata
+    practice = Training(inputdata.dbgPractice)
+    test     = Training(inputdata.dbgTest01)
+    #practiceSeq = Sequence(practice)
+    #testSeq = Sequence(t=test)
     bothSeq = Sequence(practice, test)
-    n = 0
-    while n < len(bothSeq.allFrames):
-        print('Frame {}:'.format(n))
-        print(bothSeq.allFrames[n].frameAttrs())
-        print('')
-        n += 1
+    for section in bothSeq.overview:
+        for n, frame in enumerate(bothSeq.framesDic[section]):
+            print('{} {:02}'.format(section.upper(),n))
+            print(frame.frameAttrs(), '\n')

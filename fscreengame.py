@@ -5,7 +5,7 @@ import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from functools import partial
-import uidmgr, tsequence, filelogger
+import uidmgr, tsequence, filelogger, inputdata
 
 
 def pixelFromRate(rate, t, o = 0):
@@ -474,8 +474,8 @@ class FullBox(QDialog):
         super(FullBox, self).setLayout(layout)
     
     def gameSequenceConfig(self):
-        self.practice = tsequence.Training(tsequence.practice_data)
-        self.test     = tsequence.Training(tsequence.test_data)
+        self.practice = tsequence.Training(inputdata.dbgPractice)
+        self.test     = tsequence.Training(inputdata.dbgTest01)
         self.sequence = tsequence.Sequence(self.practice, self.test,
                                            **self.timeoutsDic)
         self.frIndex = (None, None)
