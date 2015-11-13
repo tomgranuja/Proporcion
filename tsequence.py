@@ -99,7 +99,7 @@ class Training():
         result = None
         HEIGHT, RATE, WIDTH = range(3)
         if self.current[RATE]:
-            if r and 0 <= r <= 1:
+            if r or r == 0.0 and 0 <= r <= 1:
                 result = 'outside'
                 error = abs(r - self.current[RATE])
                 if error <= Training.YELLOW_ERROR:
@@ -216,7 +216,7 @@ class Sequence():
     def addThanksToSequence(self):
         k = 'thanks'
         self.overview.append(k)
-        self.framesDic[k]= [Frame(refreshWdg = k)]
+        self.framesDic[k]= [Frame(refreshWdg = k, timeout = 4000)]
 
     def nextFrameSection(self):
         frSec, frN = self.frIndex
@@ -233,8 +233,9 @@ class Sequence():
             else:
                 sectionName = self.overview[frSec]
         self.frIndex = (frSec, frN)
-        print('{} {:02}'.format(sectionName,frN))
-        print(self.framesDic[sectionName][frN].frameAttrs(), '\n')
+        if sectionName:
+            print('{} {:02}'.format(sectionName,frN))
+            print(self.framesDic[sectionName][frN].frameAttrs(), '\n')
         return sectionName
 
 

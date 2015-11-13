@@ -514,7 +514,7 @@ class FullBox(QDialog):
     
     def setNextFrame(self):
         section = self.sequence.nextFrameSection()
-        if section == None or section == 'thanks':
+        if section == None:
             self.finishGame()
             return
         _, frN = self.sequence.frIndex
@@ -580,9 +580,7 @@ class FullBox(QDialog):
             self.toListen = True
 
     def finishGame(self):
-        self.setListenFlags(False, False)
-        self.setRefreshWdg('thanks')
-        QTimer.singleShot(4000, self.close)
+        self.close()
 
     
 if __name__ == "__main__":
