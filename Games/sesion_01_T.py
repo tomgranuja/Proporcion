@@ -6,10 +6,11 @@ import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 sys.path.append(APP_DIR)
-import fscreengame
+import fscreengame, inputdata
 
 #Probamos redefinir constante
 
+fscreengame.PRACTICE_STR = inputdata.tPractice
 fscreengame.tsequence.TEST_PARTIALS = [2,3]
 
 if __name__ == "__main__":
