@@ -238,10 +238,73 @@ class CheckWidget(CustomRateWidget):
         elif self.audio == 'phonon':
             self.m_media.setCurrentSource(self.phononSource(wav))
             self.m_media.play()
+
+class PartialWidget(CustomRateWidget):
+    def __init__(self, parent=None):
+        super(PartialWidget, self).__init__(parent)
+        p = self.palette()
+        p.setColor(self.backgroundRole(), QColor(255,255,255))
+        self.setPalette(p)
+        self.setAutoFillBackground(True)
+        self.greenBorder = QRect(self.xFromRate(0.5/4),
+                                 self.yFromRate(0.5),
+                                 self.wFromRate(0.5/3),
+                                 self.hFromRate(0.5))
+        dx = self.wFromRate(0.5/3 + 0.5/4)
+        self.yellBorder  = self.greenBorder.translated( dx, 0 )
+        self.outBorder   = self.yellBorder.translated(dx, 0)
+        self.count = [ 0, 0, 0 ]
+        self.bars  = [self.greenBorder, 
+                      self.yellBorder, 
+                      self.outBorder]
+        self.barUnit = None
+
+    def setBarUnit(self, dataLen):
+        barMaxH = self.hFromRate(1) - 100
+        self.barUnit = barMaxH / dataLen
+    
+    def setBars(self, feedback):
+        GREEN, YELL, OUT = range(3)
+        fbdic = {'in_green' : GREEN,
+                 'in_yellow': YELL,
+                 'outside'  : OUT}
+        self.count[fbdic.get(feedback, OUT)] += 1
+        tops = [ self.hFromRate(1) - c * self.barUnit
+                for c in self.count ]
+        [self.bars[i].setTop(tops[i]) for i,_ in enumerate(tops)]
+        self.update()
+
+    def paintEvent(self, event=None):
+        painter = QPainter(self)
+        painter.setPen(Qt.NoPen)
+        greenColor = QColor(0,128,0)
+        yellowColor = QColor(222,205,135)
+        outsideColor = QColor(179,179,179)
+        #green
+        painter.setBrush(greenColor)
+        painter.drawRect(self.greenBorder)
+        greenPix = QPixmap('excelent.png')
+        greenX = self.greenBorder.left()
+        greenY = self.greenBorder.top() - 100
+        painter.drawPixmap(greenX, greenY, greenPix)
+        #yell
+        painter.setBrush(yellowColor)
+        painter.drawRect(self.yellBorder)
+        yellPix = QPixmap('good.png')
+        yellX = self.yellBorder.left()
+        yellY = self.yellBorder.top() - 100
+        painter.drawPixmap(yellX, yellY, yellPix)
+        #out
+        painter.setBrush(outsideColor)
+        painter.drawRect(self.outBorder)
+        outPix = QPixmap('bad.png')
+        outX = self.outBorder.left()
+        outY = self.outBorder.top() - 100
+        painter.drawPixmap(outX, outY, outPix)
             
 class RefreshWidget(CustomRateWidget):
-    WIDTH  = 1.0 * CustomRateWidget.REF_WIDTH
-    HEIGHT = 1.03125 * CustomRateWidget.REF_HEIGHT
+    #WIDTH  = 1.0 * CustomRateWidget.REF_WIDTH
+    #HEIGHT = 1.03125 * CustomRateWidget.REF_HEIGHT
     #WIDTH  = 640
     #HEIGHT = 660
     def __init__(self, wdgType=None, parent=None):
@@ -255,7 +318,7 @@ class RefreshWidget(CustomRateWidget):
           'pract': partial(self.setMsgWdg,'Vamos a practicar'),
           'ready':      partial(self.setMsgWdg,'¿Estás listo?'),
           'pause':       self.setIntroWdg,
-          'parcials':   partial(self.setMsgWdg,'Tus resultados...'),
+          'parcials':   self.setPartialWdg,
           'thanks':     partial(self.setMsgWdg,'Gracias...')
         }
         self.setType.get(wdgType, self.setType['intro'])()
@@ -267,7 +330,10 @@ class RefreshWidget(CustomRateWidget):
         bearpix = QPixmap('intro_sesion1.png')
         self.wdg = QLabel()
         self.wdg.setPixmap(bearpix)
-        
+
+    def setPartialWdg(self):
+        self.wdg = PartialWidget()
+
     def setMsgWdg(self, msg):
         self.wdg = QLabel()
         font = self.wdg.font()
@@ -468,9 +534,12 @@ class FullBox(QDialog):
         if frame.fbActive:
             h, testR, w = training.current 
             userR = sldr._userRate
+            partialWdg = self.slayout.dic['parcials'].wdg
             check = self.whiteBox.check
             check.feedback = training.rateCheck(userR)
             check.adjustRate(testR)
+            partialWdg.setBarUnit(len(training.data))
+            partialWdg.setBars(check.feedback)
             check.playFeedbackSound()
             check.setVisible(True)
             check.fbBlink(1000, 150)
