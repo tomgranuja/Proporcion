@@ -110,7 +110,7 @@ class Slider(CustomRateWidget):
             raya = QRect(self._userClickX - w / 2, 
                          0, 
                          w,
-                         self.HEIGHT)
+                         self.HEIGHT - 1)
             painter.setBrush(self.palette().brush(QPalette.Button))
             painter.drawRect(raya)
     
