@@ -310,7 +310,7 @@ class RefreshWidget(CustomRateWidget):
     def __init__(self, wdgType=None, parent=None):
         super(RefreshWidget, self).__init__(parent)
         p = self.palette()
-        p.setColor(self.backgroundRole(), Qt.yellow)
+        p.setColor(self.backgroundRole(), QColor(179,179,179))
         self.setPalette(p)
         self.setAutoFillBackground(True)
         self.setType = {
