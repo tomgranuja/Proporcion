@@ -415,12 +415,17 @@ class UserChooser(QDialog):
 class FullBox(QDialog):
     def __init__(self, parent=None):
         super(FullBox, self).__init__(parent)
+        self.setTimeoutsDic()
         self.setTheBackground(179,179,179)
         self.setUserSession()
         if self.userUid:
             print("Construyendo juego para {}".format(self.userUid))
             self.buildGame()
         
+    def setTimeoutsDic(self):
+         self.timeoutsDic = {'fbBlinkTime'  : 1000,
+                             'fbBlinkPeriod':  150}
+
     def setTheBackground(self,r,g,b):
         p = self.palette()
         p.setColor(self.backgroundRole(), QColor(r,g,b))
@@ -471,7 +476,8 @@ class FullBox(QDialog):
     def gameSequenceConfig(self):
         self.practice = tsequence.Training(tsequence.practice_data)
         self.test     = tsequence.Training(tsequence.test_data)
-        self.sequence = tsequence.Sequence(self.practice, self.test)
+        self.sequence = tsequence.Sequence(self.practice, self.test,
+                                           **self.timeoutsDic)
         self.frIndex = (None, None)
         self.timeoutTimer = QTimer()
         self.timeoutTimer.setSingleShot(True)
@@ -542,7 +548,8 @@ class FullBox(QDialog):
             partialWdg.setBars(check.feedback)
             check.playFeedbackSound()
             check.setVisible(True)
-            check.fbBlink(1000, 150)
+            check.fbBlink(self.timeoutsDic['fbBlinkTime'], 
+                          self.timeoutsDic['fbBlinkPeriod'])
         else:
             self.whiteBox.check.setVisible(False)
         if frame.mustSetRate:

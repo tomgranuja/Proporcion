@@ -149,15 +149,28 @@ class Frame():
         return '\n'.join(ss)
     
 class Sequence():
-    def __init__(self,p = None, t = None):
+    def __init__(self,p = None, t = None, **kargs):
         self.framesDic = {}
         self.addIntroToSequence()
+        self.tout = {'practSt'  : 5000,
+                     'testSt'   : 5000,
+                     'practFb'  : 2000,
+                     'testFb'   : 2000,
+                     'pparcials': 4000,
+                     'tparcials': 4000,
+                     'thanks'   : 4000
+                     }
+        self.setTimeouts(kargs)
         if p:
             self.addPracticeToSequence(p)
         if t:
             self.addTestToSequence(t)
         self.addThanksToSequence()
         self.frIndex = (None, None)
+    
+    def setTimeouts(self,kargs):
+        for k in kargs:
+            self.tout[k] = kargs[k]
     
     def addIntroToSequence(self):
         k = 'intro'
@@ -170,12 +183,14 @@ class Sequence():
         self.overview.append(k)
         firstFrame = Frame(spListen = True, refreshWdg = 'pract',
                            setRate = True)
-        rateFrame  = Frame(clkListen = True, isStim = True)
-        fbFrame    = Frame(timeout = 1200, fbActive = True,
-                           dataWrite = True)
+        rateFrame  = Frame(clkListen = True, isStim = True,
+                           timeout = self.tout['practSt'])
+        fbFrame    = Frame(timeout = self.tout['practFb'], 
+                           fbActive = True, dataWrite = True)
         restFrame  = Frame(spListen = True, restIsVisible = True,
                            setRate = True)
-        partFrame  = Frame(refreshWdg = 'parcials', timeout = 1000)
+        partFrame  = Frame(refreshWdg = 'parcials', 
+                           timeout = self.tout['pparcials'])
         self.framesDic[k] = [firstFrame]
         self.pFrames = []
         for n, rate in enumerate(tr_object.data):
@@ -189,12 +204,13 @@ class Sequence():
         firstFrame = Frame(spListen = True, refreshWdg = 'ready',
                            setRate = True)
         rateFrame  = Frame(clkListen = True, isStim = True,
-                           timeout = 5000)
-        fbFrame    = Frame(timeout = 1200, fbActive = True,
-                           dataWrite = True)
+                           timeout = self.tout['testSt'])
+        fbFrame    = Frame(timeout = self.tout['testFb'], 
+                           fbActive = True, dataWrite = True)
         restFrame  = Frame(spListen = True, restIsVisible = True,
                            setRate = True)
-        partFrame  = Frame(refreshWdg = 'parcials', timeout = 1000)
+        partFrame  = Frame(refreshWdg = 'parcials', 
+                           timeout = self.tout['tparcials'])
         pauseFrame = Frame(refreshWdg = 'pause', spListen = True,
                            setRate = True)
         self.framesDic[k] = [firstFrame]
@@ -216,7 +232,8 @@ class Sequence():
     def addThanksToSequence(self):
         k = 'thanks'
         self.overview.append(k)
-        self.framesDic[k]= [Frame(refreshWdg = k, timeout = 4000)]
+        self.framesDic[k]= [Frame(refreshWdg = k, 
+                                  timeout = self.tout['thanks'])]
 
     def nextFrameSection(self):
         frSec, frN = self.frIndex
