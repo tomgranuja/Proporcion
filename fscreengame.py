@@ -147,6 +147,7 @@ class CheckWidget(CustomRateWidget):
         self.gSemiWidth = 0
         self.ySemiWidth = 0
         self.setErrors(greenError, yellError)
+        self.audio = self.gameAudioConfig()
         self.yellLeftX  = None
         self.greenLeftX = None
         self.feedback   = None
@@ -181,6 +182,19 @@ class CheckWidget(CustomRateWidget):
         self.intermitent = not self.intermitent
         self.update()
         
+    def gameAudioConfig(self):
+        audio = None
+        if QSound.isAvailable():
+            audio = 'qsound'
+        else:
+            from PyQt4.phonon import Phonon
+            self.phononSource = Phonon.MediaSource
+            self.m_media = Phonon.MediaObject()
+            self.audioOut = Phonon.AudioOutput(Phonon.GameCategory)
+            Phonon.createPath(self.m_media, self.audioOut)
+            audio = 'phonon'
+        return audio
+    
     def paintEvent(self, event=None):
         painter = QPainter(self)
         painter.setPen(Qt.NoPen)
@@ -213,6 +227,17 @@ class CheckWidget(CustomRateWidget):
             painter.setBrush(box_color[self.feedback])
             if self.intermitent:
                 painter.drawRect(feedbackBox)
+
+    def playFeedbackSound(self):
+        wavs = {'outside'  : 'bad_short.wav',
+                'in_yellow': 'good.wav',
+                'in_green' : 'excelent.wav'}
+        wav = wavs.get(self.feedback, wavs['outside'])
+        if self.audio == 'qsound':
+            QSound.play(wav)
+        elif self.audio == 'phonon':
+            self.m_media.setCurrentSource(self.phononSource(wav))
+            self.m_media.play()
             
 class RefreshWidget(CustomRateWidget):
     WIDTH  = 1.0 * CustomRateWidget.REF_WIDTH
@@ -384,7 +409,7 @@ class FullBox(QDialog):
         self.frIndex = (None, None)
         self.timeoutTimer = QTimer()
         self.timeoutTimer.setSingleShot(True)
-        
+
     def initLoggers(self):
         if self.practice:
             pFilePath = filelogger.practiceLogPath(self.userUid)
@@ -446,7 +471,7 @@ class FullBox(QDialog):
             check = self.whiteBox.check
             check.feedback = training.rateCheck(userR)
             check.adjustRate(testR)
-            #self.check.playFeedbackSound()
+            check.playFeedbackSound()
             check.setVisible(True)
             check.fbBlink(1000, 150)
         else:
