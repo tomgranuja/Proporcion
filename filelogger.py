@@ -1,20 +1,20 @@
 #!/usr/bin/python3 -tt
 #-*- coding:utf-8 -*-
 
+LOGDIR = 'Logger'
+
 def testLogPath(uid, sess = 1, isCtrl = False):
-    logDir = ''
     stype = 'T'
     if isCtrl:
         stype = 'C'
-    fpath = '{}{}_S{:02}_{}'.format(logDir, uid, sess, stype)
+    fpath = '{}/{}_S{:02}_{}'.format(LOGDIR, uid, sess, stype)
     return fpath
 
 def practiceLogPath(uid, sess = 1, isCtrl = False):
-    logDir = ''
     stype = 'T'
     if isCtrl:
         stype = 'C'
-    fpath = '{}{}_P{:02}_{}'.format(logDir, uid, sess, stype)
+    fpath = '{}/{}_P{:02}_{}'.format(LOGDIR, uid, sess, stype)
     return fpath
     
 

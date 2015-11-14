@@ -25,6 +25,7 @@ fscreengame.STIM_TIME       = [2000, 1000]
 fscreengame.PRACTICE_STR = ''
 fscreengame.TEST_STR = inputdata.dbgTest01
 fscreengame.tsequence.TEST_PARTIALS = [2,3]
+fscreengame.filelogger.LOGDIR = '../Logger'
 
 if __name__ == "__main__":
     app  = QApplication(sys.argv)
