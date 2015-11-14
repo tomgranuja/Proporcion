@@ -19,6 +19,7 @@ fscreengame.FB_WAVS = [ '{}/{}'.format(APP_DIR, w)
                        for w in fscreengame.FB_WAVS]
 fscreengame.SLIDER_PIXMAPS[0] = '{}/{}'.format(APP_DIR,'agua.png')
 fscreengame.CONTROL = True
+fscreengame.SESSION  = 5
 fscreengame.PRACTICE_ERRORS = (0.0, 0.05)
 fscreengame.FB_BLINK_PERIOD = [70]
 fscreengame.STIM_TIME       = [2000, 1000]

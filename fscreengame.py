@@ -21,8 +21,9 @@ INTRO_PIXMAP     = 'intro_sesion1.png'
 SLIDER_PIXMAPS   = ['i_sesion1.png','d_sesion1.png']
 PARCIALS_PIXMAPS = ['bad.png'      ,'good.png', 'excelent.png']
 FB_WAVS          = ['bad_short.wav','good.wav', 'excelent.wav']
-CONTROL          = False
 TWO_VALS         = [0.15, 0.85]
+CONTROL          = False
+SESSION           = 1
 
 def pixelFromRate(rate, t, o = 0):
     return int(round(rate*t)) + o
@@ -541,12 +542,14 @@ class FullBox(QDialog):
 
     def initLoggers(self):
         if self.practice:
-            pFilePath = filelogger.practiceLogPath(self.userUid, 
+            pFilePath = filelogger.practiceLogPath(self.userUid,
+                                                   sess=SESSION,
                                                    isCtrl=CONTROL)
             self.plogger = filelogger.Logger(pFilePath)
         if self.test:
-            tFilePath = filelogger.testLogPath(self.userUid, 
-                                                   isCtrl=CONTROL)
+            tFilePath = filelogger.testLogPath(self.userUid,
+                                               sess=SESSION,
+                                               isCtrl=CONTROL)
             self.tlogger = filelogger.Logger(tFilePath)
 
     def gameStart(self):
