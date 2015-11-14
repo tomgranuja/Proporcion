@@ -1,10 +1,10 @@
 #!/usr/bin/python3 -tt
 #-*- coding:utf-8 -*-
 
-TEST_PARTIALS = [4,10]
-TEST_PAUSES = [6]
-#TEST_PARTIALS   = range(9,36,9)
-#TEST_PAUSES     = [18]
+#TEST_PARTIALS = [4,10]
+#TEST_PAUSES = [6]
+TEST_PARTIALS   = range(9,36,9)
+TEST_PAUSES     = [18]
 
 
 class Training():

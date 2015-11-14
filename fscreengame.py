@@ -7,8 +7,8 @@ from PyQt4.QtGui import *
 from functools import partial
 import uidmgr, tsequence, filelogger, inputdata
 
-PRACTICE_STR = inputdata.dbgPractice
-TEST_STR = inputdata.dbgTest01
+PRACTICE_STR = inputdata.tPractice
+TEST_STR = inputdata.tTest01
 PRACTICE_ERRORS = (0.15, 0.05)
 TEST_ERRORS     = PRACTICE_ERRORS
 STIM_TIME       = [5000]
