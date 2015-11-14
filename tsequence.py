@@ -6,12 +6,15 @@ TEST_PAUSES = [6]
 #TEST_PARTIALS   = range(9,36,9)
 #TEST_PAUSES     = [18]
 
+
 class Training():
-    GREEN_ERROR  = 0.05
-    YELLOW_ERROR = 0.15
-    def __init__(self, dataStr=None):
+    def __init__(self, dataStr=None, 
+                 yError = 0.15, 
+                 gError = 0.05  ):
         self.currentTrial = None
         self.data = self.getRates(dataStr)
+        self.yError = yError
+        self.gError = gError
         #self.toNextRate()
         
     @property
@@ -56,10 +59,10 @@ class Training():
             if r or r == 0.0 and 0 <= r <= 1:
                 result = 'outside'
                 error = abs(r - self.current[RATE])
-                if error <= Training.YELLOW_ERROR:
+                if error <= self.yError:
                     result = 'in_yellow'
-                    if error <= Training.GREEN_ERROR:
-                        result = 'in_green'
+                if error <= self.gError:
+                    result = 'in_green'
             else: print('None valid rate value to check')
         else: print('None currentRate to check')
         return result

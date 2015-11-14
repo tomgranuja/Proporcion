@@ -9,6 +9,8 @@ import uidmgr, tsequence, filelogger, inputdata
 
 PRACTICE_STR = inputdata.dbgPractice
 TEST_STR = inputdata.dbgTest01
+PRACTICE_ERRORS = (0.15, 0.05)
+TEST_ERRORS     = PRACTICE_ERRORS
 
 def pixelFromRate(rate, t, o = 0):
     return int(round(rate*t)) + o
@@ -476,8 +478,8 @@ class FullBox(QDialog):
         super(FullBox, self).setLayout(layout)
     
     def gameSequenceConfig(self):
-        self.practice = tsequence.Training(PRACTICE_STR)
-        self.test     = tsequence.Training(TEST_STR)
+        self.practice = tsequence.Training(PRACTICE_STR, *PRACTICE_ERRORS)
+        self.test     = tsequence.Training(TEST_STR, *TEST_ERRORS)
         self.sequence = tsequence.Sequence(self.practice, self.test,
                                            **self.timeoutsDic)
         self.frIndex = (None, None)
@@ -557,8 +559,8 @@ class FullBox(QDialog):
         if frame.mustSetRate:
             sldr._userClickX = None
             training.toNextRate()
-            gerror = training.GREEN_ERROR
-            yerror = training.YELLOW_ERROR
+            gerror = training.gError
+            yerror = training.yError
             self.whiteBox.check.setErrors(gerror, yerror)
             h, r, w = training.current
             self.whiteBox.rateBox.setBars(h, r, w)

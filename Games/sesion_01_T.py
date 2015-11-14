@@ -10,9 +10,9 @@ import fscreengame, inputdata
 
 #Probamos redefinir constante
 
-fscreengame.PRACTICE_STR = ''
+fscreengame.PRACTICE_ERRORS = (0.0, 0.05)
 #fscreengame.PRACTICE_STR = inputdata.tPractice
-fscreengame.TEST_STR = ''
+#fscreengame.TEST_STR = ''
 fscreengame.tsequence.TEST_PARTIALS = [2,3]
 
 if __name__ == "__main__":
