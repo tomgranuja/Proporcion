@@ -17,6 +17,10 @@ FB_TIME         = [2000]
 FB_BLINK_TIME   = [1000]
 FB_BLINK_PERIOD = [ 150]
 THANKS_TIME     = [4000]
+INTRO_PIXMAP     = 'intro_sesion1.png'
+SLIDER_PIXMAPS   = ['i_sesion1.png','d_sesion1.png']
+PARCIALS_PIXMAPS = ['bad.png'      ,'good.png', 'excelent.png']
+FB_WAVS          = ['bad_short.wav','good.wav', 'excelent.wav']
 
 def pixelFromRate(rate, t, o = 0):
     return int(round(rate*t)) + o
@@ -239,9 +243,10 @@ class CheckWidget(CustomRateWidget):
                 painter.drawRect(feedbackBox)
 
     def playFeedbackSound(self):
-        wavs = {'outside'  : 'bad_short.wav',
-                'in_yellow': 'good.wav',
-                'in_green' : 'excelent.wav'}
+        bad, good, excl = range(3)
+        wavs = {'outside'  : FB_WAVS[bad],
+                'in_yellow': FB_WAVS[good],
+                'in_green' : FB_WAVS[excl]}
         wav = wavs.get(self.feedback, wavs['outside'])
         if self.audio == 'qsound':
             QSound.play(wav)
@@ -290,24 +295,25 @@ class PartialWidget(CustomRateWidget):
         greenColor = QColor(0,128,0)
         yellowColor = QColor(222,205,135)
         outsideColor = QColor(179,179,179)
+        bad, good, excl = range(3)
         #green
         painter.setBrush(greenColor)
         painter.drawRect(self.greenBorder)
-        greenPix = QPixmap('excelent.png')
+        greenPix = QPixmap(PARCIALS_PIXMAPS[excl])
         greenX = self.greenBorder.left()
         greenY = self.greenBorder.top() - 100
         painter.drawPixmap(greenX, greenY, greenPix)
         #yell
         painter.setBrush(yellowColor)
         painter.drawRect(self.yellBorder)
-        yellPix = QPixmap('good.png')
+        yellPix = QPixmap(PARCIALS_PIXMAPS[good])
         yellX = self.yellBorder.left()
         yellY = self.yellBorder.top() - 100
         painter.drawPixmap(yellX, yellY, yellPix)
         #out
         painter.setBrush(outsideColor)
         painter.drawRect(self.outBorder)
-        outPix = QPixmap('bad.png')
+        outPix = QPixmap(PARCIALS_PIXMAPS[bad])
         outX = self.outBorder.left()
         outY = self.outBorder.top() - 100
         painter.drawPixmap(outX, outY, outPix)
@@ -337,7 +343,7 @@ class RefreshWidget(CustomRateWidget):
         self.setLayout(layout)
         
     def setIntroWdg(self):
-        bearpix = QPixmap('intro_sesion1.png')
+        bearpix = QPixmap(INTRO_PIXMAP)
         self.wdg = QLabel()
         self.wdg.setPixmap(bearpix)
 
@@ -380,8 +386,9 @@ class WhiteBox(CustomRateWidget):
     def sliderLayout(self):
         self.lPhotoBox = QLabel()
         self.rPhotoBox = QLabel()
-        self.lPhotoBox.setPixmap(QPixmap('i_sesion1.png'))
-        self.rPhotoBox.setPixmap(QPixmap('d_sesion1.png'))
+        left, right = range(2)
+        self.lPhotoBox.setPixmap(QPixmap(SLIDER_PIXMAPS[left]))
+        self.rPhotoBox.setPixmap(QPixmap(SLIDER_PIXMAPS[right]))
         self.slider = Slider()
         self.check = CheckWidget(parent = self.slider)
         layout = QHBoxLayout()
