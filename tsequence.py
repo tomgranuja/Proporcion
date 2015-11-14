@@ -78,6 +78,34 @@ class Training():
         dataStr = str(data)
         return 'Training({})'.format(dataStr)
         
+class TwoValsTraining(Training):
+    def __init__(self, dataStr=None, yError=0.15, gError=0.05, 
+                 twoVals=[0.15,0.85]):
+        super(TwoValsTraining,self).__init__(dataStr, yError, gError)
+        MIN, MAX = range(2)
+        self.twoValsMin = twoVals[MIN]
+        self.twoValsMax = twoVals[MAX]
+    def rateCheck(self, r=None):
+        '''Check r error against current rate.'''
+        result = None
+        HEIGHT, RATE, WIDTH = range(3)
+        if self.current[RATE]:
+            if r or r == 0.0 and 0 <= r <= 1:
+                result = 'outside'
+                if self.current[RATE] > 0.5:
+                    checkRate = self.twoValsMax
+                else:
+                    checkRate = self.twoValsMin
+                error = abs(r - checkRate)
+                if error <= self.yError:
+                    result = 'in_yellow'
+                if error <= self.gError:
+                    result = 'in_green'
+            else:
+                print('None valid rate value to check')
+        else: print('None currentRate to check')
+        return result
+
 class Frame():
     def __init__(self, spListen = False, clkListen = False,
                  isStim = False, timeout = 0, fbActive = False,

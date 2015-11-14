@@ -21,6 +21,8 @@ INTRO_PIXMAP     = 'intro_sesion1.png'
 SLIDER_PIXMAPS   = ['i_sesion1.png','d_sesion1.png']
 PARCIALS_PIXMAPS = ['bad.png'      ,'good.png', 'excelent.png']
 FB_WAVS          = ['bad_short.wav','good.wav', 'excelent.wav']
+CONTROL          = False
+TWO_VALS         = [0.15, 0.85]
 
 def pixelFromRate(rate, t, o = 0):
     return int(round(rate*t)) + o
@@ -152,6 +154,28 @@ class Slider(CustomRateWidget):
         self._userClickX = x
         self._userRate = self.rateFromX(self._userClickX)
         self.sliderMouseRelease.emit()
+
+class TwoValSlider(Slider):
+    def mouseMoveEvent(self, event=None):
+        if self._mouseListen:
+            x = event.x()
+            MIN, MAX = range(2)
+            if self.rateFromX(x) > 0.5:
+                self._userClickX = self.xFromRate(TWO_VALS[MAX])
+            else:
+                self._userClickX = self.xFromRate(TWO_VALS[MIN])
+            self.update()
+    def checkUserEvent(self, event):
+        x = event.x()
+        MIN, MAX = range(2)
+        if self.rateFromX(x) > 0.5:
+            self._userClickX = self.xFromRate(TWO_VALS[MAX])
+            self._userRate = self.rateFromX(self._userClickX)
+        else:
+            self._userClickX = self.xFromRate(TWO_VALS[MIN])
+            self._userRate = self.rateFromX(self._userClickX)
+        self.sliderMouseRelease.emit()
+
 
 class CheckWidget(CustomRateWidget):
     WIDTH  = Slider.WIDTH
@@ -389,7 +413,10 @@ class WhiteBox(CustomRateWidget):
         left, right = range(2)
         self.lPhotoBox.setPixmap(QPixmap(SLIDER_PIXMAPS[left]))
         self.rPhotoBox.setPixmap(QPixmap(SLIDER_PIXMAPS[right]))
-        self.slider = Slider()
+        if CONTROL:
+            self.slider = TwoValSlider()
+        else:
+            self.slider = Slider()
         self.check = CheckWidget(parent = self.slider)
         layout = QHBoxLayout()
         layout.addStretch()
@@ -486,8 +513,16 @@ class FullBox(QDialog):
         super(FullBox, self).setLayout(layout)
     
     def gameSequenceConfig(self):
-        self.practice = tsequence.Training(PRACTICE_STR, *PRACTICE_ERRORS)
-        self.test     = tsequence.Training(TEST_STR, *TEST_ERRORS)
+        if CONTROL:
+                
+            self.practice = tsequence.TwoValsTraining(PRACTICE_STR,
+                            *PRACTICE_ERRORS, twoVals=TWO_VALS)
+            self.test     = tsequence.TwoValsTraining(TEST_STR,
+                            *TEST_ERRORS, twoVals=TWO_VALS)
+        else:    
+            self.practice = tsequence.Training(PRACTICE_STR,                     
+                                               *PRACTICE_ERRORS)
+            self.test     = tsequence.Training(TEST_STR, *TEST_ERRORS)
         self.sequence = tsequence.Sequence(self.practice, self.test)
         dic = { 'practSt'  : STIM_TIME[0],
                 'testSt'   : STIM_TIME[-1],
@@ -506,10 +541,12 @@ class FullBox(QDialog):
 
     def initLoggers(self):
         if self.practice:
-            pFilePath = filelogger.practiceLogPath(self.userUid)
+            pFilePath = filelogger.practiceLogPath(self.userUid, 
+                                                   isCtrl=CONTROL)
             self.plogger = filelogger.Logger(pFilePath)
         if self.test:
-            tFilePath = filelogger.testLogPath(self.userUid)
+            tFilePath = filelogger.testLogPath(self.userUid, 
+                                                   isCtrl=CONTROL)
             self.tlogger = filelogger.Logger(tFilePath)
 
     def gameStart(self):
@@ -565,6 +602,12 @@ class FullBox(QDialog):
             partialWdg = self.slayout.dic['parcials'].wdg
             check = self.whiteBox.check
             check.feedback = training.rateCheck(userR)
+            if CONTROL:
+                MIN, MAX = range(2)
+                if testR > 0.5:
+                    testR = TWO_VALS[MAX]
+                else:
+                    testR = TWO_VALS[MIN]
             check.adjustRate(testR)
             partialWdg.setBarUnit(len(training.data))
             partialWdg.setBars(check.feedback)

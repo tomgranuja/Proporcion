@@ -17,11 +17,11 @@ fscreengame.PARCIALS_PIXMAPS = [ '{}/{}'.format(APP_DIR, w)
                                 for w in fscreengame.PARCIALS_PIXMAPS]
 fscreengame.FB_WAVS = [ '{}/{}'.format(APP_DIR, w) 
                        for w in fscreengame.FB_WAVS]
-#fscreengame.SLIDER_PIXMAPS[0] = '{}/{}'.format(APP_DIR,'agua.png')
-
+fscreengame.SLIDER_PIXMAPS[0] = '{}/{}'.format(APP_DIR,'agua.png')
+fscreengame.CONTROL = True
 fscreengame.PRACTICE_ERRORS = (0.0, 0.05)
 fscreengame.FB_BLINK_PERIOD = [70]
-fscreengame.STIM_TIME       = [2000, 500]
+fscreengame.STIM_TIME       = [2000, 1000]
 fscreengame.PRACTICE_STR = ''
 fscreengame.TEST_STR = inputdata.dbgTest01
 fscreengame.tsequence.TEST_PARTIALS = [2,3]
