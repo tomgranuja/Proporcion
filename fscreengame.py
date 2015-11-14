@@ -11,6 +11,12 @@ PRACTICE_STR = inputdata.dbgPractice
 TEST_STR = inputdata.dbgTest01
 PRACTICE_ERRORS = (0.15, 0.05)
 TEST_ERRORS     = PRACTICE_ERRORS
+STIM_TIME       = [5000]
+PARCIALS_TIME   = [4000]
+FB_TIME         = [2000]
+FB_BLINK_TIME   = [1000]
+FB_BLINK_PERIOD = [ 150]
+THANKS_TIME     = [4000]
 
 def pixelFromRate(rate, t, o = 0):
     return int(round(rate*t)) + o
@@ -419,16 +425,11 @@ class UserChooser(QDialog):
 class FullBox(QDialog):
     def __init__(self, parent=None):
         super(FullBox, self).__init__(parent)
-        self.setTimeoutsDic()
         self.setTheBackground(179,179,179)
         self.setUserSession()
         if self.userUid:
             print("Construyendo juego para {}".format(self.userUid))
             self.buildGame()
-        
-    def setTimeoutsDic(self):
-         self.timeoutsDic = {'fbBlinkTime'  : 1000,
-                             'fbBlinkPeriod':  150}
 
     def setTheBackground(self,r,g,b):
         p = self.palette()
@@ -480,8 +481,18 @@ class FullBox(QDialog):
     def gameSequenceConfig(self):
         self.practice = tsequence.Training(PRACTICE_STR, *PRACTICE_ERRORS)
         self.test     = tsequence.Training(TEST_STR, *TEST_ERRORS)
-        self.sequence = tsequence.Sequence(self.practice, self.test,
-                                           **self.timeoutsDic)
+        self.sequence = tsequence.Sequence(self.practice, self.test)
+        dic = { 'practSt'  : STIM_TIME[0],
+                'testSt'   : STIM_TIME[-1],
+                'practFb'  : FB_TIME[0],
+                'testFb'   : FB_TIME[-1],
+                'pparcials': PARCIALS_TIME[0],
+                'tparcials': PARCIALS_TIME[-1],
+                'thanks'   : THANKS_TIME[0],
+                'fbBlinkTime'  : FB_BLINK_TIME[0],
+                'fbBlinkPeriod':  FB_BLINK_PERIOD[0]
+               }
+        self.sequence.setTimeouts(dic)
         self.frIndex = (None, None)
         self.timeoutTimer = QTimer()
         self.timeoutTimer.setSingleShot(True)
@@ -552,8 +563,8 @@ class FullBox(QDialog):
             partialWdg.setBars(check.feedback)
             check.playFeedbackSound()
             check.setVisible(True)
-            check.fbBlink(self.timeoutsDic['fbBlinkTime'], 
-                          self.timeoutsDic['fbBlinkPeriod'])
+            check.fbBlink(self.sequence.tout['fbBlinkTime'], 
+                          self.sequence.tout['fbBlinkPeriod'])
         else:
             self.whiteBox.check.setVisible(False)
         if frame.mustSetRate:

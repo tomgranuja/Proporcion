@@ -109,9 +109,7 @@ class Frame():
         return '\n'.join(ss)
     
 class Sequence():
-    def __init__(self,p = None, t = None, **kargs):
-        self.framesDic = {}
-        self.addIntroToSequence()
+    def __init__(self,p = None, t = None):
         self.tout = {'practSt'  : 5000,
                      'testSt'   : 5000,
                      'practFb'  : 2000,
@@ -120,18 +118,26 @@ class Sequence():
                      'tparcials': 4000,
                      'thanks'   : 4000
                      }
-        self.setTimeouts(kargs)
-        if p:
-            self.addPracticeToSequence(p)
-        if t:
-            self.addTestToSequence(t)
+        self.practObject = p
+        self.testObject  = t
+        self.createSequence()
+
+    
+    def setTimeouts(self,dic):
+        for k in dic:
+            self.tout[k] = dic[k]
+        self.createSequence()
+        
+    def createSequence(self,toSection = None, toFrame = None):
+        self.framesDic = {}
+        self.addIntroToSequence()
+        if self.practObject:
+            self.addPracticeToSequence(self.practObject)
+        if self.testObject:
+            self.addTestToSequence(self.testObject)
         self.addThanksToSequence()
-        self.frIndex = (None, None)
-    
-    def setTimeouts(self,kargs):
-        for k in kargs:
-            self.tout[k] = kargs[k]
-    
+        self.frIndex = (toSection, toFrame)
+        
     def addIntroToSequence(self):
         k = 'intro'
         self.overview = [k]
