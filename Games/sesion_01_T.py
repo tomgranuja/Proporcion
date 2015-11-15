@@ -1,11 +1,12 @@
 #!/usr/bin/python3 -tt
 #-*- coding:utf-8 -*-
 
-APP_DIR = '..'
+MOD_DIR = '../App/Python_Modules'
+MEDIA_DIR = '{}/../Media'.format(MOD_DIR)
 import sys
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
-sys.path.append(APP_DIR)
+sys.path.append(MOD_DIR)
 import fscreengame, inputdata
 
 #Probamos redefinir constante
@@ -47,13 +48,13 @@ def makeConfChanges():
     fscreengame.SESSION         = SESSION
     fscreengame.tsequence.TEST_PARTIALS = TEST_PARTIALS
     fscreengame.filelogger.LOGDIR       = LOGDIR
-    fscreengame.INTRO_PIXMAP = '{}/{}'.format(APP_DIR,              
+    fscreengame.INTRO_PIXMAP = '{}/{}'.format(MEDIA_DIR,              
                                           INTRO_PIXMAP)
-    fscreengame.SLIDER_PIXMAPS = [ '{}/{}'.format(APP_DIR, w)
+    fscreengame.SLIDER_PIXMAPS = [ '{}/{}'.format(MEDIA_DIR, w)
                                    for w in SLIDER_PIXMAPS]
-    fscreengame.PARCIALS_PIXMAPS = [ '{}/{}'.format(APP_DIR, w)
+    fscreengame.PARCIALS_PIXMAPS = [ '{}/{}'.format(MEDIA_DIR, w)
                                      for w in PARCIALS_PIXMAPS]
-    fscreengame.FB_WAVS = [ '{}/{}'.format(APP_DIR, w) 
+    fscreengame.FB_WAVS = [ '{}/{}'.format(MEDIA_DIR, w) 
                             for w in FB_WAVS]
 
 if __name__ == "__main__":

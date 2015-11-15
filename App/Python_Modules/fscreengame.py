@@ -7,6 +7,7 @@ from PyQt4.QtGui import *
 from functools import partial
 import uidmgr, tsequence, filelogger, inputdata
 
+MEDIA_DIR = '../Media'
 PRACTICE_STR = inputdata.tPractice
 EXP_STR = inputdata.tTest01
 PRACTICE_ERRORS = (0.15, 0.05)
@@ -17,10 +18,14 @@ FB_TIME         = [2000]
 FB_BLINK_TIME   = [1000]
 FB_BLINK_PERIOD = [ 150]
 THANKS_TIME     = [4000]
-INTRO_PIXMAP     = 'intro_sesion1.png'
-SLIDER_PIXMAPS   = ['i_sesion1.png','d_sesion1.png']
-PARCIALS_PIXMAPS = ['bad.png'      ,'good.png', 'excelent.png']
-FB_WAVS          = ['bad_short.wav','good.wav', 'excelent.wav']
+path = 'intro_sesion1.png'
+INTRO_PIXMAP     = '{}/{}'.format(MEDIA_DIR, path)
+path = ['i_sesion1.png','d_sesion1.png']
+SLIDER_PIXMAPS   = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
+path = ['bad.png', 'good.png', 'excelent.png']
+PARCIALS_PIXMAPS = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
+path = ['bad_short.wav','good.wav', 'excelent.wav']
+FB_WAVS          = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
 TWO_VALS         = [0.15, 0.85]
 CONTROL          = False
 SESSION           = 1

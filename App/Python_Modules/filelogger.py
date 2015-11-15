@@ -1,7 +1,7 @@
 #!/usr/bin/python3 -tt
 #-*- coding:utf-8 -*-
 
-LOGDIR = 'Logger'
+LOGDIR = '../../Logger'
 
 def testLogPath(uid, sess = 1, isCtrl = False):
     stype = 'T'
