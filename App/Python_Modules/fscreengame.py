@@ -109,7 +109,7 @@ class Slider(CustomRateWidget):
     HEIGHT = 0.0938 * CustomRateWidget.REF_HEIGHT 
     #WIDTH  = 440
     #HEIGHT = 60
-    sliderMouseRelease = pyqtSignal()
+    sliderMousePress = pyqtSignal()
     def __init__(self, parent=None):
         super(Slider, self).__init__(parent)
         self.testTime = QTime()
@@ -148,7 +148,7 @@ class Slider(CustomRateWidget):
             self._userClickX = x
             self.update()
     
-    def mouseReleaseEvent(self,event):
+    def mousePressEvent(self,event):
         if self._mouseListen:
             self._mouseListen = False
             self._userTime = self.testTime.elapsed()
@@ -159,7 +159,7 @@ class Slider(CustomRateWidget):
         x = max(self.riel.x1(), min(self.riel.x2(), event.x()))
         self._userClickX = x
         self._userRate = self.rateFromX(self._userClickX)
-        self.sliderMouseRelease.emit()
+        self.sliderMousePress.emit()
 
 class TwoValSlider(Slider):
     def mouseMoveEvent(self, event=None):
@@ -180,7 +180,7 @@ class TwoValSlider(Slider):
         else:
             self._userClickX = self.xFromRate(TWO_VALS[MIN])
             self._userRate = self.rateFromX(self._userClickX)
-        self.sliderMouseRelease.emit()
+        self.sliderMousePress.emit()
 
 
 class CheckWidget(CustomRateWidget):
@@ -558,8 +558,8 @@ class FullBox(QDialog):
             self.tlogger = filelogger.Logger(tFilePath)
 
     def gameStart(self):
-        sliderRelease = self.whiteBox.slider.sliderMouseRelease
-        sliderRelease.connect(self.onSliderMouseRelease)
+        sliderPress = self.whiteBox.slider.sliderMousePress
+        sliderPress.connect(self.onSliderMousePress)
         self.timeoutTimer.timeout.connect(self.onTimeOut)
         self.setNextFrame()
 
@@ -574,7 +574,7 @@ class FullBox(QDialog):
         else:
             super(FullBox, self).keyPressEvent(e)
     
-    def onSliderMouseRelease(self):
+    def onSliderMousePress(self):
         if self.clkListen:
             self.toListen = False
             self.clkListen = False
