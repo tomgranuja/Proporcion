@@ -24,7 +24,7 @@ class Logger():
         self.initFile()
         
     def initFile(self):
-        with open(self.fpath, 'w') as f:
+        with open(self.fpath, 'a') as f:
             head = '{}\n'.format(self.fpath)
             f.write(head)
         
