@@ -18,6 +18,7 @@ FB_TIME         = [2000]
 FB_BLINK_TIME   = [1000]
 FB_BLINK_PERIOD = [ 150]
 THANKS_TIME     = [4000]
+FRUIT_BAR_RGB = (254, 0, 0)
 path = 'intro_sesion1.png'
 INTRO_PIXMAP     = '{}/{}'.format(MEDIA_DIR, path)
 path = ['i_sesion1.png','d_sesion1.png']
@@ -67,7 +68,7 @@ class RateBox(CustomRateWidget):
     def __init__(self, parent=None):
         super(RateBox, self).__init__(parent)
         self.blueRect = None
-        self.redRect  = None
+        self.fruitRect  = None
         
     def setBars(self, height, rate, width):
         blueHeight = 1.0
@@ -80,19 +81,19 @@ class RateBox(CustomRateWidget):
                          )
             if 0.0 < rate <= 1.0:
                 uppery = self.yFromRate(1 - rate * height)
-                self.redRect = QRect(self.blueRect)
-                self.redRect.setTop(uppery)
+                self.fruitRect = QRect(self.blueRect)
+                self.fruitRect.setTop(uppery)
         
     def paintEvent(self, event=None):
         painter = QPainter(self)
         blueColor = QColor(85, 142, 213)
-        redColor  = QColor(254, 0, 0)
+        fruitColor  = QColor(*FRUIT_BAR_RGB)
         if self.blueRect:
             painter.setBrush(blueColor)
             painter.drawRect(self.blueRect)
-        if self.redRect:
-            painter.setBrush(redColor)
-            painter.drawRect(self.redRect)
+        if self.fruitRect:
+            painter.setBrush(fruitColor)
+            painter.drawRect(self.fruitRect)
             
 class RestBox(CustomRateWidget):
     WIDTH  = RateBox.WIDTH
@@ -340,12 +341,13 @@ class PartialWidget(CustomRateWidget):
         greenY = self.greenBorder.top() - 100
         painter.drawPixmap(greenX, greenY, greenPix)
         #yell
-        painter.setBrush(yellowColor)
-        painter.drawRect(self.yellBorder)
-        yellPix = QPixmap(PARCIALS_PIXMAPS[good])
-        yellX = self.yellBorder.left()
-        yellY = self.yellBorder.top() - 100
-        painter.drawPixmap(yellX, yellY, yellPix)
+        if not CONTROL:
+            painter.setBrush(yellowColor)
+            painter.drawRect(self.yellBorder)
+            yellPix = QPixmap(PARCIALS_PIXMAPS[good])
+            yellX = self.yellBorder.left()
+            yellY = self.yellBorder.top() - 100
+            painter.drawPixmap(yellX, yellY, yellPix)
         #out
         painter.setBrush(outsideColor)
         painter.drawRect(self.outBorder)
