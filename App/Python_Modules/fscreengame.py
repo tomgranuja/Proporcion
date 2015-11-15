@@ -341,13 +341,13 @@ class PartialWidget(CustomRateWidget):
         greenY = self.greenBorder.top() - 100
         painter.drawPixmap(greenX, greenY, greenPix)
         #yell
-        if not CONTROL:
-            painter.setBrush(yellowColor)
-            painter.drawRect(self.yellBorder)
-            yellPix = QPixmap(PARCIALS_PIXMAPS[good])
-            yellX = self.yellBorder.left()
-            yellY = self.yellBorder.top() - 100
-            painter.drawPixmap(yellX, yellY, yellPix)
+        #if not CONTROL:
+        painter.setBrush(yellowColor)
+        painter.drawRect(self.yellBorder)
+        yellPix = QPixmap(PARCIALS_PIXMAPS[good])
+        yellX = self.yellBorder.left()
+        yellY = self.yellBorder.top() - 100
+        painter.drawPixmap(yellX, yellY, yellPix)
         #out
         painter.setBrush(outsideColor)
         painter.drawRect(self.outBorder)
