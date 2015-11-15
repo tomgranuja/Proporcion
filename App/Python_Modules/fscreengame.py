@@ -367,11 +367,11 @@ class RefreshWidget(CustomRateWidget):
         self.setAutoFillBackground(True)
         self.setType = {
           'intro':       self.setIntroWdg,
-          'pract': partial(self.setMsgWdg,'Vamos a practicar'),
+          'pract': partial(self.setMsgWdg,'¡Vamos a practicar!'),
           'ready':      partial(self.setMsgWdg,'¿Estás listo?'),
           'pause':      partial(self.setMsgWdg,'¿Descansamos?'),
           'parcials':   self.setPartialWdg,
-          'thanks':     partial(self.setMsgWdg,'Gracias...')
+          'thanks':     partial(self.setMsgWdg,'¡¡¡Gracias!!!')
         }
         self.setType.get(wdgType, self.setType['intro'])()
         layout = QVBoxLayout()
@@ -393,6 +393,7 @@ class RefreshWidget(CustomRateWidget):
         font.setBold(True)
         self.wdg.setFont(font)
         self.wdg.setText(msg)
+        self.wdg.setAlignment(Qt.AlignCenter)
 
 class WhiteBox(CustomRateWidget):
     #WIDTH  = 640
