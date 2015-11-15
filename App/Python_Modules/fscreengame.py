@@ -9,7 +9,7 @@ import uidmgr, tsequence, filelogger, inputdata
 
 MEDIA_DIR = '../Media'
 PRACTICE_STR = inputdata.tPractice
-EXP_STR = inputdata.tTest01
+EXP_STR = inputdata.t_sesion01
 PRACTICE_ERRORS = (0.15, 0.05)
 TEST_ERRORS     = PRACTICE_ERRORS
 STIM_TIME       = [5000]
