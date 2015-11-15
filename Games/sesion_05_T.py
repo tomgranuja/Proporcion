@@ -15,6 +15,7 @@ CONTROL          = False
 TEST_ERRORS      = (0.15, 0.05) ##Tamaño del feedback
 INTRO_PIXMAP     = 'intro_sesion1_630.png' ##Imagen de intro
 SLIDER_PIXMAPS   = ['i_sesion1.png','d_sesion1.png'] ##Extremos
+FRUIT_BAR_RGB    = (254,0,0)   ##Color rgb de la barra
 EXP_STR         = inputdata.tTest01 ##Estímulos de experimento
 PRACTICE_STR     = ''
 #PRACTICE_STR     = inputdata.tPractice
@@ -48,6 +49,7 @@ def makeConfChanges():
     fscreengame.SESSION         = SESSION
     fscreengame.tsequence.TEST_PARTIALS = TEST_PARTIALS
     fscreengame.filelogger.LOGDIR       = LOGDIR
+    fscreengame.FRUIT_BAR_RGB   = FRUIT_BAR_RGB
     fscreengame.INTRO_PIXMAP = '{}/{}'.format(MEDIA_DIR,              
                                           INTRO_PIXMAP)
     fscreengame.SLIDER_PIXMAPS = [ '{}/{}'.format(MEDIA_DIR, w)
