@@ -369,7 +369,7 @@ class RefreshWidget(CustomRateWidget):
           'intro':       self.setIntroWdg,
           'pract': partial(self.setMsgWdg,'Vamos a practicar'),
           'ready':      partial(self.setMsgWdg,'¿Estás listo?'),
-          'pause':       self.setIntroWdg,
+          'pause':      partial(self.setMsgWdg,'¿Descansamos?'),
           'parcials':   self.setPartialWdg,
           'thanks':     partial(self.setMsgWdg,'Gracias...')
         }
