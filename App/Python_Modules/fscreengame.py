@@ -442,7 +442,7 @@ class UserChooser(QDialog):
     def __init__(self, parent=None):
         super(UserChooser, self).__init__(parent)
         self.label    = QLabel("Identificación")
-        self.lineEdit = QLineEdit('ABC')
+        self.lineEdit = QLineEdit('apellido nombre')
         buttonBox = QDialogButtonBox(QDialogButtonBox.Ok |
                                           QDialogButtonBox.Cancel)
         layout = QVBoxLayout()
@@ -454,16 +454,18 @@ class UserChooser(QDialog):
         buttonBox.rejected.connect(self.reject)
         self.lineEdit.selectAll()
         self.lineEdit.setFocus()
-        self.choosenUid = None
+        self.choosenName = None
+        #self.choosenUid = None
     
     def accept(self):
         userUpperText = self.lineEdit.text().upper()
-        validation = uidmgr.isValidUid(userUpperText)
+        validation = uidmgr.isValidName(userUpperText)
         if validation:
-            self.choosenUid = userUpperText
+            self.choosenName = userUpperText
+            #self.choosenUid = userUpperText
             QDialog.accept(self)
         else:
-            self.label.setText("¡¡Uid inválida!!")
+            self.label.setText("¡¡Nombre inválido!!")
             self.lineEdit.selectAll()
             self.lineEdit.setFocus()
             return
@@ -473,8 +475,8 @@ class FullBox(QDialog):
         super(FullBox, self).__init__(parent)
         self.setTheBackground(179,179,179)
         self.setUserSession()
-        if self.userUid:
-            print("Construyendo juego para {}".format(self.userUid))
+        if self.userName:
+            print("Construyendo juego para {}".format(self.userName))
             self.buildGame()
 
     def setTheBackground(self,r,g,b):
@@ -485,10 +487,12 @@ class FullBox(QDialog):
         
     def setUserSession(self):
         dialog = UserChooser(self)
-        self.userUid = None
+        #self.userUid = None
+        self.userName = None
         if dialog.exec_():
-            self.userUid = dialog.choosenUid
-            print("Usuario {} identificado.".format(self.userUid))
+            #self.userUid = dialog.choosenUid
+            self.userName = dialog.choosenName
+            print("Usuario {} identificado.".format(self.userName))
     
     def buildGame(self):
         self.whiteBox = WhiteBox()
@@ -553,12 +557,12 @@ class FullBox(QDialog):
 
     def initLoggers(self):
         if self.practice:
-            pFilePath = filelogger.practiceLogPath(self.userUid,
+            pFilePath = filelogger.practiceLogPath(self.userName,
                                                    sess=SESSION,
                                                    isCtrl=CONTROL)
             self.plogger = filelogger.Logger(pFilePath)
         if self.test:
-            tFilePath = filelogger.testLogPath(self.userUid,
+            tFilePath = filelogger.testLogPath(self.userName,
                                                sess=SESSION,
                                                isCtrl=CONTROL)
             self.tlogger = filelogger.Logger(tFilePath)
@@ -672,7 +676,7 @@ class FullBox(QDialog):
 if __name__ == "__main__":
     app  = QApplication(sys.argv)
     form = FullBox()
-    if form.userUid == None:
+    if form.userName == None:
         print("No se identificó usuario, saliendo.")
         sys.exit(QDialog.Rejected)
     form.showFullScreen()

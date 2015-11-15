@@ -61,7 +61,7 @@ if __name__ == "__main__":
     makeConfChanges()
     app  = QApplication(sys.argv)
     form = fscreengame.FullBox()
-    if form.userUid == None:
+    if form.userName == None:
         print("No se identificó usuario, saliendo.")
         sys.exit(QDialog.Rejected)
     form.showFullScreen()
