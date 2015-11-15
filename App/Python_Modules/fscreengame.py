@@ -106,7 +106,8 @@ class RestBox(CustomRateWidget):
 
 class Slider(CustomRateWidget):
     WIDTH  = 0.6875 * CustomRateWidget.REF_WIDTH
-    HEIGHT = 0.0938 * CustomRateWidget.REF_HEIGHT 
+    HEIGHT = 0.0938 * CustomRateWidget.REF_HEIGHT
+    RIEL_WIDTH = 3
     #WIDTH  = 440
     #HEIGHT = 60
     sliderMousePress = pyqtSignal()
@@ -124,9 +125,14 @@ class Slider(CustomRateWidget):
         
     def paintEvent(self, event=None):
         painter = QPainter(self)
+        pen = painter.pen()
         #Riel
+        pen.setWidth(self.RIEL_WIDTH)
+        painter.setPen(pen)
         painter.drawLine(self.riel)
         #Raya
+        pen.setWidth(1)
+        painter.setPen(pen)
         w = 4
         if self._userClickX:
             raya = QRect(self._userClickX - w / 2, 
