@@ -250,7 +250,7 @@ c_sesion05 = '''
 0.482 1 1
 0.51 1 0.5
 0.502 1.5 0.5
-'''[:1]
+'''[1:]
 
 dbg_sesion01 = t_sesion01[251:]
 dbgPractice = cPractice[19:]
