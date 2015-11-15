@@ -568,8 +568,9 @@ class FullBox(QDialog):
             self.tlogger = filelogger.Logger(tFilePath)
 
     def gameStart(self):
-        sliderPress = self.whiteBox.slider.sliderMousePress
-        sliderPress.connect(self.onSliderMousePress)
+        sldr = self.whiteBox.slider
+        sldr._mouseListen = False
+        sldr.sliderMousePress.connect(self.onSliderMousePress)
         self.timeoutTimer.timeout.connect(self.onTimeOut)
         self.setNextFrame()
 
