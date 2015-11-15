@@ -368,23 +368,17 @@ class RefreshWidget(CustomRateWidget):
         self.setPalette(p)
         self.setAutoFillBackground(True)
         self.setType = {
-          'intro':       self.setIntroWdg,
           'pract': partial(self.setMsgWdg,'¡Vamos a practicar!'),
           'ready':      partial(self.setMsgWdg,'¿Estás listo?'),
           'pause':      partial(self.setMsgWdg,'¿Descansamos?'),
           'parcials':   self.setPartialWdg,
           'thanks':     partial(self.setMsgWdg,'¡¡¡Gracias!!!')
         }
-        self.setType.get(wdgType, self.setType['intro'])()
+        self.setType.get(wdgType, self.setType['pract'])()
         layout = QVBoxLayout()
         layout.addWidget(self.wdg)
         self.setLayout(layout)
         
-    def setIntroWdg(self):
-        bearpix = QPixmap(INTRO_PIXMAP)
-        self.wdg = QLabel()
-        self.wdg.setPixmap(bearpix)
-
     def setPartialWdg(self):
         self.wdg = PartialWidget()
 
@@ -396,6 +390,23 @@ class RefreshWidget(CustomRateWidget):
         self.wdg.setFont(font)
         self.wdg.setText(msg)
         self.wdg.setAlignment(Qt.AlignCenter)
+
+class IntroWidget(CustomRateWidget):
+    def __init__(self, pixpath=None, parent=None):
+        super(IntroWidget, self).__init__(parent)
+        self.pixmp = QPixmap(pixpath)
+        self.origin = self.calcUpperLeft()
+
+    def calcUpperLeft(self):
+        x = (self.WIDTH - self.pixmp.width()) / 2
+        y = (self.HEIGHT - self.pixmp.height()) / 2
+        return QPointF(x, y)
+
+    def paintEvent(self, event=None):
+        painter = QPainter(self)
+        #painter.setPen(Qt.NoPen)
+        #greenColor = QColor(0,128,0)
+        painter.drawPixmap(self.origin, self.pixmp)
 
 class WhiteBox(CustomRateWidget):
     #WIDTH  = 640
@@ -499,22 +510,24 @@ class FullBox(QDialog):
     
     def buildGame(self):
         self.whiteBox = WhiteBox()
+        self.introWdg = IntroWidget(pixpath=INTRO_PIXMAP)
         self.slayout= QStackedLayout()
-        self.slayout.dic = self.makeStckDic('intro',
-                                            'pract',
+        self.slayout.dic = self.makeStckDic('pract',
                                             'ready',
                                             'pause',
                                             'parcials',
                                             'thanks',
+                                            intro = self.introWdg,
                                             whiteBox = self.whiteBox)
         self.setLayout(self.slayout)
         self.gameSequenceConfig()
         self.initLoggers()
         self.gameStart()
     
-    def makeStckDic(self, *args, whiteBox):
+    def makeStckDic(self, *args, intro, whiteBox):
         stckDic = {arg: RefreshWidget(arg) for arg in args}
         stckDic['whiteBox'] = whiteBox
+        stckDic['intro'] = intro
         for k in stckDic:
             self.slayout.addWidget(stckDic[k])
         return stckDic
