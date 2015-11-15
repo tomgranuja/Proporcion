@@ -9,26 +9,55 @@ sys.path.append(APP_DIR)
 import fscreengame, inputdata
 
 #Probamos redefinir constante
-fscreengame.INTRO_PIXMAP = '{}/{}'.format(APP_DIR,              
-                                          fscreengame.INTRO_PIXMAP)
-fscreengame.SLIDER_PIXMAPS = [ '{}/{}'.format(APP_DIR, w)
-                                for w in fscreengame.SLIDER_PIXMAPS]
-fscreengame.PARCIALS_PIXMAPS = [ '{}/{}'.format(APP_DIR, w)
-                                for w in fscreengame.PARCIALS_PIXMAPS]
-fscreengame.FB_WAVS = [ '{}/{}'.format(APP_DIR, w) 
-                       for w in fscreengame.FB_WAVS]
-fscreengame.SLIDER_PIXMAPS[0] = '{}/{}'.format(APP_DIR,'agua.png')
-fscreengame.CONTROL = True
-fscreengame.SESSION  = 5
-fscreengame.PRACTICE_ERRORS = (0.0, 0.05)
-fscreengame.FB_BLINK_PERIOD = [70]
-fscreengame.STIM_TIME       = [2000, 1000]
-fscreengame.PRACTICE_STR = ''
-fscreengame.TEST_STR = inputdata.dbgTest01
-fscreengame.tsequence.TEST_PARTIALS = [2,3]
-fscreengame.filelogger.LOGDIR = '../Logger'
+SESSION          = 1
+CONTROL          = False
+TEST_ERRORS      = (0.15, 0.05) ##Tamaño del feedback
+INTRO_PIXMAP     = 'intro_sesion1.png' ##Imagen de intro
+SLIDER_PIXMAPS   = ['i_sesion1.png','d_sesion1.png'] ##Extremos
+EXP_STR         = inputdata.tTest01 ##Estímulos de experimento
+PRACTICE_STR     = ''
+#PRACTICE_STR     = inputdata.tPractice
+STIM_TIME        = [5000]
+PARCIALS_TIME    = [4000]
+FB_TIME          = [2000]
+FB_BLINK_TIME    = [1000]
+FB_BLINK_PERIOD  = [ 150]
+THANKS_TIME      = [4000]
+PARCIALS_PIXMAPS = ['bad.png'      ,'good.png', 'excelent.png']
+FB_WAVS          = ['bad_short.wav','good.wav', 'excelent.wav']
+TWO_VALS         = [0.01, 0.99]
+TEST_PARTIALS    = range(9,36,9)
+LOGDIR           = '../Logger'
+PRACTICE_ERRORS  = TEST_ERRORS
+
+
+def makeConfChanges():
+    fscreengame.PRACTICE_STR    = PRACTICE_STR
+    fscreengame.EXP_STR         = EXP_STR
+    fscreengame.PRACTICE_ERRORS = PRACTICE_ERRORS
+    fscreengame.TEST_ERRORS     = TEST_ERRORS
+    fscreengame.STIM_TIME       = STIM_TIME
+    fscreengame.PARCIALS_TIME   = PARCIALS_TIME
+    fscreengame.FB_TIME         = FB_TIME
+    fscreengame.FB_BLINK_TIME   = FB_BLINK_TIME
+    fscreengame.FB_BLINK_PERIOD = FB_BLINK_PERIOD
+    fscreengame.THANKS_TIME     = THANKS_TIME
+    fscreengame.TWO_VALS        = TWO_VALS
+    fscreengame.CONTROL         = CONTROL
+    fscreengame.SESSION         = SESSION
+    fscreengame.tsequence.TEST_PARTIALS = TEST_PARTIALS
+    fscreengame.filelogger.LOGDIR       = LOGDIR
+    fscreengame.INTRO_PIXMAP = '{}/{}'.format(APP_DIR,              
+                                          INTRO_PIXMAP)
+    fscreengame.SLIDER_PIXMAPS = [ '{}/{}'.format(APP_DIR, w)
+                                   for w in SLIDER_PIXMAPS]
+    fscreengame.PARCIALS_PIXMAPS = [ '{}/{}'.format(APP_DIR, w)
+                                     for w in PARCIALS_PIXMAPS]
+    fscreengame.FB_WAVS = [ '{}/{}'.format(APP_DIR, w) 
+                            for w in FB_WAVS]
 
 if __name__ == "__main__":
+    makeConfChanges()
     app  = QApplication(sys.argv)
     form = fscreengame.FullBox()
     if form.userUid == None:

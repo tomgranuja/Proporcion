@@ -8,7 +8,7 @@ from functools import partial
 import uidmgr, tsequence, filelogger, inputdata
 
 PRACTICE_STR = inputdata.tPractice
-TEST_STR = inputdata.tTest01
+EXP_STR = inputdata.tTest01
 PRACTICE_ERRORS = (0.15, 0.05)
 TEST_ERRORS     = PRACTICE_ERRORS
 STIM_TIME       = [5000]
@@ -518,12 +518,12 @@ class FullBox(QDialog):
                 
             self.practice = tsequence.TwoValsTraining(PRACTICE_STR,
                             *PRACTICE_ERRORS, twoVals=TWO_VALS)
-            self.test     = tsequence.TwoValsTraining(TEST_STR,
+            self.test     = tsequence.TwoValsTraining(EXP_STR,
                             *TEST_ERRORS, twoVals=TWO_VALS)
         else:    
             self.practice = tsequence.Training(PRACTICE_STR,                     
                                                *PRACTICE_ERRORS)
-            self.test     = tsequence.Training(TEST_STR, *TEST_ERRORS)
+            self.test     = tsequence.Training(EXP_STR, *TEST_ERRORS)
         self.sequence = tsequence.Sequence(self.practice, self.test)
         dic = { 'practSt'  : STIM_TIME[0],
                 'testSt'   : STIM_TIME[-1],
