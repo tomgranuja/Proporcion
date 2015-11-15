@@ -11,10 +11,10 @@ import fscreengame, inputdata
 
 ###########Configuración de la sesión##########################
 SESSION          = 1
-CONTROL          = False
-TEST_ERRORS      = (0.15, 0.05) ##Tamaño del feedback
-INTRO_PIXMAP     = 'intro_sesion1.png' ##Imagen de intro
-SLIDER_PIXMAPS   = ['i_sesion1.png','d_sesion1.png'] ##Extremos
+CONTROL          = True
+TEST_ERRORS      = (0.0, 0.05) ##Tamaño del feedback
+INTRO_PIXMAP     = 'intro_sesion1_630.png' ##Imagen de intro
+SLIDER_PIXMAPS   = ['agua.png','d_sesion1.png'] ##Extremos
 EXP_STR         = inputdata.tTest01 ##Estímulos de experimento
 PRACTICE_STR     = ''
 PRACTICE_STR     = inputdata.tPractice
