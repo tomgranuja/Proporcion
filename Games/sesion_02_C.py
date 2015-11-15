@@ -13,9 +13,9 @@ import fscreengame, inputdata
 SESSION          = 2
 CONTROL          = True
 TEST_ERRORS      = (0.0, 0.05) ##Tamaño del feedback
-INTRO_PIXMAP     = 'intro_sesion1_630.png' ##Imagen de intro
-SLIDER_PIXMAPS   = ['agua.png','d_sesion1.png'] ##Extremos
-FRUIT_BAR_RGB    = (254,0,0)   ##Color rgb de la barra
+INTRO_PIXMAP     = 'intro_sesion2_630.png' ##Imagen de intro
+SLIDER_PIXMAPS   = ['agua.png','d_sesion2.png'] ##Extremos
+FRUIT_BAR_RGB    = (255,255,0)   ##Color rgb de la barra
 EXP_STR         = inputdata.c_sesion05 ##Estímulos de experimento
 PRACTICE_STR     = ''
 #PRACTICE_STR     = inputdata.tPractice
