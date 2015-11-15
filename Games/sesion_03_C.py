@@ -10,14 +10,14 @@ sys.path.append(MOD_DIR)
 import fscreengame, inputdata
 
 ###########Configuración de la sesión##########################
-SESSION          = 1
-CONTROL          = False
-TEST_ERRORS      = (0.15, 0.05) ##Tamaño del feedback
+SESSION          = 3
+CONTROL          = True
+TEST_ERRORS      = (0.0, 0.05) ##Tamaño del feedback
 INTRO_PIXMAP     = 'intro_sesion1_630.png' ##Imagen de intro
-SLIDER_PIXMAPS   = ['i_sesion1.png','d_sesion1.png'] ##Extremos
+SLIDER_PIXMAPS   = ['agua.png','d_sesion1.png'] ##Extremos
 EXP_STR         = inputdata.tTest01 ##Estímulos de experimento
 PRACTICE_STR     = ''
-PRACTICE_STR     = inputdata.tPractice
+#PRACTICE_STR     = inputdata.tPractice
 STIM_TIME        = [5000]
 PARCIALS_TIME    = [4000]
 FB_TIME          = [2000]
