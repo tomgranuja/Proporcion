@@ -605,7 +605,10 @@ class FullBox(QDialog):
     
     def onTimeOut(self):
         if self.toListen:
-            self.whiteBox.slider._mouseListen = False
+            sldr = self.whiteBox.slider
+            sldr._mouseListen = False
+            sldr._userTime = sldr.testTime.elapsed()
+            sldr._userRate = None
             self.setNextFrame()
     
     def setNextFrame(self):
