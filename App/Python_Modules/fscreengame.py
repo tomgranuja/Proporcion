@@ -9,7 +9,7 @@ import uidmgr, tsequence, filelogger, inputdata
 
 MEDIA_DIR = '../Media'
 PRACTICE_STR = inputdata.tPractice
-EXP_STR = inputdata.t_sesion01
+EXP_STR = inputdata.t_Exp_01
 PRACTICE_ERRORS = (0.15, 0.05)
 TEST_ERRORS     = PRACTICE_ERRORS
 STIM_TIME       = [5000]
@@ -19,7 +19,7 @@ FB_BLINK_TIME   = [1000]
 FB_BLINK_PERIOD = [ 150]
 THANKS_TIME     = [4000]
 FRUIT_BAR_RGB = (254, 0, 0)
-path = 'intro_sesion1_630.png'
+path = 'intro_sesion1.png'
 INTRO_PIXMAP     = '{}/{}'.format(MEDIA_DIR, path)
 path = ['i_sesion1.png','d_sesion1.png']
 SLIDER_PIXMAPS   = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
