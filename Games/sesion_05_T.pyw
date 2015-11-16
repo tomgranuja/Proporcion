@@ -12,7 +12,7 @@ import fscreengame, inputdata
 ###########Configuración de la sesión##########################
 SESSION          = 5
 CONTROL          = False
-TEST_ERRORS      = (0.15, 0.05) ##Tamaño del feedback
+TEST_ERRORS      = (0.075, 0.025) ##Tamaño del feedback
 INTRO_PIXMAP     = 'intro_sesion5.png' ##Imagen de intro
 SLIDER_PIXMAPS   = ['i_sesion5.png','d_sesion5.png'] ##Extremos
 FRUIT_BAR_RGB    = (254,0,0)   ##Color rgb de la barra
