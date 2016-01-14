@@ -4,11 +4,12 @@ Proporcion is a PyQt little game to train proportion perception in elementary
 students. The game was designed by my friend Camilo.
 
 
-The script [fscreen_game.pyw](./fscreen_game.pyw) runs fullscreen, Esc key press to quit.
-It shows a slider that waits for mouse click in order to 
-record mouse x position and time. Inmediatly after slider interaction, the 
-widget shows a reference area of what would be the better proportion selection and
-plays a sound (currently desactivated) depending on how close the choice was from the current proportion.
+The [game dir](./Games/), contains some session scripts to try.
+After entering a three chars identifier, they show a slider that waits for mouse click in order to 
+record mouse x position and time. Use space bar to switch to the differents trial screens. Inmediatly after slider interaction, the 
+widget shows a reference area of what would be the better proportion selection and plays a sound depending on how close the choice was from the current proportion. The session can be aborted anytime by Esc press.
+The control game sessions differs from the test game sessions by restricting the proportions to 0 and 1. There are five test sessions and five control sessions.
+The user data can be checked in the [log dir](./Logger/) by user id.
 
 ## Code Example
 
