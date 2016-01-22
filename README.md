@@ -3,258 +3,90 @@
 Proporcion is a PyQt little game to train proportion perception in elementary 
 students. The game was designed by my friend Camilo.
 
+The script [quick_game](./quick_game.pyw) runs fullscreen, Esc key press to quit. It shows a reference bar and slider that waits for mouse click in order to record mouse x position and time. Inmediatly after slider interaction, the widget shows a reference area of what would be the better proportion selection and plays a sound depending on how close the choice was from the reference bar proportion.
 
-The [game dir](./Games/), contains some session scripts to try.
-After entering a three chars identifier, they show a slider that waits for mouse click in order to 
-record mouse x position and time. Use space bar to switch to the differents trial screens. Inmediatly after slider interaction, the 
-widget shows a reference area of what would be the better proportion selection and plays a sound depending on how close the choice was from the current proportion. The session can be aborted anytime by Esc press.
-The control game sessions differs from the test game sessions by restricting the proportions to 0 and 1. There are five test sessions and five control sessions.
-The user data can be checked in the [log dir](./Logger/) by user id.
+If you want to try it, see installation and test instructions below.
+
+
+
 
 ## Code Example
 
+The [fscreengame](./App/Python_Modules/fscreengame.py) module has the core of the game. It begins with some constant definitions that allow to tweak the game default settings:
 
-### Data set and Training class
+### Media path
 
-The game input data consist of two values lines that are readed into tuples (height, rate)
-in `Training()` class:
-```python
-example_data = '''
-1.0 0.5
-1.0 0.25
-0.6 0.5
-0.6 0.75
-0.6 0.25
-0.3 0.8
-0.3 0.2
-0.3 0.5
-0.3 0.75
-1.0 0.2
-1.0 0.7
-1.0 0.3
-0.5 0.5
-'''[1:]
-```
+The path to the images and audios used in the game is splitted in a general dir path, `MEDIA_DIR`, and the different media names in that dir:
 
-You can modify the class var `TEST_BREAKS` with a list of data index to trigger a user refresh pause in that data samples.
+- `INTRO_PIXMAP` The game introduction image showed in the first frame.
+- `SLIDER_PIXMAPS` List with the slider's left side and right side images.
+- `PARCIALS_PIXMAPS` List with the "excelent", "good" and "outside" smileys showed in the performance graph pauses.
+- `FB_WAVS` List with the "excelent", "good" and "outside" feedback sounds.
+
+### Input data
+
+The game trials present different rates, heights and widths of the reference bars. The input numbers are stored in the [inputdata](./App/Python_Modules/inputdata.py) module and there are two constant for the input set selection, they contains `inputdata` module's strings:
+
+- `PRACTICE_STR` A string with some practice trials inputs or a null string if the session don't need practice trials. practice trials records are stored in a different file in the [log dir](./Logger/)
+- `EXP_STR` A string with the experiment trials input. Also it can be a null string if there are no trials intended.
+
+You can see the string format as three blank separated vals separated by line breaks in the `inputdata` module:
 
 ```python
-class Training():
-    GREEN_ERROR  = 0.05
-    YELLOW_ERROR = 0.15
-    #Pausas en [3, 6, 9, 12, ...,33]
-    TEST_BREAKS  = range(3,36,3)...
-
-    def getRates(self, data):
-        '''Heights,rates from data string, reset trial counter.'''
-        tupls_list = None
-        if data:
-            tupls_list = [ (float(h), float(r)) for h,r in[
-                           tuple(l.split()) for l in data.splitlines() ]]
-            self.currentTrial = 0
-            print(tupls_list)
-        return tupls_list
-```
-The class variables `GREEN_ERROR` and `YELLOW_ERROR` are used to eval the user's choice
-error in terms of rate. They are also used in `CheckWidget(CustomRateWidget)` class to calculate the green
-and yellow length of the feedback rectangles [see CheckBox below](./README.md#feedback-and-checkwidget-class).
-
-### Rate representation and RateBox class
-
-The `RateBox(CustomRateWidget)` widget has two rectangles (blue and red), whoes dimensions are 
-changed with `setBars(height, rate)`. It's arguments are two rates,
-one for the height of the blue bar, and the other for the proportion of the
-red bar that is drawed in front of the blue.
-
-```python
-class RateBox(CustomRateWidget):
-    ...
-    
-    def setBars(self, height, rate):
-        blueHeight = 1.0
-        if 0.0 < height  <= 1.0:
-            self.blueRect = QRect(
-                         self.xFromRate(0),
-                         self.yFromRate(1-height),
-                         self.wFromRate(1),
-                         self.hFromRate(height)
-                         )
-            if 0.0 < rate <= 1.0:
-                uppery = self.yFromRate(1 - rate * height)
-                self.redRect = QRect(self.blueRect)
-                self.redRect.setTop(uppery)
-        
-    def paintEvent(self, event=None):
-        painter = QPainter(self)
-        blueColor = QColor(85, 142, 213)
-        redColor  = QColor(254, 0, 0)
-        if self.blueRect:
-            painter.setBrush(blueColor)
-            painter.drawRect(self.blueRect)
-        if self.redRect:
-            painter.setBrush(redColor)
-            painter.drawRect(self.redRect)
+'''0.21 1 1
+0.76 1.5 0.5
+0.01 1 0.5
+0.5 1.5 1
+0.95 1 0.5
+0.03 1 0.5
+0.5 1 0.5
+0.16 1 1
+0.76 4 1
+0.26 4 0.5
+0.21 4 1
+0.61 1.5 1
+0.8 1.5 0.5
+0.03 1.5 0.5
+0.03 4 0.5
+0.43 1.5 0.5...
 ```
 
+The first column is the rate (0 to 1), the second is the maximum height downscaling factor (1/height) and the third is the width factor.
 
-### User interaction and Slider class
+### Performance feedback
 
-The draw of the slider consist of a line (`riel`) and a button (`raya`) in the
-`Slider(CustomRateWidget)`
-class:
-```python
-class Slider(CustomRateWidget):
-    ...
-    def __init__(self, parent=None):
-        ...
-        self.riel=QLine(self.xFromRate(0),
-                        self.yFromRate(0.5),
-                        self.xFromRate(1),
-                        self.yFromRate(0.5))
-        ...
-    def paintEvent(self, event=None):
-        painter = QPainter(self)
-        #Riel
-        painter.drawLine(self.riel)
-        #Raya
-        w = 4
-        if self._userClickX:
-            raya = QRect(self._userClickX - w / 2, 
-                         0, 
-                         w,
-                         self.HEIGHT)
-            painter.setBrush(self.palette().brush(QPalette.Button))
-            painter.drawRect(raya)
-    ...
-```
-When user click release is generated, the custom signal `sliderMouseRelease(float)`
-is emitted with the user selected rate:
-```python
-    ...
-    def mouseReleaseEvent(self,event):
-        if self._mouseListen:
-            self._mouseListen = False
-            self.checkUserEvent(None, event.x())
-            self.update()
-    
-    def checkUserEvent(self, time, x):
-        self._userClickX = max(self.riel.x1(), min(self.riel.x2(), x))
-        rate = self.rateFromX(self._userClickX)
-        self.sliderMouseRelease.emit(rate)
-```
+After each slider click, the performance is categorized in one of three levels: "excelent/green", "good/yellow" and "outside/none". The actual performance is presented to the user with the respective color and a sound. These determination is made comparing the user rate selection error with the predefined umbrals for the "good/yellow" zone or the "excelent/green" zone.
+These umbrals (the maximum diference from the current rate allowed) are organiced in two tuples:
 
+- `PRACTICE_ERRORS` tuple with the "good/yellow" umbral and the "excelent/green" umbral for the practice trials.
+- `TEST_ERRORS` tuple with the "good/yellow" umbral and the "excelent/green" umbral for the test trials.
 
-### Feedback and CheckWidget class
+### Game's different times
 
-The reference area displayed after user interaction consist of two rectangles 
-defined in `CheckWidget(CustomRateWidget)` class. First, the yellow and green
-left sides are calculated whit a rate center value using `adjustRate(center)`:
-```python
-class CheckWidget(CustomRateWidget):
-    ...
-    def __init__(self, greenError=None, yellError=None, parent=None):
-        ...
-        self.gSemiWidth = self.wFromRate(greenError)
-        self.ySemiWidth = self.wFromRate(yellError)
-        ...
-    
-    def adjustRate(self, center):
-        spanCenterX = self.xFromRate(center)
-        self.yellLeftX  = spanCenterX - self.ySemiWidth
-        self.greenLeftX = spanCenterX - self.gSemiWidth
-```
-Then, the rectangles are drawn:
-```python
-    ...
-    
-    def paintEvent(self, event=None):
-        painter = QPainter(self)
-        painter.setPen(Qt.NoPen)
-        greenColor = QColor(0,128,0,150)
-        yellowColor = QColor(222,205,135,150)
-        outsideColor = QColor(0,0,0,0)
-        h = self.hFromRate(1)
-        top = self.xFromRate(0)
-        #yellowBox
-        if self.yellLeftX:
-            painter.setBrush(yellowColor)
-            yellowBox = QRect(self.yellLeftX, top, self.ySemiWidth * 2, h)
-            painter.drawRect(yellowBox)
-        #greenBox
-        if self.greenLeftX:
-            painter.setBrush(greenColor)
-            dx = self.ySemiWidth - self.gSemiWidth
-            green = yellowBox.translated(dx , 0)
-            green.setWidth(self.gSemiWidth * 2)
-            painter.drawRect(green)
-        ...
-```
+There are six constant for defining different times in milliseconds
 
+- `STIM_TIME` The timeout for the user click after rate trial presentation. If 0, the timeout is canceled and the games wait indefinitely for the user. A 'none' rate is recorded for each user timeout.
+- `PARCIALS_TIME` The time during the presentation of the parcials and finals results graphs. Again, if 0, the timeout is canceled.
+- `FB_TIME` The time in wich is presented the feedback to the user selection
+- `FB_BLINK_TIME` The time in wich the performance color blinks on the slider.
+- `FB_BLINK_PERIOD` The "on" or "off" time of each blink (half the period of the blink).
+- `THANKS_TIME` The final thanks frame time before game quit.
 
-### Top level and central widget
+### Other constants
 
-The top level widget is `FullBox(QDialog)`:
+- `FRUIT_BAR_RGB` RGB tuple for the color of the trials reference rate bars.
+- `TWO_VALS` List of the two slider extreme rates allowed in the special control game (see [experimental test](./README.md#experimental-test-with-students)).
+- `CONTROL` Boolean True if a control game is intended (see [experimental test](./README.md#experimental-test-with-students)).
+- `SESSION` The number of the session for the record file identifier (see [experimental test](./README.md#experimental-test-with-students)).
 
-```python
-class FullBox(QDialog):
-    def __init__(self, parent=None):
-        super(FullBox, self).__init__(parent)
-        p = self.palette()
-        bgColor = QColor(179,179,179)
-        p.setColor(self.backgroundRole(), bgColor)
-        self.setPalette(p)
-        self.setAutoFillBackground(True)
-        self.whiteBox = WhiteBox()
-        layout = QHBoxLayout()
-        layout.addWidget(self.whiteBox)
-        self.setLayout(layout)
-```
-
-`WhiteBox(CustomRateWidget)` instance is a fixed widget with fixed dimensions, parent of all the
-dinamic widgets (slider, rateBox, checkBox and the photo boxes):
-
-```python
-class WhiteBox(QWidget):
-    ...
-    def __init__(self, parent=None):
-        ...
-        layout = QVBoxLayout()
-        layout.addLayout(self.rateBoxLayout())
-        layout.addStretch()
-        layout.addLayout(self.sliderLayout())
-        self.setLayout(layout)
-```
-Two methods in this class are used to update the widgets after user rate selection.
-First the `onSliderMouseRelease(rate)` is called. After processing the user rate selected
-and show feedback, a timer in this method launch the second method, `nextGame()` in order
-to progress to the next game:
-```python
-    ...
-    def onSliderMouseRelease(self, rate):
-        self.test.writeAnswer(None, rate)
-        self.check.feedback = self.test.rateCheck(rate)
-        self.check.adjustRate(self.test.currentRate)
-        #self.check.playFeedbackSound()
-        self.check.setVisible(True)
-        self.check.fbBlink(1600, 200)
-        QTimer.singleShot(3000, self.nextGame)
-        
-    def nextGame(self):
-        self.check.setVisible(False)
-        self.test.toNextRate()
-        self.rateBox.setBars(self.test.currentHeight,
-                             self.test.currentRate)
-        self.rateBox.update()
-        self.slider._mouseListen = True
-```
 
 
 ## Motivation
 
 Proporcion is intended for test a brief training method that could assist in 
-the student understanding of rational numbers. This is a paralel effort to test the 
-game **performance** in PyQt (timing and space accuarcy of user interaction 
-information).
+the student understanding of rational numbers. A pilot experiment was conducted with this software in november 2015 and the data recorded is beeing analized in order to verify Camilo's hypothesis.
+Our hope is to continue the software development once we get the conclusions
+from the pilot test.
 
 ## Installation
 
@@ -274,36 +106,61 @@ Once you get the python/pyqt installation, you can download the [project zip](ht
 
 ## Test
 
-In order to test fullscreen just run [fscreen_game.pyw](./fscreen_game.pyw).
+In order to test fullscreen just run [quick_game](./quick_game.pyw).
 Remember Esc key press to quit.
 The game will progress with the following height and rate sucession:
 ```python
-(1.0, 0.5)
-(1.0, 0.25)
-(0.6, 0.5)
-(0.6, 0.75)
-(0.6, 0.25)
-(0.3, 0.8)
-(0.3, 0.2)
-(0.3, 0.5)
-(0.3, 0.75)
-(1.0, 0.2)
-(1.0, 0.7)
-(1.0, 0.3)
-(0.5, 0.5)
+('0.26', '1.00')
+('0.21', '0.67')
+('0.61', '1.00')
+('0.43', '1.00')
+('0.7', '0.67')
+('0.16', '0.25')
+('0.01', '0.67')
+('0.95', '0.67')
+('0.43', '0.25')
+('0.01', '0.25')
+('0.61', '0.25')
+('0.8', '0.25')
 ```
 For windows user it can be run by double-clicking the file 
-if the windows PATH environ contains python dir and pyqt dir (see Installation 
-section above).
+if the windows PATH environ contains python dir and pyqt dir
+(see [Installation section](./README.md#installation) above).
 
-If fscreen_game.pyw is run from a command line interface, (CMD on windows) it 
-shows in the terminal the current trial number, the time in milliseconds and
-the rate value of the user mouse click release.
+### Experimental test with students
 
-Use the time_test.py script to simulate some predefined user mouse releases
-in the slider center spaced by 5 seconds, and compare time meassures.
-Sice feedback time are setted to 1 second, you should expect elapsed times
-round 4000 milliseconds after the first 5000 millisecond record.
+The [game dir](./Games/), contains a collection of progressive sessions to try with students. 
+There are five test games:
+
+- [sesion_01_T](./Games/sesion_01_T.pyw)
+- [sesion_02_T](./Games/sesion_02_T.pyw)
+- [sesion_03_T](./Games/sesion_03_T.pyw)
+- [sesion_04_T](./Games/sesion_04_T.pyw)
+- [sesion_05_T](./Games/sesion_05_T.pyw)
+
+and five control games:
+
+- [sesion_01_C](./Games/sesion_01_C.pyw)
+- [sesion_02_C](./Games/sesion_02_C.pyw)
+- [sesion_03_C](./Games/sesion_03_C.pyw)
+- [sesion_04_C](./Games/sesion_04_C.pyw)
+- [sesion_05_C](./Games/sesion_05_C.pyw)
+
+The control games show a modified slider that only allows the extreme values
+so the game objective is slighly different, to only select if the reference
+has more "water" or "fruit". Thus, the real proportion training is only acomplished by playing the test games. You can split the student group into a "test" group and a "control" group to observe the differences.
+
+This sessions begin with a user identification window waiting for a three chars identifier that must be asigned uniquely to each user across all sessions. This identifier is usefull to analyze anonimous data.
+After entering the three chars identifier, there is some introduction pages and a three trial practice in the case of the first session. To progress in the game the student must press space bar until a new proportion is showed waiting for an slider click selection.
+For each rate presented, the user performance is recorded after slider click.
+The user data can be checked in the [log dir](./Logger/) by user id.
+Each session consist of 36 trials plus some partial result graph frames and a brief pause on the middle. After completing the 36 trials, a final result graph is presented and a thanks frame.
+
+### Time accuarcy test
+
+There are multiple factors influencing the time record accuarcy of the test. Some of them involves the screen, keyboard and mouse respond delay. For this reason is probably to get a time error of a few milliseconds. The SO and other programs runing also affects the time record accuarcy.
+We have made an [small time test](./App/Python_Modules/time_test.py) module. It is affected with the same time error of the game sessions so it can't be used to meassure the time accuarcy but is usefull to see the consistence of the record by simulating multiple slider mouse click separated by 1000 ms period. Check the [log dir](./Logger/) after runing the test and find the time test record. It should contain a session record with times a few milliseconds away from 1000.
+
 
 ## Contributors
 
