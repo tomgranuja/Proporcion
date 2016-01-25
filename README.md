@@ -3,7 +3,7 @@
 Proporcion is a PyQt little game to train proportion perception in elementary 
 students. The game was designed by my friend Camilo.
 
-The script [quick_game](./App/Media/quick_game.mkv) runs fullscreen, Esc key press to quit. It shows a reference bar and slider that waits for mouse click in order to record mouse x position and time. Inmediatly after slider interaction, the widget shows a reference area of what would be the better proportion selection and plays a sound depending on how close the choice was from the reference bar proportion.
+The script [quick_game](https://github.com/tomgranuja/Proporcion/raw/master/App/Media/quick_game.mkv) runs fullscreen, Esc key press to quit. It shows a reference bar and slider that waits for mouse click in order to record mouse x position and time. Inmediatly after slider interaction, the widget shows a reference area of what would be the better proportion selection and plays a sound depending on how close the choice was from the reference bar proportion.
 
 If you want to try it, see [installation](./README.md#installation) and [test](./README.md#test) instructions below.
 
