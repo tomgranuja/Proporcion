@@ -158,5 +158,5 @@ We have made a [small time test](./App/Python_Modules/time_test.py) module. It i
 
 ## Contributors
 
-Camilo Eureka Gouett, Salvador Gaviota.
+Camilo Gouet, Salvador Gaviota.
 
