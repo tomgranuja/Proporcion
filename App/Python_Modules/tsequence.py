@@ -19,27 +19,30 @@ class Training():
         
     @property
     def current(self):
-        '''(height, rate) or (None, None) if outside data.'''
+        '''(rate, scale, width) or (None, None, None) if outside data.'''
         try:
-            height, rate, width = self.data[self.currentTrial]
+            rate, scale, width = self.data[self.currentTrial]
         except IndexError:
             print('Current trial outside data range')
-            height, rate, width = None, None, None
-        return height, rate, width
+            rate, scale, width = None, None, None
+        return rate, scale, width
         
     def getRates(self, data):
-        '''Heights,rates from data string.'''
+        '''Rates, scales, widths from data string.'''
         float_tupls = []
         if data:
             for n, line in enumerate(data.splitlines()):
+                w = '1.0'
+                if len(line.split()) > 2:
+                    w = line.split()[2]
                 try:
-                    r,s,w =  line.split()
-                    hf,rf, wf = 1/float(s), float(r), float(w)
+                    r,s =  line.split()[:2]
+                    rf,sf, wf = float(r), float(s), float(w)
                 except:
                     msg = 'Error in data line {}: {}'
                     print(msg.format(n, repr(line)))
                     raise
-                float_tupls.append( (hf, rf, wf) )
+                float_tupls.append( (rf, sf, wf) )
         return float_tupls
         
     def toNextRate(self):
@@ -54,7 +57,7 @@ class Training():
     def rateCheck(self, r=None):
         '''Check r error against current rate.'''
         result = None
-        HEIGHT, RATE, WIDTH = range(3)
+        RATE, SCALE, _ = range(3)
         if self.current[RATE]:
             if r or r == 0.0 and 0 <= r <= 1:
                 result = 'outside'
@@ -88,7 +91,7 @@ class TwoValsTraining(Training):
     def rateCheck(self, r=None):
         '''Check r error against current rate.'''
         result = None
-        HEIGHT, RATE, WIDTH = range(3)
+        RATE, SCALE, _ = range(3)
         if self.current[RATE]:
             if r or r == 0.0 and 0 <= r <= 1:
                 result = 'outside'
@@ -131,22 +134,6 @@ class DotsTraining(Training):
                     raise
                 mix_tupls.append( (rf, sf, p) )
         return mix_tupls
-
-    def rateCheck(self, r=None):
-        '''Check r error against current rate.'''
-        result = None
-        RATE, SCALE, IPATH = range(3)
-        if self.current[RATE]:
-            if r or r == 0.0 and 0 <= r <= 1:
-                result = 'outside'
-                error = abs(r - self.current[RATE])
-                if error <= self.yError:
-                    result = 'in_yellow'
-                if error <= self.gError:
-                    result = 'in_green'
-            else: print('None valid rate value to check')
-        else: print('None currentRate to check')
-        return result
 
 class Frame():
     def __init__(self, spListen = False, clkListen = False,
