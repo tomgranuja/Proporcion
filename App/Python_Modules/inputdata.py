@@ -10,6 +10,17 @@ def images_in_dir(dir_path):
               if s.split('.')[-1].lower() in SUFF_LIST]
     return sorted(images)
 
+def image_to_data_str(imgs_path, data_str):
+    '''Append image paths to data.'''
+    ipaths = images_in_dir(imgs_path)
+    datalines = [s for s in data_str.splitlines() if s.strip() != '']
+    if len(ipaths) != len(datalines):
+        msg = '{} images and {} data lines.'.format(
+               len(ipaths), len(datalines))
+        raise ValueError(msg)
+    data = ['{} {}'.format(d,i) for d,i in zip(datalines, ipaths)]
+    return '\n'.join(data)
+
 tPractice = '''
 0.6 1 0.5
 0.4 1 1
