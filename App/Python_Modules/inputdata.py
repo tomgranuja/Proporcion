@@ -3,6 +3,8 @@
 
 from os import listdir as os_listdir
 
+MEDIA_DIR = '../Media'
+
 def images_in_dir(dir_path):
     '''Sorted list of images paths in dir_path.'''
     SUFF_LIST = ['bmp', 'jpg', 'jpeg', 'png']
@@ -21,6 +23,7 @@ def image_to_data_str(imgs_path, data_str):
     data = ['{} {}'.format(d,i) for d,i in zip(datalines, ipaths)]
     return '\n'.join(data)
 
+##########Inputs obsoletos (ratio, downscaling, width)##########
 tPractice = '''
 0.6 1 0.5
 0.4 1 1
@@ -436,3 +439,18 @@ c_Exp_05 = '''
 ###Otras sesiones útiles para probar el código
 dbg_sesion01 = t_Exp_01[251:]
 dbgPractice = cPractice[19:]
+
+
+##########Inputs for bars and dots.#############################
+dbg_dire = '{}/{}'.format(MEDIA_DIR, 'Scatters')
+values   = '''
+0.500 1.0
+0.250 1.0
+0.750 1.0
+0.333 1.0
+0.500 2.0
+0.250 2.0
+0.750 2.0
+0.777 1.5
+'''
+dbg_data = image_to_data_str(dbg_dire, values)
