@@ -106,6 +106,48 @@ class TwoValsTraining(Training):
         else: print('None currentRate to check')
         return result
 
+class DotsTraining(Training):
+    @property
+    def current(self):
+        '''(rate, scale, ipath) or (None, None, None) if outside data.'''
+        try:
+            rate, scale, ipath = self.data[self.currentTrial]
+        except IndexError:
+            print('Current trial outside data range')
+            rate, scale, ipath = None, None, None
+        return rate, scale, ipath
+
+    def getRates(self, data):
+        '''rates, scales, ipaths from data string.'''
+        mix_tupls = []
+        if data:
+            for n, line in enumerate(data.splitlines()):
+                try:
+                    r,s,p =  line.split()
+                    rf,sf = float(r), float(s)
+                except:
+                    msg = 'Error in data line {}: {}'
+                    print(msg.format(n, repr(line)))
+                    raise
+                mix_tupls.append( (rf, sf, p) )
+        return mix_tupls
+
+    def rateCheck(self, r=None):
+        '''Check r error against current rate.'''
+        result = None
+        RATE, SCALE, IPATH = range(3)
+        if self.current[RATE]:
+            if r or r == 0.0 and 0 <= r <= 1:
+                result = 'outside'
+                error = abs(r - self.current[RATE])
+                if error <= self.yError:
+                    result = 'in_yellow'
+                if error <= self.gError:
+                    result = 'in_green'
+            else: print('None valid rate value to check')
+        else: print('None currentRate to check')
+        return result
+
 class Frame():
     def __init__(self, spListen = False, clkListen = False,
                  isStim = False, timeout = 0, fbActive = False,
