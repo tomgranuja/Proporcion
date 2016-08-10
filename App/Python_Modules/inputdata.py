@@ -1,6 +1,15 @@
 #!/usr/bin/python3 -tt
 #-*- coding:utf-8 -*-
 
+from os import listdir as os_listdir
+
+def images_in_dir(dir_path):
+    '''Sorted list of images paths in dir_path.'''
+    SUFF_LIST = ['bmp', 'jpg', 'jpeg', 'png']
+    images = [s for s in os_listdir(dir_path)
+              if s.split('.')[-1].lower() in SUFF_LIST]
+    return sorted(images)
+
 tPractice = '''
 0.6 1 0.5
 0.4 1 1
