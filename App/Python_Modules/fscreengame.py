@@ -70,7 +70,7 @@ class BarsBox(CustomRateWidget):
         self.blueRect = None
         self.fruitRect  = None
         
-    def setBars(self, rate, scale, width):
+    def setStim(self, rate, scale, width):
         blueHeight = 1.0
         height = 1 / scale
         if 0.0 < height  <= 1.0 and 0.0 < width <= 1.0:
@@ -124,10 +124,10 @@ class DotsBox(CustomRateWidget):
             painter.drawPixmap(self.origin, self.pixmp)
 
 class RestBox(CustomRateWidget):
-    WIDTH  = RateBox.WIDTH
-    HEIGHT = RateBox.HEIGHT
     def __init__(self, parent=None):
         super(RestBox, self).__init__(parent)
+        self.WIDTH  = parent.WIDTH
+        self.HEIGHT = parent.HEIGHT
         p = self.palette()
         p.setColor(self.backgroundRole(), Qt.white)
         self.setPalette(p)
@@ -446,18 +446,18 @@ class WhiteBox(CustomRateWidget):
         self.setPalette(p)
         self.setAutoFillBackground(True)
         layout = QVBoxLayout()
-        layout.addLayout(self.rateBoxLayout())
+        layout.addLayout(self.stimBoxLayout())
         layout.addStretch()
         layout.addLayout(self.sliderLayout())
         self.setLayout(layout)
 
-    def rateBoxLayout(self):
-        self.rateBox = BarsBox()
-        self.restBox = RestBox(self.rateBox)
+    def stimBoxLayout(self):
+        self.stimBox = BarsBox()
+        self.restBox = RestBox(self.stimBox)
         self.restBox.setVisible(False)
         layout = QHBoxLayout()
         layout.addStretch()
-        layout.addWidget(self.rateBox)
+        layout.addWidget(self.stimBox)
         layout.addStretch()
         return layout
 
@@ -686,7 +686,7 @@ class FullBox(QDialog):
             yerror = training.yError
             self.whiteBox.check.setErrors(gerror, yerror)
             r, s, w = training.current
-            self.whiteBox.rateBox.setBars(r, s, w)
+            self.whiteBox.stimBox.setStim(r, s, w)
         if frame.isStim:
             sldr._userClickX = None
             sldr._mouseListen = True
