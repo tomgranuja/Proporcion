@@ -60,13 +60,13 @@ class CustomRateWidget(QWidget):
     def sizeHint(self):
         return QSize(self.WIDTH, self.HEIGHT)
 
-class RateBox(CustomRateWidget):
+class BarsBox(CustomRateWidget):
     WIDTH  = 2 * 0.1875 * CustomRateWidget.REF_WIDTH
     HEIGHT = 0.7188 * CustomRateWidget.REF_HEIGHT
     #WIDTH  = 120
     #HEIGHT = 460
     def __init__(self, parent=None):
-        super(RateBox, self).__init__(parent)
+        super(BarsBox, self).__init__(parent)
         self.blueRect = None
         self.fruitRect  = None
         
@@ -452,7 +452,7 @@ class WhiteBox(CustomRateWidget):
         self.setLayout(layout)
 
     def rateBoxLayout(self):
-        self.rateBox = RateBox()
+        self.rateBox = BarsBox()
         self.restBox = RestBox(self.rateBox)
         self.restBox.setVisible(False)
         layout = QHBoxLayout()
