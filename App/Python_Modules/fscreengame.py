@@ -95,6 +95,33 @@ class RateBox(CustomRateWidget):
             painter.setBrush(fruitColor)
             painter.drawRect(self.fruitRect)
             
+class DotsBox(CustomRateWidget):
+    '''Container for dots stimuli presentation.'''
+    WIDTH  = 0.875 * CustomRateWidget.REF_WIDTH
+    HEIGHT = 0.830 * CustomRateWidget.REF_HEIGHT
+    def __init__(self, parent=None):
+        super(DotsBox, self).__init__(parent)
+        self.pixmp = None
+        self.origin = self.calcUpperLeft()
+
+    def calcUpperLeft(self):
+        x, y = 0, 0
+        if self.pixmp:
+            x = (self.WIDTH - self.pixmp.width()) / 2
+            y = (self.HEIGHT - self.pixmp.height()) / 2
+        return QPointF(x, y)
+
+    def setStim(self, rate, scale, pixpath):
+        '''Discard rate, scale. Set image from pixpath.'''
+        if pixpath:
+            self.pixmp = QPixmap(pixpath)
+            self.origin = self.calcUpperLeft()
+
+    def paintEvent(self, event=None):
+        if self.pixmp:
+            painter = QPainter(self)
+            painter.drawPixmap(self.origin, self.pixmp)
+
 class RestBox(CustomRateWidget):
     WIDTH  = RateBox.WIDTH
     HEIGHT = RateBox.HEIGHT
