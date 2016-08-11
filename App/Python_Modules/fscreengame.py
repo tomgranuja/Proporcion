@@ -70,8 +70,9 @@ class RateBox(CustomRateWidget):
         self.blueRect = None
         self.fruitRect  = None
         
-    def setBars(self, height, rate, width):
+    def setBars(self, rate, scale, width):
         blueHeight = 1.0
+        height = 1 / scale
         if 0.0 < height  <= 1.0 and 0.0 < width <= 1.0:
             self.blueRect = QRect(
                          self.xFromRate((1-width)/2),
@@ -658,7 +659,7 @@ class FullBox(QDialog):
             t, r = sldr._userTime, sldr._userRate
             logger.write(n, t, r)
         if frame.fbActive:
-            h, testR, w = training.current 
+            testR, s, w = training.current 
             userR = sldr._userRate
             partialWdg = self.slayout.dic['parcials'].wdg
             check = self.whiteBox.check
@@ -684,8 +685,8 @@ class FullBox(QDialog):
             gerror = training.gError
             yerror = training.yError
             self.whiteBox.check.setErrors(gerror, yerror)
-            h, r, w = training.current
-            self.whiteBox.rateBox.setBars(h, r, w)
+            r, s, w = training.current
+            self.whiteBox.rateBox.setBars(r, s, w)
         if frame.isStim:
             sldr._userClickX = None
             sldr._mouseListen = True
