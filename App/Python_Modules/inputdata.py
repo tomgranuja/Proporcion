@@ -3,19 +3,31 @@
 
 from os import listdir as os_listdir
 
-MEDIA_DIR = '../Media'
+def pull_dir_data(dir_path):
+    '''filtered string from txt file in dir.'''
+    SUFF_LIST = ['txt']
+    datafiles = [s for s in os_listdir(dir_path)
+                 if s.split('.')[-1].lower() in SUFF_LIST]
+    if len(datafiles) != 1:
+        msg = '{} datafiles in {}.'.format(len(datafiles), dir_path)
+        raise ValueError(msg)
+    data_path =  '{}/{}'.format(dir_path, datafiles[0])
+    with open(data_path) as f:
+        datalines = [ s for s in f.read().splitlines()
+                     if s.strip() != '' and s[0] not in ['%', '#']]
+        return '\n'.join(datalines)
 
 def images_in_dir(dir_path):
     '''Sorted list of images paths in dir_path.'''
     SUFF_LIST = ['bmp', 'jpg', 'jpeg', 'png']
-    images = [s for s in os_listdir(dir_path)
+    images = ['{}/{}'.format(dir_path, s) for s in os_listdir(dir_path)
               if s.split('.')[-1].lower() in SUFF_LIST]
     return sorted(images)
 
-def image_to_data_str(imgs_path, data_str):
-    '''Append image paths to data.'''
-    ipaths = images_in_dir(imgs_path)
-    datalines = [s for s in data_str.splitlines() if s.strip() != '']
+def data_and_image_str(data_dir):
+    '''Append image paths to data in dir.'''
+    ipaths = images_in_dir(data_dir)
+    datalines = [ s for s in pull_dir_data(data_dir).splitlines() ]
     if len(ipaths) != len(datalines):
         msg = '{} images and {} data lines.'.format(
                len(ipaths), len(datalines))
@@ -441,16 +453,9 @@ dbg_sesion01 = t_Exp_01[251:]
 dbgPractice = cPractice[19:]
 
 
-##########Inputs for bars and dots.#############################
-dbg_dire = '{}/{}'.format(MEDIA_DIR, 'Scatters')
-values   = '''
-0.500 1.0
-0.250 1.0
-0.750 1.0
-0.333 1.0
-0.500 2.0
-0.250 2.0
-0.750 2.0
-0.777 1.5
-'''
-dbg_data = image_to_data_str(dbg_dire, values)
+##########Inputs test for bars and dots.#############################
+if __name__ == "__main__":
+    MEDIA_DIR = '../Media'
+    dbg_dire = '{}/{}'.format(MEDIA_DIR, 'Dots')
+    dots_example = data_and_image_str(dbg_dire)
+    print(dots_example)
