@@ -8,8 +8,14 @@ from functools import partial
 import uidmgr, tsequence, filelogger, inputdata
 
 MEDIA_DIR = '../Media'
-PRACTICE_STR = inputdata.tPractice
-EXP_STR = inputdata.t_Exp_01
+GAME      = ('dots', 'prop')
+#Available games:
+#  ('bars', 'ord'), ('bars', 'ord'), ('dots', 'prop'), ('dots', 'ord')
+INPUT_DIR = '../Media/Dots'
+PRACTICE_STR = inputdata.data_and_image_str(INPUT_DIR)
+EXP_STR = inputdata.data_and_image_str(INPUT_DIR)
+#PRACTICE_STR = inputdata.tPractice
+#EXP_STR = inputdata.pull_dir_data(INPUT_DIR)
 PRACTICE_ERRORS = (0.15, 0.05)
 TEST_ERRORS     = PRACTICE_ERRORS
 STIM_TIME       = [5000]
@@ -28,9 +34,6 @@ PARCIALS_PIXMAPS = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
 path = ['bad_short.wav','good.wav', 'excelent.wav']
 FB_WAVS          = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
 TWO_VALS         = [0.15, 0.85]
-GAME             = ('bars', 'prop')
-#Available games:
-#  ('bars', 'ord'), ('bars', 'ord'), ('dots', 'prop'), ('dots', 'ord')
 SESSION          = 1
 
 def pixelFromRate(rate, t, o = 0):
