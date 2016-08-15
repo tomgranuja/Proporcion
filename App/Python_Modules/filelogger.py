@@ -3,18 +3,21 @@
 
 LOGDIR = '../../Logger'
 
-def testLogPath(uid, sess = 1, isCtrl = False):
-    stype = 'T'
-    if isCtrl:
-        stype = 'C'
-    fpath = '{}/{}_S{:02}_{}'.format(LOGDIR, uid, sess, stype)
+stim_id = {'bars': 'B', 'dots': 'D'}
+ans_id  = {'prop': 'PRP', 'ord': 'ORD'}
+
+def testLogPath(uid, sess = 1, stim = None, ans = None):
+    stimul_type = stim_id.get(stim,'n')
+    answer_type = ans_id.get(ans, 'n')
+    gm_type = stimul_type + answer_type
+    fpath = '{}/{}_S{:02}_{}'.format(LOGDIR, uid, sess, gm_type)
     return fpath
 
-def practiceLogPath(uid, sess = 1, isCtrl = False):
-    stype = 'T'
-    if isCtrl:
-        stype = 'C'
-    fpath = '{}/{}_P{:02}_{}'.format(LOGDIR, uid, sess, stype)
+def practiceLogPath(uid, sess = 1, stim = None, ans = None):
+    stimul_type = stim_id.get(stim,'n')
+    answer_type = ans_id.get(ans, 'n')
+    gm_type = stimul_type + answer_type
+    fpath = '{}/{}_P{:02}_{}'.format(LOGDIR, uid, sess, gm_type)
     return fpath
     
 
@@ -44,4 +47,3 @@ if __name__ == "__main__":
     testLogger  = Logger(testPath)
     n, t, r = (0,2500, 0.75)
     testLogger.write(n, t, r)
-    

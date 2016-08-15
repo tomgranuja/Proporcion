@@ -28,10 +28,9 @@ PARCIALS_PIXMAPS = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
 path = ['bad_short.wav','good.wav', 'excelent.wav']
 FB_WAVS          = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
 TWO_VALS         = [0.15, 0.85]
-GAME             = ('bars', 'ord')
+GAME             = ('bars', 'prop')
 #Available games:
 #  ('bars', 'ord'), ('bars', 'ord'), ('dots', 'prop'), ('dots', 'ord')
-CONTROL          = False
 SESSION          = 1
 
 def pixelFromRate(rate, t, o = 0):
@@ -372,7 +371,6 @@ class PartialWidget(CustomRateWidget):
         greenY = self.greenBorder.top() - 100
         painter.drawPixmap(greenX, greenY, greenPix)
         #yell
-        #if not CONTROL:
         painter.setBrush(yellowColor)
         painter.drawRect(self.yellBorder)
         yellPix = QPixmap(PARCIALS_PIXMAPS[good])
@@ -472,7 +470,7 @@ class WhiteBox(CustomRateWidget):
         left, right = range(2)
         self.lPhotoBox.setPixmap(QPixmap(SLIDER_PIXMAPS[left]))
         self.rPhotoBox.setPixmap(QPixmap(SLIDER_PIXMAPS[right]))
-        if CONTROL or GAME[1] == 'ord':
+        if GAME[1] == 'ord':
             self.slider = TwoValSlider()
         else:
             self.slider = Slider()
@@ -607,13 +605,13 @@ class FullBox(QDialog):
     def initLoggers(self):
         if self.practice:
             pFilePath = filelogger.practiceLogPath(self.userUid,
-                                                   sess=SESSION,
-                                                   isCtrl=CONTROL)
+                                                   SESSION,
+                                                   *GAME)
             self.plogger = filelogger.Logger(pFilePath)
         if self.test:
             tFilePath = filelogger.testLogPath(self.userUid,
-                                               sess=SESSION,
-                                               isCtrl=CONTROL)
+                                               SESSION,
+                                               *GAME)
             self.tlogger = filelogger.Logger(tFilePath)
 
     def gameStart(self):
@@ -673,7 +671,7 @@ class FullBox(QDialog):
             partialWdg = self.slayout.dic['parcials'].wdg
             check = self.whiteBox.check
             check.feedback = training.rateCheck(userR)
-            if CONTROL or GAME[1] == 'ord':
+            if GAME[1] == 'ord':
                 MIN, MAX = range(2)
                 if testR > 0.5:
                     testR = TWO_VALS[MAX]
