@@ -126,7 +126,7 @@ class DotsTraining(Training):
         if data:
             for n, line in enumerate(data.splitlines()):
                 try:
-                    r,s,p =  line.split()
+                    r,s,p =  line.split()[:2] + line.split()[-1:]
                     rf,sf = float(r), float(s)
                 except:
                     msg = 'Error in data line {}: {}'
