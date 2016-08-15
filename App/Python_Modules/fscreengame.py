@@ -28,8 +28,11 @@ PARCIALS_PIXMAPS = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
 path = ['bad_short.wav','good.wav', 'excelent.wav']
 FB_WAVS          = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
 TWO_VALS         = [0.15, 0.85]
+GAME             = ('bars', 'ord')
+#Available games:
+#  ('bars', 'ord'), ('bars', 'ord'), ('dots', 'prop'), ('dots', 'ord')
 CONTROL          = False
-SESSION           = 1
+SESSION          = 1
 
 def pixelFromRate(rate, t, o = 0):
     return int(round(rate*t)) + o
@@ -453,6 +456,8 @@ class WhiteBox(CustomRateWidget):
 
     def stimBoxLayout(self):
         self.stimBox = BarsBox()
+        if GAME[0] == 'dots':
+            self.stimBox = DotsBox()
         self.restBox = RestBox(self.stimBox)
         self.restBox.setVisible(False)
         layout = QHBoxLayout()
@@ -467,7 +472,7 @@ class WhiteBox(CustomRateWidget):
         left, right = range(2)
         self.lPhotoBox.setPixmap(QPixmap(SLIDER_PIXMAPS[left]))
         self.rPhotoBox.setPixmap(QPixmap(SLIDER_PIXMAPS[right]))
-        if CONTROL:
+        if CONTROL or GAME[1] == 'ord':
             self.slider = TwoValSlider()
         else:
             self.slider = Slider()
@@ -569,16 +574,20 @@ class FullBox(QDialog):
         super(FullBox, self).setLayout(layout)
     
     def gameSequenceConfig(self):
-        if CONTROL:
-                
+        if GAME == ('bars','prop'):
+            self.practice = tsequence.Training(PRACTICE_STR,
+                                               *PRACTICE_ERRORS)
+            self.test     = tsequence.Training(EXP_STR, *TEST_ERRORS)
+        elif GAME == ('bars','ord'):
             self.practice = tsequence.TwoValsTraining(PRACTICE_STR,
                             *PRACTICE_ERRORS, twoVals=TWO_VALS)
             self.test     = tsequence.TwoValsTraining(EXP_STR,
                             *TEST_ERRORS, twoVals=TWO_VALS)
-        else:    
-            self.practice = tsequence.Training(PRACTICE_STR,                     
+        elif GAME == ('dots','prop'):
+            self.practice = tsequence.DotsTraining(PRACTICE_STR,
                                                *PRACTICE_ERRORS)
-            self.test     = tsequence.Training(EXP_STR, *TEST_ERRORS)
+            self.test     = tsequence.DotsTraining(EXP_STR, *TEST_ERRORS)
+
         self.sequence = tsequence.Sequence(self.practice, self.test)
         dic = { 'practSt'  : STIM_TIME[0],
                 'testSt'   : STIM_TIME[-1],
@@ -664,7 +673,7 @@ class FullBox(QDialog):
             partialWdg = self.slayout.dic['parcials'].wdg
             check = self.whiteBox.check
             check.feedback = training.rateCheck(userR)
-            if CONTROL:
+            if CONTROL or GAME[1] == 'ord':
                 MIN, MAX = range(2)
                 if testR > 0.5:
                     testR = TWO_VALS[MAX]
