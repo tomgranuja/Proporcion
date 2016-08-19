@@ -1,13 +1,12 @@
 #!/usr/bin/python3 -tt
 #-*- coding:utf-8 -*-
 
-import sys
+import sys, os
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from functools import partial
 import uidmgr, tsequence, filelogger, inputdata
 
-MEDIA_DIR = '../Media'
 GAME      = ('dots', 'prop')
 #Available games:
 #  ('bars', 'ord'), ('bars', 'ord'), ('dots', 'prop'), ('dots', 'ord')
@@ -24,16 +23,19 @@ FB_BLINK_TIME   = [1000]
 FB_BLINK_PERIOD = [ 150]
 THANKS_TIME     = [4000]
 FRUIT_BAR_RGB = (254, 0, 0)
-path = 'intro_sesion1.png'
-INTRO_PIXMAP     = '{}/{}'.format(MEDIA_DIR, path)
-path = ['i_sesion1.png','d_sesion1.png']
-SLIDER_PIXMAPS   = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
-path = ['bad.png', 'good.png', 'excelent.png']
-PARCIALS_PIXMAPS = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
-path = ['bad_short.wav','good.wav', 'excelent.wav']
-FB_WAVS          = ['{}/{}'.format(MEDIA_DIR, p) for p in path ]
+MEDIA_DIR = '../Media'
+INTRO_PIXMAP     = 'intro_sesion1.png'
+SLIDER_PIXMAPS   = ['i_sesion1.png','d_sesion1.png']
+PARCIALS_PIXMAPS = ['bad.png', 'good.png', 'excelent.png']
+FB_WAVS          = ['bad_short.wav','good.wav', 'excelent.wav']
 TWO_VALS         = [0.15, 0.85]
 SESSION          = 1
+
+def md_path(fname):
+    '''Convert fname to relative path using MEDIA_DIR.'''
+    mod_dir = os.path.dirname(__file__)
+    path = os.path.join(mod_dir, MEDIA_DIR, fname)
+    return os.path.relpath(path)
 
 def pixelFromRate(rate, t, o = 0):
     return int(round(rate*t)) + o
@@ -312,10 +314,10 @@ class CheckWidget(CustomRateWidget):
                 painter.drawRect(feedbackBox)
 
     def playFeedbackSound(self):
-        bad, good, excl = range(3)
-        wavs = {'outside'  : FB_WAVS[bad],
-                'in_yellow': FB_WAVS[good],
-                'in_green' : FB_WAVS[excl]}
+        bad, good, excl = [ md_path(p) for p in FB_WAVS ]
+        wavs = {'outside'  : bad,
+                'in_yellow': good,
+                'in_green' : excl}
         wav = wavs.get(self.feedback, wavs['outside'])
         if self.audio == 'qsound':
             QSound.play(wav)
@@ -364,28 +366,25 @@ class PartialWidget(CustomRateWidget):
         greenColor = QColor(0,128,0)
         yellowColor = QColor(222,205,135)
         outsideColor = QColor(179,179,179)
-        bad, good, excl = range(3)
+        bad, good, excl = [ QPixmap(md_path(p)) for p in PARCIALS_PIXMAPS]
         #green
         painter.setBrush(greenColor)
         painter.drawRect(self.greenBorder)
-        greenPix = QPixmap(PARCIALS_PIXMAPS[excl])
         greenX = self.greenBorder.left()
         greenY = self.greenBorder.top() - 100
-        painter.drawPixmap(greenX, greenY, greenPix)
+        painter.drawPixmap(greenX, greenY, excl)
         #yell
         painter.setBrush(yellowColor)
         painter.drawRect(self.yellBorder)
-        yellPix = QPixmap(PARCIALS_PIXMAPS[good])
         yellX = self.yellBorder.left()
         yellY = self.yellBorder.top() - 100
-        painter.drawPixmap(yellX, yellY, yellPix)
+        painter.drawPixmap(yellX, yellY, good)
         #out
         painter.setBrush(outsideColor)
         painter.drawRect(self.outBorder)
-        outPix = QPixmap(PARCIALS_PIXMAPS[bad])
         outX = self.outBorder.left()
         outY = self.outBorder.top() - 100
-        painter.drawPixmap(outX, outY, outPix)
+        painter.drawPixmap(outX, outY, bad)
             
 class RefreshWidget(CustomRateWidget):
     #WIDTH  = 1.0 * CustomRateWidget.REF_WIDTH
@@ -469,9 +468,9 @@ class WhiteBox(CustomRateWidget):
     def sliderLayout(self):
         self.lPhotoBox = QLabel()
         self.rPhotoBox = QLabel()
-        left, right = range(2)
-        self.lPhotoBox.setPixmap(QPixmap(SLIDER_PIXMAPS[left]))
-        self.rPhotoBox.setPixmap(QPixmap(SLIDER_PIXMAPS[right]))
+        left, right = [QPixmap(md_path(p)) for p in SLIDER_PIXMAPS]
+        self.lPhotoBox.setPixmap(left)
+        self.rPhotoBox.setPixmap(right)
         if GAME[1] == 'ord':
             self.slider = TwoValSlider()
         else:
@@ -539,7 +538,7 @@ class FullBox(QDialog):
     
     def buildGame(self):
         self.whiteBox = WhiteBox()
-        self.introWdg = IntroWidget(pixpath=INTRO_PIXMAP)
+        self.introWdg = IntroWidget(pixpath=md_path(INTRO_PIXMAP))
         self.slayout= QStackedLayout()
         self.slayout.dic = self.makeStckDic('pract',
                                             'ready',
