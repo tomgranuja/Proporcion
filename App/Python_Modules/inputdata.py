@@ -1,33 +1,43 @@
 #!/usr/bin/python3 -tt
 #-*- coding:utf-8 -*-
 
-from os import listdir as os_listdir
+import os
 
-def pull_dir_data(dir_path):
+#INPUT_DIR = os.path.join(os.path.dirname(__file__), '../Media/Dots')
+#INPUT_DIR = os.path.join(os.path.relpath(os.path.dirname(__file__)), '../Inputs')
+INPUT_DIR = '../Inputs'
+
+def rel_path(dname, fname=None):
+    '''Convert dirname and fname to relative path using INPUT_DIR.'''
+    mod_dir = os.path.dirname(__file__)
+    path_list = [ p for p in [dname, fname] if p is not None ]
+    path = os.path.join(mod_dir, INPUT_DIR, *path_list)
+    return os.path.relpath(path)
+
+def pull_dir_data(dir_name):
     '''filtered string from txt file in dir.'''
     SUFF_LIST = ['txt']
-    datafiles = [s for s in os_listdir(dir_path)
+    datafiles = [s for s in os.listdir(rel_path(dir_name))
                  if s.split('.')[-1].lower() in SUFF_LIST]
     if len(datafiles) != 1:
-        msg = '{} datafiles in {}.'.format(len(datafiles), dir_path)
+        msg = '{} datafiles in {}.'.format(len(datafiles), dir_name)
         raise ValueError(msg)
-    data_path =  '{}/{}'.format(dir_path, datafiles[0])
-    with open(data_path) as f:
+    with open(rel_path(dir_name, datafiles[0])) as f:
         datalines = [ s for s in f.read().splitlines()
                      if s.strip() != '' and s[0] not in ['%', '#']]
         return '\n'.join(datalines)
 
-def images_in_dir(dir_path):
+def images_in_dir(dir_name):
     '''Sorted list of images paths in dir_path.'''
     SUFF_LIST = ['bmp', 'jpg', 'jpeg', 'png']
-    images = ['{}/{}'.format(dir_path, s) for s in os_listdir(dir_path)
+    images = [rel_path(dir_name, s) for s in os.listdir(rel_path(dir_name))
               if s.split('.')[-1].lower() in SUFF_LIST]
     return sorted(images)
 
-def data_and_image_str(data_dir):
+def data_and_image_str(data_dir_name):
     '''Append image paths to data in dir.'''
-    ipaths = images_in_dir(data_dir)
-    datalines = [ s for s in pull_dir_data(data_dir).splitlines() ]
+    ipaths = images_in_dir(data_dir_name)
+    datalines = [ s for s in pull_dir_data(data_dir_name).splitlines() ]
     if len(ipaths) != len(datalines):
         msg = '{} images and {} data lines.'.format(
                len(ipaths), len(datalines))
@@ -454,8 +464,8 @@ dbgPractice = cPractice[19:]
 
 
 ##########Inputs test for bars and dots.#############################
+
+
 if __name__ == "__main__":
-    MEDIA_DIR = '../Media'
-    dbg_dire = '{}/{}'.format(MEDIA_DIR, 'Dots')
-    dots_example = data_and_image_str(dbg_dire)
-    print(dots_example)
+    input_str = data_and_image_str('session_01')
+    print(input_str)

@@ -11,9 +11,8 @@ MEDIA_DIR = '../Media'
 GAME      = ('dots', 'prop')
 #Available games:
 #  ('bars', 'ord'), ('bars', 'ord'), ('dots', 'prop'), ('dots', 'ord')
-INPUT_DIR = '../Media/Dots'
-PRACTICE_STR = inputdata.data_and_image_str(INPUT_DIR)
-EXP_STR = inputdata.data_and_image_str(INPUT_DIR)
+PRACTICE_STR = ''
+EXP_STR = inputdata.data_and_image_str('session_02')
 #PRACTICE_STR = inputdata.tPractice
 #EXP_STR = inputdata.pull_dir_data(INPUT_DIR)
 PRACTICE_ERRORS = (0.15, 0.05)
