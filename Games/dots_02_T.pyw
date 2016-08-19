@@ -9,15 +9,14 @@ sys.path.append(MOD_DIR)
 import fscreengame, inputdata
 
 ###########Configuración de la sesión##########################
-SESSION          = 1
-GAME             = ('bars', 'ord')
-TEST_ERRORS      = (0.0, 0.05) ##Tamaño del feedback
+SESSION          = 2
+GAME             = ('dots', 'prop')
+TEST_ERRORS      = (0.15, 0.05) ##Tamaño del feedback
 INTRO_PIXMAP     = 'intro_sesion1.png' ##Imagen de intro
-SLIDER_PIXMAPS   = ['agua.png','d_sesion1.png'] ##Extremos
+SLIDER_PIXMAPS   = ['i_sesion1.png','d_sesion1.png'] ##Extremos
 FRUIT_BAR_RGB    = (254,0,0)   ##Color rgb de la barra
-EXP_STR          = inputdata.c_Exp_01 ##Estímulos de experimento
+EXP_STR          = inputdata.data_and_image_str('session_02')
 PRACTICE_STR     = ''
-PRACTICE_STR     = inputdata.tPractice
 STIM_TIME        = [5000]
 PARCIALS_TIME    = [4000]
 FB_TIME          = [2000]

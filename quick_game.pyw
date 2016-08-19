@@ -10,22 +10,13 @@ import fscreengame, inputdata, tsequence
 
 tsequence.TEST_PARTIALS       = [4,10]
 tsequence.TEST_PAUSES         = [6]
-MEDIA_DIR                     = 'App/Media'
+fscreengame.GAME              = ('bars', 'prop')
 fscreengame.PRACTICE_STR      = ''
 fscreengame.EXP_STR           = inputdata.dbg_sesion01
-fscreengame.filelogger.LOGDIR = 'Logger'
-
-path = 'intro_sesion1.png'
-fscreengame.INTRO_PIXMAP      = '{}/{}'.format(MEDIA_DIR, path)
-path = ['i_sesion1.png','d_sesion1.png']
-fscreengame.SLIDER_PIXMAPS    = ['{}/{}'.format(MEDIA_DIR, p) 
-                                 for p in path ]
-path = ['bad.png', 'good.png', 'excelent.png']
-fscreengame.PARCIALS_PIXMAPS  = ['{}/{}'.format(MEDIA_DIR, p) 
-                                 for p in path ]
-path = ['bad_short.wav','good.wav', 'excelent.wav']
-fscreengame.FB_WAVS           = ['{}/{}'.format(MEDIA_DIR, p) 
-                                 for p in path ]
+#fscreengame.INTRO_PIXMAP      = 'intro_sesion1.png'
+#fscreengame.SLIDER_PIXMAPS    = ['i_sesion1.png','d_sesion1.png']
+#fscreengame.PARCIALS_PIXMAPS  = ['bad.png', 'good.png', 'excelent.png']
+#fscreengame.FB_WAVS = ['bad_short.wav','good.wav', 'excelent.wav']
 
 class QuickSequence(tsequence.Sequence):
     def createSequence(self,toSection = None, toFrame = None):
