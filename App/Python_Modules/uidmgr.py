@@ -24,6 +24,17 @@ def isValidUid(chars, length=LENGTH, pool=POOL):
         else:
             test = True
     return test
+
+def isValidName(chars):
+    test = False
+    if chars:
+        for c in chars:
+            if c != ' ':
+                if not c.isalpha():
+                    break
+        else:
+            test = True
+    return test
             
 
 def nextSessionId(current=None):

@@ -488,7 +488,7 @@ class UserChooser(QDialog):
     def __init__(self, parent=None):
         super(UserChooser, self).__init__(parent)
         self.label    = QLabel("Identificación")
-        self.lineEdit = QLineEdit('ABC')
+        self.lineEdit = QLineEdit('apellido nombre')
         buttonBox = QDialogButtonBox(QDialogButtonBox.Ok |
                                           QDialogButtonBox.Cancel)
         layout = QVBoxLayout()
@@ -504,12 +504,12 @@ class UserChooser(QDialog):
     
     def accept(self):
         userUpperText = self.lineEdit.text().upper()
-        validation = uidmgr.isValidUid(userUpperText)
+        validation = uidmgr.isValidName(userUpperText)
         if validation:
             self.choosenUid = userUpperText
             QDialog.accept(self)
         else:
-            self.label.setText("¡¡Uid inválida!!")
+            self.label.setText("¡¡Nombre inválido!!")
             self.lineEdit.selectAll()
             self.lineEdit.setFocus()
             return
