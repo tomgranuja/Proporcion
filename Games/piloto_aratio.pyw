@@ -10,13 +10,13 @@ import fscreengame, inputdata
 
 ###########Configuración de la sesión##########################
 SESSION          = 2
-GAME             = ('bars', 'prop')
+GAME             = ('dots', 'prop')
 TEST_ERRORS      = (0.15, 0.05) ##Tamaño del feedback
 INTRO_PIXMAP     = 'intro_sesion1.png' ##Imagen de intro
 SLIDER_PIXMAPS   = ['i_sesion1.png','d_sesion1.png'] ##Extremos
 FRUIT_BAR_RGB    = (254,0,0)   ##Color rgb de la barra
-EXP_STR          = inputdata.pull_dir_data('session_02')
-PRACTICE_STR     = ''
+EXP_STR          = inputdata.a4col_data_img('session_prueba')
+PRACTICE_STR     = inputdata.a4col_data_img('session_practice')
 STIM_TIME        = [5000]
 PARCIALS_TIME    = [4000]
 FB_TIME          = [2000]

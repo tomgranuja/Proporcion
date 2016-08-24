@@ -11,7 +11,7 @@ GAME      = ('dots', 'prop')
 #Available games:
 #  ('bars', 'ord'), ('bars', 'ord'), ('dots', 'prop'), ('dots', 'ord')
 PRACTICE_STR = ''
-EXP_STR = inputdata.data_and_image_str('session_02')
+EXP_STR = inputdata.data_img('session_02')
 #PRACTICE_STR = inputdata.tPractice
 #EXP_STR = inputdata.pull_dir_data(INPUT_DIR)
 PRACTICE_ERRORS = (0.15, 0.05)

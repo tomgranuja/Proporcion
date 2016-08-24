@@ -2,6 +2,7 @@
 #-*- coding:utf-8 -*-
 
 import os
+from functools import partial
 
 #INPUT_DIR = os.path.join(os.path.dirname(__file__), '../Media/Dots')
 #INPUT_DIR = os.path.join(os.path.relpath(os.path.dirname(__file__)), '../Inputs')
@@ -14,8 +15,8 @@ def rel_path(dname, fname=None):
     path = os.path.join(mod_dir, INPUT_DIR, *path_list)
     return os.path.relpath(path)
 
-def pull_dir_data(dir_name):
-    '''filtered string from txt file in dir.'''
+def pull_dir_data(dir_name, rcol=0, scol=1, wcol=2):
+    '''Filtered col string from txt file in dir.'''
     SUFF_LIST = ['txt']
     datafiles = [s for s in os.listdir(rel_path(dir_name))
                  if s.split('.')[-1].lower() in SUFF_LIST]
@@ -23,8 +24,12 @@ def pull_dir_data(dir_name):
         msg = '{} datafiles in {}.'.format(len(datafiles), dir_name)
         raise ValueError(msg)
     with open(rel_path(dir_name, datafiles[0])) as f:
-        datalines = [ s for s in f.read().splitlines()
-                     if s.strip() != '' and s[0] not in ['%', '#']]
+        validlines = [ s for s in f.read().splitlines()
+                       if s.strip() != '' and s[0] not in ['%', '#']]
+        colt = (rcol, scol, wcol)
+        datacols = [ [ s.split()[col] for col in colt ]
+                    for s in validlines ]
+        datalines = [ '{} {} {}'.format(*t) for t in datacols ]
         return '\n'.join(datalines)
 
 def images_in_dir(dir_name):
@@ -34,16 +39,24 @@ def images_in_dir(dir_name):
               if s.split('.')[-1].lower() in SUFF_LIST]
     return sorted(images)
 
-def data_and_image_str(data_dir_name):
+def data_and_image_str(data_dir_name, rcol=0, scol=1, wcol=2):
     '''Append image paths to data in dir.'''
+    colt = (rcol, scol, wcol)
+    datalines = pull_dir_data(data_dir_name, *colt).splitlines()
     ipaths = images_in_dir(data_dir_name)
-    datalines = [ s for s in pull_dir_data(data_dir_name).splitlines() ]
     if len(ipaths) != len(datalines):
         msg = '{} images and {} data lines.'.format(
                len(ipaths), len(datalines))
         raise ValueError(msg)
     data = ['{} {}'.format(d,i) for d,i in zip(datalines, ipaths)]
     return '\n'.join(data)
+
+data            = partial(pull_dir_data)
+data_img        = partial(data_and_image_str)
+n4col_data      = partial(pull_dir_data, rcol=0, scol=2, wcol=3)
+a4col_data      = partial(pull_dir_data, rcol=1, scol=2, wcol=3)
+n4col_data_img  = partial(data_and_image_str, rcol=0, scol=2, wcol=3)
+a4col_data_img  = partial(data_and_image_str, rcol=1, scol=2, wcol=3)
 
 ##########Inputs obsoletos (ratio, downscaling, width)##########
 tPractice = '''
