@@ -66,6 +66,12 @@ class CustomRateWidget(QWidget):
     def sizeHint(self):
         return QSize(self.WIDTH, self.HEIGHT)
 
+    def setTheBackground(self,r,g,b):
+        p = self.palette()
+        p.setColor(self.backgroundRole(), QColor(r,g,b))
+        self.setPalette(p)
+        self.setAutoFillBackground(True)
+
 class BarsBox(CustomRateWidget):
     WIDTH  = 2 * 0.1875 * CustomRateWidget.REF_WIDTH
     HEIGHT = 0.7188 * CustomRateWidget.REF_HEIGHT
@@ -135,9 +141,7 @@ class RestBox(CustomRateWidget):
         self.WIDTH  = parent.WIDTH
         self.HEIGHT = parent.HEIGHT
         p = self.palette()
-        p.setColor(self.backgroundRole(), Qt.white)
-        self.setPalette(p)
-        self.setAutoFillBackground(True)
+        self.setTheBackground(255,255,255)
 
 class Slider(CustomRateWidget):
     WIDTH  = 0.6875 * CustomRateWidget.REF_WIDTH
@@ -328,10 +332,7 @@ class CheckWidget(CustomRateWidget):
 class PartialWidget(CustomRateWidget):
     def __init__(self, parent=None):
         super(PartialWidget, self).__init__(parent)
-        p = self.palette()
-        p.setColor(self.backgroundRole(), QColor(255,255,255))
-        self.setPalette(p)
-        self.setAutoFillBackground(True)
+        self.setTheBackground(255,255,255)
         self.greenBorder = QRect(self.xFromRate(0.5/4),
                                  self.yFromRate(0.5),
                                  self.wFromRate(0.5/3),
@@ -393,10 +394,7 @@ class RefreshWidget(CustomRateWidget):
     #HEIGHT = 660
     def __init__(self, wdgType=None, parent=None):
         super(RefreshWidget, self).__init__(parent)
-        p = self.palette()
-        p.setColor(self.backgroundRole(), QColor(179,179,179))
-        self.setPalette(p)
-        self.setAutoFillBackground(True)
+        self.setTheBackground(179,179,179)
         self.setType = {
           'pract': partial(self.setMsgWdg,'¡Vamos a practicar!'),
           'ready':      partial(self.setMsgWdg,'¿Estás listo?'),
@@ -443,10 +441,7 @@ class WhiteBox(CustomRateWidget):
     #HEIGHT = 660
     def __init__(self, parent=None):
         super(WhiteBox, self).__init__(parent)
-        p = self.palette()
-        p.setColor(self.backgroundRole(), Qt.white)
-        self.setPalette(p)
-        self.setAutoFillBackground(True)
+        self.setTheBackground(255,255,255)
         layout = QVBoxLayout()
         layout.addLayout(self.stimBoxLayout())
         layout.addStretch()
@@ -517,18 +512,12 @@ class UserChooser(QDialog):
 class FullBox(QDialog):
     def __init__(self, parent=None):
         super(FullBox, self).__init__(parent)
-        self.setTheBackground(179,179,179)
+        CustomRateWidget.setTheBackground(self,179,179,179)
         self.setUserSession()
         if self.userUid:
             print("Construyendo juego para {}".format(self.userUid))
             self.buildGame()
 
-    def setTheBackground(self,r,g,b):
-        p = self.palette()
-        p.setColor(self.backgroundRole(), QColor(r,g,b))
-        self.setPalette(p)
-        self.setAutoFillBackground(True)
-        
     def setUserSession(self):
         dialog = UserChooser(self)
         self.userUid = None
