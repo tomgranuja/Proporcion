@@ -30,6 +30,7 @@ PARCIALS_PIXMAPS = ['bad.png', 'good.png', 'excelent.png']
 FB_WAVS          = ['bad_short.wav','good.wav', 'excelent.wav']
 TWO_VALS         = [0.15, 0.85]
 SESSION          = 1
+INNER_BG_COLOR   = (128, 128, 128)
 
 def md_path(fname):
     '''Convert fname to relative path using MEDIA_DIR.'''
@@ -141,7 +142,7 @@ class RestBox(CustomRateWidget):
         self.WIDTH  = parent.WIDTH
         self.HEIGHT = parent.HEIGHT
         p = self.palette()
-        self.setTheBackground(255,255,255)
+        self.setTheBackground(*INNER_BG_COLOR)
 
 class Slider(CustomRateWidget):
     WIDTH  = 0.6875 * CustomRateWidget.REF_WIDTH
@@ -441,7 +442,7 @@ class WhiteBox(CustomRateWidget):
     #HEIGHT = 660
     def __init__(self, parent=None):
         super(WhiteBox, self).__init__(parent)
-        self.setTheBackground(255,255,255)
+        self.setTheBackground(*INNER_BG_COLOR)
         layout = QVBoxLayout()
         layout.addLayout(self.stimBoxLayout())
         layout.addStretch()

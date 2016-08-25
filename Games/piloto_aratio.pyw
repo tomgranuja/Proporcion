@@ -28,6 +28,7 @@ FB_WAVS          = ['bad_short.wav','good.wav', 'excelent.wav']
 TWO_VALS         = [0.01, 0.99]
 TEST_PARTIALS    = range(9,36,9)
 PRACTICE_ERRORS  = TEST_ERRORS
+INNER_BG_COLOR   = (128,128,128)
 ################################################################
 
 def makeConfChanges():
@@ -49,6 +50,7 @@ def makeConfChanges():
     fscreengame.SLIDER_PIXMAPS   = SLIDER_PIXMAPS
     fscreengame.PARCIALS_PIXMAPS = PARCIALS_PIXMAPS
     fscreengame.FB_WAVS          = FB_WAVS
+    fscreengame.INNER_BG_COLOR   = INNER_BG_COLOR
     fscreengame.tsequence.TEST_PARTIALS = TEST_PARTIALS
 
 if __name__ == "__main__":
