@@ -82,7 +82,10 @@ There are six parameters for defining different times in milliseconds:
 
 ## Motivation
 
-Proporcion is intended for testing a brief training method that could help children in their understanding of rational numbers. Please do not consider this game as an educational tool yet. The present version is a pilot version, and is currently being tested for educational purposes. Our hope is to continue developing this software in parallel with the basic research that supports it.
+Proporcion is intended for testing a brief training method that could help children in their understanding of rational numbers. Please do not consider this game as an educational tool yet. The present version is a pilot version, and is currently being tested for educational purposes [(Gouet et al., 2020)](https://www.sciencedirect.com/science/article/abs/pii/S0010027719303282). Our hope is to continue developing this software in parallel with the basic research that supports it.
+
+>Gouet, C., Carvajal, S., Halberda, J., & Peña, M. (2020). Training nonsymbolic proportional reasoning in children and its effects on their symbolic math abilities. *Cognition* 197, [10.1016/j.cognition.2019.104154](https://doi.org/10.1016/j.cognition.2019.104154)
+
 
 ## Installation
 
