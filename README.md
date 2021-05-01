@@ -51,7 +51,7 @@ You can see the string format as three blank separated values separated by line 
 0.43 1.5 0.5...
 ```
 
-The first column is the ratio (0 to 1), the second is the maximum height downscaling factor (1/height) and the third is the width factor.
+The first column is the proportion stimuli (0 to 1). The second column is the scaling factor (i.e. ratio between the width of the response line to the height of the reference column) for example a scaling factor of 4 means that the vertical stimuli bar has a total height of a quarter (1/4) of the horizontal response line. The third column is the width factor (i.e. the width of the reference column).
 
 ### Performance feedback
 
